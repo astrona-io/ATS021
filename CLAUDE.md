@@ -423,6 +423,16 @@ authorization policies all match on the service account. Never use the
   - `podinfo`'s image user is the name `app` (ID `100`): `runAsNonRoot: true`
     needs `runAsUser: 100`, or the kubelet refuses with
     `CreateContainerConfigError`.
+  - ValidatingAdmissionPolicy on 1.35.8: `kubectl scale` goes through the
+    `deployments/scale` subresource, so a replica rule must list
+    `deployments/scale` too (the `Scale` object has `spec.replicas`). No
+    short names (`vap` does not exist). A binding with both `Deny` and `Warn`
+    is rejected. Reading a missing map key (`labels.team`) is a runtime error
+    that denies under `failurePolicy: Fail`; guard with `has()`. Type errors
+    go to `status.typeChecking`, syntax errors reject the policy. In the
+    first API server run of one playground, edits to a params ConfigMap were
+    never picked up until the API server restarted; after a restart they
+    applied at once. **Not explained.**
 - **The image tag of go-httpbin has no `v`.** It is
   `mccutchen/go-httpbin:2.25.0`; `v2.25.0` does not exist on Docker Hub.
   Verified 2026-10-10.

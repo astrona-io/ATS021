@@ -202,3 +202,19 @@ modules:
       - type: reading
         title: Summary
         path: sections/section-030/module-02/course-04-summary.md
+
+      - type: reading
+        title: "Write ValidatingAdmissionPolicies With CEL"
+        path: sections/section-030/module-03/course.md
+      - type: reading
+        title: "Policies And CEL Expressions"
+        path: sections/section-030/module-03/course-01-policies-and-cel-expressions.md
+      - type: reading
+        title: "Bindings, Params And Validation Actions"
+        path: sections/section-030/module-03/course-02-bindings-params-and-validation-actions.md
+      - type: reading
+        title: "Choosing The Right Tool"
+        path: sections/section-030/module-03/course-03-choosing-the-right-tool.md
+      - type: reading
+        title: Summary
+        path: sections/section-030/module-03/course-04-summary.md

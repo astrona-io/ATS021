@@ -394,6 +394,35 @@ authorization policies all match on the service account. Never use the
 - **The kind node container is `astro-<metadata.name>-control-plane`.**
   For example `astro-ats-021-playground-040-01-control-plane`; reach it with
   `podman exec` or `docker exec`. Verified 2026-10-10.
+- **Verified on the pinned versions (2026-10-10):**
+  - Istio 1.31.1 installs with `istioctl install --set profile=minimal -y`;
+    `istio-proxy` is a native sidecar under `initContainers`. Policy changes
+    reach the sidecars within a few seconds; checks right after an apply can
+    still show the old result. A DENY rule with only HTTP fields prints a
+    warning that it also denies TCP traffic. AuthorizationPolicy `paths` match
+    exactly (`/env` does not match `/env/`).
+  - Linkerd edge-26.10.1 installs with Gateway API CRDs v1.4.0 first. Policy
+    API versions: `Server` `policy.linkerd.io/v1beta3`, `AuthorizationPolicy`
+    and `MeshTLSAuthentication` `v1alpha1`. A Server with no
+    AuthorizationPolicy denies everyone (`ACCESS POLICY deny`). The
+    `config.linkerd.io/default-inbound-policy` annotation takes effect only
+    after the workload restarts. A refused request gets `403` with an empty
+    body.
+  - Kyverno 1.19.1 installs from
+    `https://github.com/kyverno/kyverno/releases/download/v1.19.1/install.yaml`
+    (`kubectl create`). Every `kyverno.io/v1` ClusterPolicy apply prints a
+    deprecation warning (migrate to `policies.kyverno.io` kinds). Rules use
+    `validate.failureAction`. PolicyExceptions are off by default
+    (`--enablePolicyException=false` on the admission, background and reports
+    controllers). Setting the flag to `true` with a JSON patch did not make an
+    exception take effect in the playground; **not solved**, so the course
+    teaches only that exceptions are off and how to check.
+  - `view` already allows EndpointSlices, NetworkPolicies and Ingresses on
+    1.35; it does not allow Leases. A ServiceAccount subject without
+    `namespace` in a RoleBinding defaults to the binding's namespace.
+  - `podinfo`'s image user is the name `app` (ID `100`): `runAsNonRoot: true`
+    needs `runAsUser: 100`, or the kubelet refuses with
+    `CreateContainerConfigError`.
 - **The image tag of go-httpbin has no `v`.** It is
   `mccutchen/go-httpbin:2.25.0`; `v2.25.0` does not exist on Docker Hub.
   Verified 2026-10-10.

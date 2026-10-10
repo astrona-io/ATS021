@@ -174,56 +174,15 @@ modules:
       - type: reading
         title: "Validate, Mutate And Generate With Kyverno"
         path: sections/section-030/module-01/course.md
-
       - type: reading
-        title: "Enforce Constraints With Gatekeeper And Rego"
-        path: sections/section-030/module-02/course.md
-
+        title: "Validate Rules And Admission"
+        path: sections/section-030/module-01/course-01-validate-rules-and-admission.md
       - type: reading
-        title: "Write ValidatingAdmissionPolicies With CEL"
-        path: sections/section-030/module-03/course.md
-
-  - id: module-040
-    title: "Audit Trails And Compliance Evidence"
-    description: >
-      Makes the reader able to produce the evidence a platform must
-      keep: who did what in the API (audit logs) and whether the cluster
-      meets its policies (Kyverno policy reports and Gatekeeper audit
-      results). It follows the policy section because the policy engines
-      are the compliance sources.
-
-    content:
+        title: "Enforce, Audit And Policy Reports"
+        path: sections/section-030/module-01/course-02-enforce-audit-and-policy-reports.md
       - type: reading
-        title: Section Overview
-        path: sections/section-040/README.md
-
+        title: "Mutate And Generate Rules"
+        path: sections/section-030/module-01/course-03-mutate-and-generate-rules.md
       - type: reading
-        title: "Record API Activity With Audit Logging"
-        path: sections/section-040/module-01/course.md
-
-      - type: reading
-        title: "Produce Compliance Reports From Policy Engines"
-        path: sections/section-040/module-02/course.md
-
-  - id: module-050
-    title: "Security Checks In The Delivery Pipeline"
-    description: >
-      Makes the reader able to stop non-compliant workloads before and
-      at the door of the cluster: a compliance check Task that gates a
-      Tekton pipeline, and admission-time image policies that accept only
-      trusted, pinned images. It comes last because it reuses everything
-      earlier: service accounts and RBAC for the pipeline, and Kyverno and
-      Gatekeeper for the checks.
-
-    content:
-      - type: reading
-        title: Section Overview
-        path: sections/section-050/README.md
-
-      - type: reading
-        title: "Gate A Tekton Pipeline On A Compliance Check"
-        path: sections/section-050/module-01/course.md
-
-      - type: reading
-        title: "Admit Only Trusted Images"
-        path: sections/section-050/module-02/course.md
+        title: Summary
+        path: sections/section-030/module-01/course-04-summary.md

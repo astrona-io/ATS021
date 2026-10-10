@@ -1,39 +1,27 @@
 # Enforce Constraints With Gatekeeper And Rego
 
-<!-- astrona:playground -->
-> [!NOTE]
-> This module has a playground — a throwaway environment to run the commands in.
-> ```bash
-> astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-02/playground
-> ```
+Kyverno lets you write many platform rules as YAML patterns. Gatekeeper takes a different path: it uses Open Policy Agent, or OPA, to evaluate Rego policy code during admission. Rego is OPA's policy language. In Gatekeeper, you put that Rego code in a Kubernetes resource, and Gatekeeper calls OPA when the API server asks whether an object is allowed.
 
-<!-- TODO(build): opening framing — what this module settles, and the contrast that sharpens its boundary. -->
+Keep one sentence in mind for this module: **a ConstraintTemplate defines a new constraint kind, and each Constraint configures where that rule applies.** You will create a template that requires labels, create a constraint from it, change the constraint between `deny`, `dryrun` and `warn`, and read both audit results and template compile errors.
+
+The module has three parts. **ConstraintTemplates And Rego** creates a new constraint kind and explains the small Rego rule inside it. **Constraints And Enforcement Actions** applies that kind to pods in one namespace and proves the difference between `deny`, `dryrun` and `warn`. **Audit Status And Template Errors** reads the audit results for existing pods and finds the compile error in a broken template.
 
 ## Learning objectives
 
-- Write a ConstraintTemplate with a Rego violation rule and the parameter schema for its constraint
-- Create a Constraint that applies the template to selected kinds and namespaces with parameters
-- Switch a Constraint between deny, dryrun and warn with enforcementAction
-- Read the audit results in a Constraint's status and list existing violations
-- Find the error in a ConstraintTemplate whose Rego does not compile from its status
+After this module you can:
+
+- Write a ConstraintTemplate with a Rego violation rule and the parameter schema for its constraint.
+- Create a Constraint that applies the template to selected kinds and namespaces with parameters.
+- Switch a Constraint between `deny`, `dryrun` and `warn` with `enforcementAction`.
+- Read the audit results in a Constraint's status and list existing violations.
+- Find the error in a ConstraintTemplate whose Rego does not compile from its status.
 
 ## Before you start
 
-<!-- TODO(build): assumed knowledge, and what the playground already provides. -->
+You need Kubernetes basics: pods, namespaces, labels, custom resources, admission controllers, and the commands `kubectl get` and `kubectl apply`. It helps to know that a CustomResourceDefinition creates a new Kubernetes resource kind.
 
-## Outline
+Your playground is a single-node `kind` cluster running Kubernetes 1.35 with **Gatekeeper 3.23.1** installed. Gatekeeper is the admission controller. OPA evaluates the Rego code inside Gatekeeper. The `starfleet` namespace has `scout`, `probe` and `shuttle`; `probe` has no `team` label on purpose. The `outpost` namespace has `drifter`, which uses the image tag `latest`. One broken ConstraintTemplate named `k8sbrokenlabels` already exists so you can read its status. No working ConstraintTemplate or Constraint exists yet.
 
-<!-- TODO(build): each beat below becomes a section of this module (or a deep-dive part via /astrona-course-deep-dive). Delete this Outline section once written. -->
+Launch your playground now, and keep it running next to you while you read the parts:
 
-- Gatekeeper and OPA; how a ConstraintTemplate creates a new resource kind
-- Rego basics needed for a violation rule: input.review.object, parameters, msg
-- Constraints: match, parameters, enforcementAction
-- Audit - reading totalViolations and violations in the constraint status
-
-## Diagrams planned
-
-<!-- TODO(build): mermaid `flowchart` — ConstraintTemplate creating a CRD, a Constraint of that kind, and the admission and audit paths that use it -->
-
-<!-- playground provides: kind cluster with Gatekeeper 3.23.1 installed by Helm, no Kyverno. Namespaces `starfleet` and `outpost` with the Starfleet workloads; `drifter` uses an image tag `latest` and `probe` has no `team` label, so audit finds violations once a constraint exists. One prepared ConstraintTemplate `k8sbrokenlabels` with a Rego syntax error (to read its status). No working ConstraintTemplate or Constraint yet. -->
-
-<!-- module section-030/module-02 (Module 2) — stub written by /astrona-course-domain-scaffold, prose written by /astrona-course-domain-build. -->
+<!-- astrona:playground -->

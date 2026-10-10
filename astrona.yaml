@@ -186,3 +186,19 @@ modules:
       - type: reading
         title: Summary
         path: sections/section-030/module-01/course-04-summary.md
+
+      - type: reading
+        title: "Enforce Constraints With Gatekeeper And Rego"
+        path: sections/section-030/module-02/course.md
+      - type: reading
+        title: "ConstraintTemplates And Rego"
+        path: sections/section-030/module-02/course-01-constrainttemplates-and-rego.md
+      - type: reading
+        title: "Constraints And Enforcement Actions"
+        path: sections/section-030/module-02/course-02-constraints-and-enforcement-actions.md
+      - type: reading
+        title: "Audit Status And Template Errors"
+        path: sections/section-030/module-02/course-03-audit-status-and-template-errors.md
+      - type: reading
+        title: Summary
+        path: sections/section-030/module-02/course-04-summary.md

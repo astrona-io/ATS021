@@ -79,13 +79,13 @@ items:
 - key: section-030/module-02/playground
   kind: playground
   what: 'playground for module 2: Enforce Constraints With Gatekeeper And Rego'
-  status: pending
-  note: ''
+  status: done
+  note: astrona CLI developer; Gatekeeper 3.23.1 from release manifest; booted and verified 2026-10-10
 - key: section-030/module-02/course
   kind: course
   what: 'chapter for module 2: Enforce Constraints With Gatekeeper And Rego'
-  status: pending
-  note: ''
+  status: done
+  note: landing + 3 parts + summary; real output; Rego syntax and broken template status verified
 - key: section-030/module-03/playground
   kind: playground
   what: 'playground for module 3: Write ValidatingAdmissionPolicies With CEL'

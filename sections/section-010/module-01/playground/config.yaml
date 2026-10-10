@@ -1,0 +1,44 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Grant Least-Privilege Access With RBAC (PLAYGROUND) — playground environment.
+# A clean sandbox: it starts, applies the Starfleet workloads and the access
+# control starting state, then stays running for free exploration. No task,
+# no grading, no `astrona submit`.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-playground-010-01
+  docs:
+    guide: docs/overview.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - ghcr.io/stefanprodan/podinfo:6.15.0
+      - mccutchen/go-httpbin:2.25.0
+      - curlimages/curl:8.22.0
+
+# What the learner starts with: the Starfleet workloads on their own service
+# accounts, a `ci-deployer` service account with no rights, and a
+# `legacy-agent` service account bound to cluster-admin (on purpose).
+bootstrap:
+  manifests:
+    - name: starfleet
+      type: file
+      source: manifests/starfleet.yaml
+    - name: access
+      type: file
+      source: manifests/access.yaml
+  waitFor:
+    - resource: deploy/scout
+      namespace: starfleet
+    - resource: deploy/probe
+      namespace: starfleet
+    - resource: deploy/shuttle
+      namespace: starfleet
+    - resource: deploy/drifter
+      namespace: outpost
+
+teardown:
+  keepCluster: false

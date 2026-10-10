@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Require Mutual TLS And Authorize Callers With Istio (PLAYGROUND) — playground
+# environment. A clean sandbox: it starts, installs Istio and the Starfleet
+# workloads, then stays running for free exploration. No task, no grading, no
+# `astrona submit`.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-playground-020-01
+  docs:
+    guide: docs/overview.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - ghcr.io/stefanprodan/podinfo:6.15.0
+      - mccutchen/go-httpbin:2.25.0
+      - curlimages/curl:8.22.0
+      - docker.io/istio/pilot:1.31.1
+      - docker.io/istio/proxyv2:1.31.1
+
+# What the learner starts with: Istio 1.31.1 (minimal profile, sidecar mode),
+# `starfleet` with sidecar injection and `scout`, `probe`, `shuttle`, and
+# `outpost` without injection running `drifter`. No PeerAuthentication and no
+# AuthorizationPolicy: the mesh is PERMISSIVE on purpose.
+bootstrap:
+  init:
+    - name: prepare
+      description: "Install istioctl 1.31.1 and the Istio control plane (minimal profile), then apply the Starfleet workloads"
+      type: file
+      source: bootstrap/prepare.sh
+
+teardown:
+  keepCluster: false

@@ -1,0 +1,492 @@
+# Curriculum blueprint — written by /astrona-course-domain-plan, consumed by
+# /astrona-course-domain-scaffold and /astrona-course-domain-build.
+#
+# This file is the design record for the course. Commit it. Edit it by hand and
+# re-run scaffold/build; both are idempotent and will not overwrite written prose.
+#
+# Schema: references/blueprint-schema.md in the astrona-course-domain-plan skill.
+
+version: 1
+mode: extend                    # astrona.yaml exists (module-intro only)
+
+course:
+  id: ATS021
+  title: "CNPE: Security and Policy Enforcement"
+  git_url: ssh://git@github.com/astrona-io/ATS021.git
+  description: >
+    Course material for the Security and Policy Enforcement domain of the
+    Certified Cloud Native Platform Engineer (CNPE) exam, 15% of the exam.
+    It teaches a platform engineer to lock down a Kubernetes platform from the
+    inside out: least-privilege access with RBAC and Pod Security Admission,
+    mutual TLS and authorization between workloads with Istio and Linkerd,
+    governance with Kyverno, Gatekeeper and ValidatingAdmissionPolicy, audit
+    trails and compliance evidence (API server audit logs, Kyverno policy
+    reports and Gatekeeper audit results), and compliance gates in a Tekton
+    delivery pipeline plus admission-time image policies. Every change is
+    proved on a live kind cluster by an admission decision or a real request.
+  certification:
+    name: Certified Cloud Native Platform Engineer
+    code: CNPE
+    provider: CNCF / Linux Foundation
+    domain: Security and Policy Enforcement
+    weight: 15
+  environment:
+    runtime: kind
+    kind: "v0.33.0"
+    kind_node_image: "kindest/node:v1.35.8"   # pinned via runtime.kind.image in config.yaml
+    istio: "1.31.1"
+    linkerd: "edge-26.10.1"
+    kyverno: "1.19.1"
+    gatekeeper: "3.23.1"
+    cert-manager: "1.21.2"                  # plumbing only, never a lesson subject
+    tekton-pipelines: "1.17.0"
+    tkn: "0.46.1"
+    kyverno-cli-image: "ghcr.io/kyverno/kyverno-cli:v1.19.1"   # step image in the Tekton check Task (plumbing)
+    podinfo: "6.15.0"
+    go-httpbin: "2.25.0"
+
+defaults:
+  playground: true
+  module_lab: false
+  capstone: true
+  section_quiz: true
+  final_quiz: true
+
+existing:
+  schema: v1                    # flat `modules:` manifest, like ATS016
+  sections: []                  # only module-intro (sections/intro) exists
+
+sections:
+
+  # ---------------------------------------------------------------------------
+  - id: section-010
+    title: Access Control For Platform Resources
+    curriculum_item: "Applying RBAC and Security Controls Across Platform Resources"
+    description: >
+      Makes the reader able to decide who may do what in the Kubernetes API and
+      what a pod may do on its node: least-privilege RBAC for users and service
+      accounts, and Pod Security Admission with a matching securityContext. It
+      comes first because every later section creates service accounts, binds
+      roles for controllers and depends on namespaces that admit only safe pods.
+    modules:
+      - id: module-01
+        title: Grant Least-Privilege Access With RBAC
+        objectives:
+          - Create a Role and RoleBinding that give a service account exactly the verbs it needs on one resource in one namespace
+          - Choose between Role and ClusterRole, and between RoleBinding and ClusterRoleBinding, for a given access requirement
+          - Check any permission for another identity with kubectl auth can-i --as, including --list
+          - Read a Forbidden error and name the missing verb, resource and API group
+          - Find and remove an over-broad binding such as cluster-admin given to a workload service account
+          - Extend a ClusterRole through aggregation labels instead of editing a built-in role
+        outline:
+          - The API request path - authentication, authorization, admission - and where RBAC sits
+          - "Rules: apiGroups, resources, resourceNames, verbs; Role versus ClusterRole"
+          - "Bindings and subjects: users, groups, service accounts (system:serviceaccount:<ns>:<name>)"
+          - Proving access with kubectl auth can-i and reading Forbidden errors
+          - Auditing existing bindings and fixing over-broad grants; aggregated ClusterRoles
+        diagrams:
+          - type: flowchart
+            shows: A request passing authentication, RBAC authorization and admission, with the deny exit at each step
+          - type: er
+            shows: Subject - RoleBinding/ClusterRoleBinding - Role/ClusterRole - rules, with the namespace scope of each
+        playground: true
+        playground_env: >
+          kind cluster, no extra tools. Namespaces `starfleet` and `outpost` with
+          the Starfleet workloads (`scout`, `probe`, `shuttle` in starfleet;
+          `drifter` in outpost), each on its own service account. A `ci-deployer`
+          service account in `starfleet` with no permissions yet (the reader
+          grants them), and a `legacy-agent` service account bound to
+          `cluster-admin` by a ClusterRoleBinding (the over-broad grant to find).
+          A kubeconfig user `dev-anna` (client certificate, group `developers`)
+          for --as checks. No Role or RoleBinding authored by the course yet.
+
+      - id: module-02
+        title: Restrict Pods With Pod Security Admission
+        objectives:
+          - Label a namespace to enforce, audit or warn at the baseline or restricted Pod Security Standards level
+          - Read a Pod Security Admission rejection and name each field that violates the level
+          - Write a securityContext (runAsNonRoot, allowPrivilegeEscalation, capabilities drop ALL, seccompProfile RuntimeDefault) that passes restricted
+          - Test a level change against existing workloads with a server-side dry run before enforcing it
+          - Explain why a Deployment is accepted while its pods are rejected, and find the error in the ReplicaSet events
+        outline:
+          - "The three Pod Security Standards levels and the three modes: enforce, audit, warn"
+          - Namespace labels, version pinning, and the dry-run check before a level change
+          - Pod and container securityContext fields that each level checks
+          - Fixing a rejected workload; where the rejection shows up for controllers (ReplicaSet events)
+        diagrams:
+          - type: flowchart
+            shows: Pod Security Admission deciding per mode - enforce rejects, audit writes an annotation, warn returns a warning
+        playground: true
+        playground_env: >
+          kind cluster, no extra tools. Namespace `starfleet` with no Pod Security
+          labels and the Starfleet workloads running; `scout` runs as root
+          without a securityContext. A `privileged-debug` Deployment in
+          `starfleet` with `privileged: true` and a hostPath mount (the pod
+          restricted must reject). Namespace `outpost` already labelled
+          `pod-security.kubernetes.io/enforce: baseline` for comparison. No
+          policy engine installed.
+
+    capstone:
+      title: Access Control For Platform Resources Capstone
+      objective: >
+        A new team namespace `orbit` must be onboarded. The reader gives the
+        team's `ci-deployer` service account only the rights to manage
+        Deployments and Services in `orbit`, removes an inherited cluster-admin
+        binding, enforces the restricted Pod Security level on `orbit`, and
+        fixes the team's Deployment so its pods are admitted. The grader checks
+        can-i answers for allowed and forbidden actions and that a privileged
+        pod is rejected while the fixed workload runs.
+
+  # ---------------------------------------------------------------------------
+  - id: section-020
+    title: Secure Service-To-Service Communication
+    curriculum_item: "Configuring Secure Service-to-Service Communication"
+    description: >
+      Makes the reader able to encrypt and authenticate traffic between
+      workloads and allow only named callers, with Istio (primary, full depth)
+      and Linkerd (compact). It follows access control because mesh identity
+      is built from the service accounts set up there, and it comes before
+      admission control because the policy engines later govern mesh objects.
+    modules:
+      - id: module-01
+        title: Require Mutual TLS And Authorize Callers With Istio
+        objectives:
+          - Name the SPIFFE identity a workload presents from its namespace and service account
+          - Switch a namespace from PERMISSIVE to STRICT mTLS with PeerAuthentication and prove plain-text traffic is refused
+          - Write an AuthorizationPolicy that allows only the shuttle service account to call scout with GET
+          - Read a 403 RBAC access denied response and name the policy and rule that decided it
+          - Order ALLOW, DENY and CUSTOM policies and predict the result when several match
+          - Find the workload whose sidecar is missing and so breaks STRICT mTLS
+        outline:
+          - Sidecar injection, workload certificates and the SPIFFE identity
+          - "PeerAuthentication modes: PERMISSIVE versus STRICT, mesh, namespace and workload scope"
+          - "Proving mTLS: a plain-text client outside the mesh, istioctl x describe"
+          - "AuthorizationPolicy: selector, from.source.principals, to.operation, action"
+          - Policy evaluation order and the default-deny pattern
+        diagrams:
+          - type: sequence
+            shows: shuttle to scout request through both sidecars - mTLS handshake, identity check, AuthorizationPolicy decision
+          - type: flowchart
+            shows: AuthorizationPolicy evaluation order - CUSTOM, DENY, ALLOW, default allow or deny
+        playground: true
+        playground_env: >
+          kind cluster with Istio 1.31.1 installed by istioctl (minimal or
+          default profile, sidecar mode), no Linkerd. Namespace `starfleet`
+          labelled for sidecar injection with `scout`, `probe` and `shuttle`
+          (each own service account). Namespace `outpost` without injection,
+          running `drifter` (the plain-text caller). Mesh starts in the default
+          PERMISSIVE mode with no PeerAuthentication and no AuthorizationPolicy,
+          so drifter can still reach scout at the start.
+
+      - id: module-02
+        title: Require Mutual TLS And Authorize Callers With Linkerd
+        objectives:
+          - Inject the Linkerd proxy into a namespace and confirm with linkerd viz edges or linkerd check that connections use mTLS
+          - Name the Linkerd identity of a workload from its service account
+          - Write a Server and an AuthorizationPolicy with a MeshTLSAuthentication that let only shuttle call scout
+          - Set a default inbound policy (all-unauthenticated, all-authenticated, deny) and predict who is refused
+          - Map each Linkerd resource to the Istio resource that does the same job
+        outline:
+          - Linkerd's automatic mTLS and identity, compared with Istio's
+          - "Default inbound policy annotations and what each value allows"
+          - "Server, AuthorizationPolicy, MeshTLSAuthentication: selecting a port and naming allowed identities"
+          - Proving the result from shuttle and drifter
+        diagrams:
+          - type: er
+            shows: Server - AuthorizationPolicy - MeshTLSAuthentication - ServiceAccount, and what each one selects
+        playground: true
+        playground_env: >
+          kind cluster with Linkerd edge-26.10.1 (CRDs, control plane and the
+          viz extension) installed by the linkerd CLI, no Istio. Namespace
+          `starfleet` annotated for proxy injection with `scout`, `probe` and
+          `shuttle`; namespace `outpost` without injection running `drifter`.
+          Default inbound policy left at all-unauthenticated, no Server or
+          AuthorizationPolicy yet, so drifter can reach scout at the start.
+        notes: >
+          Compact module (secondary tool of the pair). Linkerd's open-source
+          project publishes only edge releases; check the CRD API versions
+          (policy.linkerd.io) against edge-26.10.1 before writing YAML.
+
+    capstone:
+      title: Secure Service-To-Service Communication Capstone
+      objective: >
+        On an Istio mesh, the `starfleet` namespace must accept only mTLS
+        traffic, `scout` must answer only GET requests from `shuttle`, and
+        `probe` must be reachable only from inside `starfleet`. One workload
+        starts without a sidecar and must be fixed so it keeps working under
+        STRICT. The grader sends requests from shuttle, drifter and a
+        plain-text client and checks each answer.
+
+  # ---------------------------------------------------------------------------
+  - id: section-030
+    title: Governance With Policy Engines And Admission Control
+    curriculum_item: "Using Policy Engines and Admission Controllers for Governance"
+    description: >
+      Makes the reader able to enforce platform rules at admission time with
+      the three tools the exam uses: Kyverno, Gatekeeper (OPA and Rego) and the
+      built-in ValidatingAdmissionPolicy with CEL. It follows the mesh section
+      because the policies here govern objects from every earlier section, and
+      it comes before audit because policy reports are part of the compliance
+      evidence.
+    modules:
+      - id: module-01
+        title: Validate, Mutate And Generate With Kyverno
+        objectives:
+          - Write a validate rule that rejects pods without resource limits in selected namespaces
+          - Switch a policy between Enforce and Audit and read the effect in a PolicyReport
+          - Write a mutate rule that adds a default label or securityContext field to matching pods
+          - Write a generate rule that creates a default-deny NetworkPolicy in every new namespace
+          - Read a Kyverno admission rejection and name the policy and rule that blocked it
+          - Exempt one workload from a rule with a PolicyException instead of weakening the policy
+        outline:
+          - Kyverno as a validating and mutating webhook; ClusterPolicy versus Policy
+          - "Rule anatomy: match, exclude, validate pattern and deny conditions"
+          - Enforce versus Audit and reading PolicyReports
+          - Mutate and generate rules
+          - PolicyException for a documented exemption
+        diagrams:
+          - type: sequence
+            shows: kubectl apply through the API server to Kyverno's mutating then validating webhook and back
+          - type: flowchart
+            shows: One rule's match/exclude selection, then the validate decision, then Enforce versus Audit outcome
+        playground: true
+        playground_env: >
+          kind cluster with Kyverno 1.19.1 installed by Helm (admission,
+          background and reports controllers), webhooks ready. Namespaces
+          `starfleet` and `outpost` with the Starfleet workloads; `probe` has no
+          resource limits and `scout` has no `team` label (objects existing
+          policies will flag in background scans). No ClusterPolicy or
+          PolicyException yet.
+
+      - id: module-02
+        title: Enforce Constraints With Gatekeeper And Rego
+        objectives:
+          - Write a ConstraintTemplate with a Rego violation rule and the parameter schema for its constraint
+          - Create a Constraint that applies the template to selected kinds and namespaces with parameters
+          - Switch a Constraint between deny, dryrun and warn with enforcementAction
+          - Read the audit results in a Constraint's status and list existing violations
+          - Find the error in a ConstraintTemplate whose Rego does not compile from its status
+        outline:
+          - Gatekeeper and OPA; how a ConstraintTemplate creates a new resource kind
+          - "Rego basics needed for a violation rule: input.review.object, parameters, msg"
+          - "Constraints: match, parameters, enforcementAction"
+          - Audit - reading totalViolations and violations in the constraint status
+        diagrams:
+          - type: flowchart
+            shows: ConstraintTemplate creating a CRD, a Constraint of that kind, and the admission and audit paths that use it
+        playground: true
+        playground_env: >
+          kind cluster with Gatekeeper 3.23.1 installed by Helm, no Kyverno.
+          Namespaces `starfleet` and `outpost` with the Starfleet workloads;
+          `drifter` uses an image tag `latest` and `probe` has no `team` label,
+          so audit finds violations once a constraint exists. One prepared
+          ConstraintTemplate `k8sbrokenlabels` with a Rego syntax error (to read
+          its status). No working ConstraintTemplate or Constraint yet.
+
+      - id: module-03
+        title: Write ValidatingAdmissionPolicies With CEL
+        objectives:
+          - Write a ValidatingAdmissionPolicy with a CEL expression that limits Deployment replicas
+          - Bind it to selected namespaces with a ValidatingAdmissionPolicyBinding and choose Deny, Warn or Audit
+          - Pass a limit through a params resource instead of hard-coding it
+          - Choose between ValidatingAdmissionPolicy, Kyverno and Gatekeeper for a given rule and say why
+        outline:
+          - In-process admission with CEL and no webhook - what changes compared with Kyverno and Gatekeeper
+          - "CEL expressions: object, oldObject, request, messageExpression"
+          - "The binding: matchResources, paramRef, validationActions"
+          - Choosing the right tool for a rule
+        diagrams:
+          - type: flowchart
+            shows: ValidatingAdmissionPolicy, its binding and an optional params ConfigMap, and where each validationAction ends
+        playground: true
+        playground_env: >
+          kind cluster, no policy engine installed (the API server does the
+          work). Namespaces `starfleet` (labelled `environment: production`)
+          and `outpost` (labelled `environment: sandbox`) with the Starfleet
+          workloads; a `scout` Deployment scaled to 8 replicas so a replica
+          limit has something to reject. A ConfigMap `replica-limits` in
+          `starfleet` to use as params. No ValidatingAdmissionPolicy yet.
+
+    capstone:
+      title: Governance With Policy Engines And Admission Control Capstone
+      objective: >
+        A platform must enforce three rules: every pod in team namespaces has
+        CPU and memory limits (Kyverno, Enforce), no container uses the
+        `latest` tag (Gatekeeper constraint), and production Deployments have
+        at most five replicas (ValidatingAdmissionPolicy). One existing
+        workload needs a documented Kyverno PolicyException. The grader applies
+        objects that must be rejected and accepted for each rule and checks the
+        Gatekeeper audit and the PolicyReport.
+
+  # ---------------------------------------------------------------------------
+  - id: section-040
+    title: Audit Trails And Compliance Evidence
+    curriculum_item: "Generating Audit Trails and Enforcing Policy Compliance (SBOM, Compliance Reports, etc.)"
+    description: >
+      Makes the reader able to produce the evidence a platform must keep:
+      who did what in the API (audit logs) and whether the cluster meets its
+      policies (Kyverno policy reports and Gatekeeper audit results). It
+      follows the policy section because the policy engines are the
+      compliance sources.
+    modules:
+      - id: module-01
+        title: Record API Activity With Audit Logging
+        objectives:
+          - Write an audit policy that records Secret access at Metadata level, Deployment changes at RequestResponse and drops noisy read events
+          - Turn on audit logging by editing the kube-apiserver static pod manifest with the policy file, log path and volumes
+          - Confirm the API server restarted with the new flags and find the problem when it does not come back
+          - Find who deleted a Deployment, with which identity and when, in the audit log with jq
+          - Name the audit level and stage of a given event and say why a rule matched it
+        outline:
+          - What an audit event holds; levels and stages
+          - "Audit policy rules: first match wins, omitStages, levels per resource and user"
+          - Turning it on - the kube-apiserver static pod, flags, volumes, waiting for the restart
+          - Searching the log with jq for one action
+        diagrams:
+          - type: sequence
+            shows: One request through the API server and the audit events written at each stage
+          - type: flowchart
+            shows: Audit policy rule matching - first matching rule decides the level, otherwise None
+        playground: true
+        playground_env: >
+          kind cluster with no audit logging configured. Starfleet workloads in
+          `starfleet`. A background `CronJob` named `deck-cleaner` in `outpost`
+          running as service account `deck-cleaner` with rights to read Secrets
+          and delete Deployments in `starfleet`, which every few minutes reads a
+          Secret and deletes and recreates the `probe` Deployment (the activity
+          to find in the log). The reader opens a shell on the control plane
+          node container with docker exec or podman exec; `jq` is available on
+          the node or the reader copies the log out.
+        notes: >
+          astrona does not expose the kind cluster configuration, so the
+          kubeadmConfigPatches/extraMounts route in the kind docs cannot be
+          used. Verify at build: node container name, that editing
+          /etc/kubernetes/manifests/kube-apiserver.yaml restarts the API server
+          cleanly inside the playground, and whether jq exists on the node.
+
+      - id: module-02
+        title: Produce Compliance Reports From Policy Engines
+        objectives:
+          - Read a Kyverno PolicyReport and list which workloads fail which rule, with kubectl and with custom columns
+          - Read Gatekeeper audit results from a Constraint's status and name each violating object
+          - Pull the audit events for one compliance question (who changed a Deployment, who read a Secret) as evidence
+          - Choose which source answers a given auditor question (what breaks policy now, what changed, who did it)
+          - Explain why an Audit-mode policy and Gatekeeper audit report existing objects that admission never saw
+        outline:
+          - Compliance evidence a platform can produce without extra tools - policy reports, audit results, audit events
+          - Kyverno PolicyReports and ClusterPolicyReports - results, summary, background scans
+          - Gatekeeper audit - Constraint status, totalViolations, the audit interval and its limit
+          - Turning reports into one answer for an auditor
+        diagrams:
+          - type: flowchart
+            shows: Existing objects scanned by Kyverno background scan and Gatekeeper audit, plus API requests recorded as audit events, feeding three evidence sources
+        playground: true
+        playground_env: >
+          kind cluster with Kyverno 1.19.1 and Gatekeeper 3.23.1 installed.
+          Two Kyverno ClusterPolicies in Audit mode (require resource limits,
+          disallow the latest tag) and one Gatekeeper ConstraintTemplate with a
+          Constraint in dryrun enforcement (require an `owner` label on
+          Deployments), all already producing results. Starfleet workloads in
+          `starfleet`; `probe` has no limits and no `owner` label, and a
+          `legacy-beacon` Deployment uses an image with the `latest` tag (the
+          violations to find). API server audit logging already turned on by the
+          bootstrap with a short Metadata-level policy, so audit events exist to
+          read. No SBOM or vulnerability scanner.
+        notes: >
+          Official-tool rule (user, 2026-10-10): only CNPE-listed tools are
+          taught. Trivy, Syft and cosign are not on the list and do not appear.
+
+    capstone:
+      title: Audit Trails And Compliance Evidence Capstone
+      objective: >
+        An auditor asks three questions about the `starfleet` namespace: which
+        identity deleted a Deployment in the last hour, which workloads fail the
+        platform's Kyverno policies, and which objects violate the Gatekeeper
+        `owner` label constraint. The reader turns on audit logging with a given
+        policy, then writes each answer to a given file. The grader checks the
+        audit log, the answer files and that the answers match the live
+        reports.
+
+  # ---------------------------------------------------------------------------
+  - id: section-050
+    title: Security Checks In The Delivery Pipeline
+    curriculum_item: "Integrating Security Scanning and Compliance Checks into Deployment Pipelines"
+    description: >
+      Makes the reader able to stop non-compliant workloads before and at the
+      door of the cluster: a compliance check Task that gates a Tekton
+      pipeline, and admission-time image policies that accept only trusted,
+      pinned images. It comes last because it reuses everything earlier:
+      service accounts and RBAC for the pipeline, and Kyverno and Gatekeeper
+      for the checks.
+    modules:
+      - id: module-01
+        title: Gate A Tekton Pipeline On A Compliance Check
+        objectives:
+          - Write a Tekton Task whose step checks the release manifests against the platform's policies and writes the outcome to a Task result
+          - Stop the deploy Task with a when expression that reads the check Task's result
+          - Add a finally Task that always reports the outcome, even when the pipeline fails
+          - Run a PipelineRun and read why a Task failed or was skipped with tkn and kubectl
+          - Give the pipeline's service account only the rights its deploy step needs
+        outline:
+          - Tekton Task, Pipeline, PipelineRun; where steps run and what a step image is
+          - A compliance check step - the check is one step image, the Tekton parts are the subject
+          - Task results, when expressions and runAfter; skipped versus failed Tasks
+          - finally Tasks; reading a run; the pipeline service account
+        diagrams:
+          - type: flowchart
+            shows: PipelineRun with check Task, a when expression on its result, deploy Task, and a finally Task that runs on every path
+        playground: true
+        playground_env: >
+          kind cluster with Tekton Pipelines 1.17.0 and the tkn 0.46.1 CLI.
+          Namespace `pipelines` with service account `pipeline-runner` that can
+          create Deployments in `starfleet` only. A prepared deploy Task that
+          applies the `scout` Deployment from manifests in a ConfigMap. Two
+          manifest sets to try: a compliant `scout` release and a release
+          without resource limits that uses the `latest` tag. The check step
+          runs the Kyverno CLI image (ghcr.io/kyverno/kyverno-cli:v1.19.1)
+          against a platform policy file; the lesson treats it as one step
+          image, not a tool to learn. No check Task yet.
+        notes: >
+          Official-tool rule: the scanner or checker is a single step image;
+          teach Task results, when expressions and finally, not the checker's
+          CLI.
+
+      - id: module-02
+        title: Admit Only Trusted Images
+        objectives:
+          - Write a Kyverno ClusterPolicy that admits images only from approved registries
+          - Reject images with the latest tag or without a tag, and require images pinned by digest in production namespaces
+          - Write the same allowed-registry rule as a Gatekeeper ConstraintTemplate and Constraint
+          - Read each rejection message and prove the policy with one rejected and one accepted Deployment
+          - Explain why a tag can point at different content over time and a digest cannot
+        outline:
+          - Tags, digests and why an image reference is a supply chain decision
+          - Allowed registries with a Kyverno validate rule and with Gatekeeper
+          - Disallowing latest and requiring digests; applying rules per namespace
+          - Testing image policies with server-side dry runs
+        diagrams:
+          - type: sequence
+            shows: Deployment create through the API server to the policy webhook - image reference checked against registry, tag and digest rules, admit or reject
+        playground: true
+        playground_env: >
+          kind cluster with Kyverno 1.19.1 and Gatekeeper 3.23.1 installed,
+          no image policy yet. Namespaces `starfleet` and `starfleet-prod`.
+          podinfo 6.15.0 preloaded under its tag and known digest, plus a
+          `docker.io/library/nginx:latest` reference to try (preloaded). No
+          registry of its own and no signing tools.
+        notes: >
+          Official-tool rule: image signing with cosign is not on the CNPE
+          list and is dropped; the module teaches admission-time image policy
+          with the listed engines.
+
+    capstone:
+      title: Security Checks In The Delivery Pipeline Capstone
+      objective: >
+        The `starfleet` release pipeline must check the release manifests,
+        stop before deploying a non-compliant release, report the outcome in a
+        finally Task, and deploy a compliant one; the cluster must reject any
+        image in `starfleet-prod` that is not from the approved registry or not
+        pinned by digest. The reader completes the Tekton Pipeline and the
+        image policy. The grader runs the pipeline with a compliant and a
+        non-compliant release, checks which one is deployed, and checks that an
+        unpinned image is rejected.

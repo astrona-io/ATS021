@@ -1,0 +1,46 @@
+# A debug Deployment that breaks every Pod Security level except privileged:
+# a privileged container with the node's root file system mounted. It runs
+# today because `starfleet` has no Pod Security labels. It is there on purpose.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: privileged-debug
+  namespace: starfleet
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: privileged-debug
+  namespace: starfleet
+  labels:
+    app: privileged-debug
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: privileged-debug
+  template:
+    metadata:
+      labels:
+        app: privileged-debug
+    spec:
+      serviceAccountName: privileged-debug
+      containers:
+        - name: debug
+          image: curlimages/curl:8.22.0
+          command: ["sh", "-c", "while true; do sleep 30; done"]
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: host-root
+              mountPath: /host
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+            limits:
+              memory: 32Mi
+      volumes:
+        - name: host-root
+          hostPath:
+            path: /

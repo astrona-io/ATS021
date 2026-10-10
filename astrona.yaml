@@ -1,0 +1,208 @@
+# Course manifest for ATS021 - Security and Policy Enforcement (Certified Cloud Native Platform Engineer).
+#
+# One entry per section under `modules:`. Each section lists, in order: its
+# README, then for each module the landing page (course.md), its parts
+# (course-0N-*.md), and right after the part a lab tests, the lab's
+# question.md reading and the `type: lab` entry. The module's wrap-up page
+# comes last. The section capstone closes the section. Playgrounds are not
+# listed: the landing page's playground marker shows them. solution.md is
+# never listed.
+#
+# Every `path:` is relative to this file.
+
+training:
+  id: ATS021
+  title: "CNPE: Security and Policy Enforcement"
+  description: >
+    Training material covering the Certified Cloud Native Platform Engineer
+    (CNPE) Security and Policy Enforcement domain: least-privilege access
+    with RBAC and Pod Security Admission, mutual TLS and authorization
+    between workloads with Istio and Linkerd, governance with Kyverno,
+    Gatekeeper and ValidatingAdmissionPolicy, API server audit logs and
+    policy compliance reports, and compliance gates in a Tekton delivery
+    pipeline plus admission-time image policies. Each module pairs a
+    layered reader with an ungraded hands-on playground. Each section
+    closes with an integration capstone.
+    Targets Kubernetes 1.35, the version the CNPE exam runs.
+
+  certification:
+    name: Certified Cloud Native Platform Engineer
+    code: CNPE
+    provider: CNCF / Linux Foundation
+    domain: Security and Policy Enforcement
+    weight: 15
+    competencies:
+      - "Configuring Secure Service-to-Service Communication"
+      - "Applying RBAC and Security Controls Across Platform Resources"
+      - "Generating Audit Trails and Enforcing Policy Compliance (SBOM, Compliance Reports, and similar)"
+      - "Using Policy Engines and Admission Controllers for Governance"
+      - "Integrating Security Scanning and Compliance Checks into Deployment Pipelines"
+
+modules:
+
+  - id: module-intro
+    title: "Introduction"
+    description: >
+      Start here. What this course trains you to do, how it is laid out, how
+      to get your machine ready with the astrona command-line tool, how the
+      content is written and checked, who maintains it, and how to report a
+      mistake.
+
+    content:
+      - type: reading
+        title: Introduction
+        path: sections/intro/README.md
+      - type: reading
+        title: "Welcome To The Course"
+        path: sections/intro/course-01-welcome.md
+      - type: reading
+        title: "Get Your Machine Ready"
+        path: sections/intro/course-02-get-your-machine-ready.md
+      - type: reading
+        title: "How This Course Is Made"
+        path: sections/intro/course-03-how-this-course-is-made.md
+
+  - id: module-010
+    title: "Access Control For Platform Resources"
+    description: >
+      Makes the reader able to decide who may do what in the Kubernetes
+      API and what a pod may do on its node: least-privilege RBAC for
+      users and service accounts, and Pod Security Admission with a
+      matching securityContext. It comes first because every later
+      section creates service accounts, binds roles for controllers and
+      depends on namespaces that admit only safe pods.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-010/README.md
+
+      - type: reading
+        title: "Grant Least-Privilege Access With RBAC"
+        path: sections/section-010/module-01/course.md
+      - type: reading
+        title: "The Request Path And Role Rules"
+        path: sections/section-010/module-01/course-01-request-path-and-role-rules.md
+      - type: reading
+        title: "Bindings, Subjects And Scope"
+        path: sections/section-010/module-01/course-02-bindings-subjects-and-scope.md
+      - type: reading
+        title: "Proving And Debugging Access"
+        path: sections/section-010/module-01/course-03-proving-and-debugging-access.md
+      - type: reading
+        title: "Finding Over-Broad Grants And Extending Roles"
+        path: sections/section-010/module-01/course-04-over-broad-grants-and-aggregation.md
+      - type: reading
+        title: Summary
+        path: sections/section-010/module-01/course-05-summary.md
+
+      - type: reading
+        title: "Restrict Pods With Pod Security Admission"
+        path: sections/section-010/module-02/course.md
+      - type: reading
+        title: "Levels, Modes And Rejections"
+        path: sections/section-010/module-02/course-01-levels-modes-and-rejections.md
+      - type: reading
+        title: "Changing A Namespace Level Safely"
+        path: sections/section-010/module-02/course-02-changing-a-namespace-level.md
+      - type: reading
+        title: "A securityContext That Passes Restricted"
+        path: sections/section-010/module-02/course-03-securitycontext-for-restricted.md
+      - type: reading
+        title: Summary
+        path: sections/section-010/module-02/course-04-summary.md
+
+  - id: module-020
+    title: "Secure Service-To-Service Communication"
+    description: >
+      Makes the reader able to encrypt and authenticate traffic between
+      workloads and allow only named callers, with Istio (primary, full
+      depth) and Linkerd (compact). It follows access control because
+      mesh identity is built from the service accounts set up there, and
+      it comes before admission control because the policy engines later
+      govern mesh objects.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-020/README.md
+
+      - type: reading
+        title: "Require Mutual TLS And Authorize Callers With Istio"
+        path: sections/section-020/module-01/course.md
+
+      - type: reading
+        title: "Require Mutual TLS And Authorize Callers With Linkerd"
+        path: sections/section-020/module-02/course.md
+
+  - id: module-030
+    title: "Governance With Policy Engines And Admission Control"
+    description: >
+      Makes the reader able to enforce platform rules at admission time
+      with the three tools the exam uses: Kyverno, Gatekeeper (OPA and
+      Rego) and the built-in ValidatingAdmissionPolicy with CEL. It
+      follows the mesh section because the policies here govern objects
+      from every earlier section, and it comes before audit because
+      policy reports are part of the compliance evidence.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-030/README.md
+
+      - type: reading
+        title: "Validate, Mutate And Generate With Kyverno"
+        path: sections/section-030/module-01/course.md
+
+      - type: reading
+        title: "Enforce Constraints With Gatekeeper And Rego"
+        path: sections/section-030/module-02/course.md
+
+      - type: reading
+        title: "Write ValidatingAdmissionPolicies With CEL"
+        path: sections/section-030/module-03/course.md
+
+  - id: module-040
+    title: "Audit Trails And Compliance Evidence"
+    description: >
+      Makes the reader able to produce the evidence a platform must
+      keep: who did what in the API (audit logs) and whether the cluster
+      meets its policies (Kyverno policy reports and Gatekeeper audit
+      results). It follows the policy section because the policy engines
+      are the compliance sources.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-040/README.md
+
+      - type: reading
+        title: "Record API Activity With Audit Logging"
+        path: sections/section-040/module-01/course.md
+
+      - type: reading
+        title: "Produce Compliance Reports From Policy Engines"
+        path: sections/section-040/module-02/course.md
+
+  - id: module-050
+    title: "Security Checks In The Delivery Pipeline"
+    description: >
+      Makes the reader able to stop non-compliant workloads before and
+      at the door of the cluster: a compliance check Task that gates a
+      Tekton pipeline, and admission-time image policies that accept only
+      trusted, pinned images. It comes last because it reuses everything
+      earlier: service accounts and RBAC for the pipeline, and Kyverno and
+      Gatekeeper for the checks.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-050/README.md
+
+      - type: reading
+        title: "Gate A Tekton Pipeline On A Compliance Check"
+        path: sections/section-050/module-01/course.md
+
+      - type: reading
+        title: "Admit Only Trusted Images"
+        path: sections/section-050/module-02/course.md

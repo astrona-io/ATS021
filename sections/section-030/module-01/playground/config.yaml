@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Validate, Mutate And Generate With Kyverno (PLAYGROUND) — playground
+# environment. A clean sandbox: it starts, installs Kyverno and the Starfleet
+# workloads, then stays running for free exploration. No task, no grading, no
+# `astrona submit`.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-playground-030-01
+  docs:
+    guide: docs/overview.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - ghcr.io/stefanprodan/podinfo:6.15.0
+      - mccutchen/go-httpbin:2.25.0
+      - curlimages/curl:8.22.0
+
+# What the learner starts with: Kyverno 1.19.1 with its webhooks ready, and the
+# Starfleet workloads. `probe` has no resource limits and `scout` has no `team`
+# label, on purpose. No ClusterPolicy and no PolicyException.
+bootstrap:
+  init:
+    - name: prepare
+      description: "Install Kyverno 1.19.1 from its release manifest, wait for its webhooks, then apply the Starfleet workloads"
+      type: file
+      source: bootstrap/prepare.sh
+
+teardown:
+  keepCluster: false

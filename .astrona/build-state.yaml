@@ -37,23 +37,24 @@ items:
 - key: section-020/module-01/playground
   kind: playground
   what: 'playground for module 1: Require Mutual TLS And Authorize Callers With Istio'
-  status: pending
-  note: ''
+  status: done
+  note: astrona CLI developer; Istio 1.31.1 minimal; booted and verified 2026-10-10
 - key: section-020/module-01/course
   kind: course
   what: 'chapter for module 1: Require Mutual TLS And Authorize Callers With Istio'
-  status: pending
-  note: ''
+  status: done
+  note: landing + 3 parts + summary; real output; DENY TCP warning, exact path match captured
 - key: section-020/module-02/playground
   kind: playground
   what: 'playground for module 2: Require Mutual TLS And Authorize Callers With Linkerd'
-  status: pending
-  note: ''
+  status: done
+  note: astrona CLI developer; Linkerd edge-26.10.1 + viz, Gateway API CRDs v1.4.0; booted 2026-10-10
 - key: section-020/module-02/course
   kind: course
   what: 'chapter for module 2: Require Mutual TLS And Authorize Callers With Linkerd'
-  status: pending
-  note: ''
+  status: done
+  note: 'compact: landing + 2 parts + summary; policy API versions verified (Server v1beta3, AP/MeshTLSAuthn
+    v1alpha1)'
 - key: section-020/quiz
   kind: quiz
   what: 'knowledge check for section-020: Secure Service-To-Service Communication'

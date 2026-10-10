@@ -1,0 +1,20 @@
+# A ConstraintTemplate whose Rego does not compile, on purpose: the closing
+# brace of the violation rule is missing. Gatekeeper accepts the object and
+# reports the error in its status.
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sbrokenlabels
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sBrokenLabels
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sbrokenlabels
+
+        violation[{"msg": msg}] {
+          not input.review.object.metadata.labels.team
+          msg := "the team label is missing"

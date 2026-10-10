@@ -130,10 +130,31 @@ modules:
       - type: reading
         title: "Require Mutual TLS And Authorize Callers With Istio"
         path: sections/section-020/module-01/course.md
+      - type: reading
+        title: "Mesh Identity And mTLS Modes"
+        path: sections/section-020/module-01/course-01-mesh-identity-and-mtls-modes.md
+      - type: reading
+        title: "Requiring STRICT Mutual TLS"
+        path: sections/section-020/module-01/course-02-requiring-strict-mtls.md
+      - type: reading
+        title: "Authorizing Callers"
+        path: sections/section-020/module-01/course-03-authorizing-callers.md
+      - type: reading
+        title: Summary
+        path: sections/section-020/module-01/course-04-summary.md
 
       - type: reading
         title: "Require Mutual TLS And Authorize Callers With Linkerd"
         path: sections/section-020/module-02/course.md
+      - type: reading
+        title: "Automatic mTLS, Identity And Default Policy"
+        path: sections/section-020/module-02/course-01-automatic-mtls-identity-and-default-policy.md
+      - type: reading
+        title: "Servers And Authorization Policies"
+        path: sections/section-020/module-02/course-02-servers-and-authorization-policies.md
+      - type: reading
+        title: Summary
+        path: sections/section-020/module-02/course-03-summary.md
 
   - id: module-030
     title: "Governance With Policy Engines And Admission Control"

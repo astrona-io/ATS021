@@ -89,13 +89,14 @@ items:
 - key: section-030/module-03/playground
   kind: playground
   what: 'playground for module 3: Write ValidatingAdmissionPolicies With CEL'
-  status: pending
-  note: ''
+  status: done
+  note: booted 2026-10-10; no engine; README + overview written
 - key: section-030/module-03/course
   kind: course
   what: 'chapter for module 3: Write ValidatingAdmissionPolicies With CEL'
-  status: pending
-  note: ''
+  status: done
+  note: landing + 3 parts + summary; scale subresource bypass, params, Warn/Audit, has() runtime error
+    verified
 - key: section-030/quiz
   kind: quiz
   what: 'knowledge check for section-030: Governance With Policy Engines And Admission Control'

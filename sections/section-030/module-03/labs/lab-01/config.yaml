@@ -1,0 +1,68 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Write ValidatingAdmissionPolicies With CEL (LAB). Graded against the live cluster.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-lab-030-03
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - ghcr.io/stefanprodan/podinfo:6.15.0
+      - mccutchen/go-httpbin:2.25.0
+      - curlimages/curl:8.22.0
+
+# Starting state: no policy engine. `starfleet` is labelled
+# environment=production and `scout` runs 8 replicas, `outpost` is labelled
+# environment=sandbox, and the ConfigMap replica-limits holds maxReplicas "5".
+# No ValidatingAdmissionPolicy and no binding.
+bootstrap:
+  init:
+    - name: seed-cluster
+      description: Create the workloads, the namespace labels and the replica-limits ConfigMap
+      type: file
+      source: bootstrap/01-seed-cluster.sh
+
+# Applied only by `astrona test`: the reference solution.
+testing:
+  init:
+    - name: apply-solution
+      description: Apply the reference policy and bindings
+      type: file
+      source: solution/apply.sh
+    - name: wait-for-policy
+      description: Wait until the API server enforces the policy
+      type: file
+      source: testing/wait-for-policy.sh
+
+validation:
+  scripts:
+    - name: replica-limit-denied-in-production
+      description: Creating or scaling a Deployment above 5 replicas is rejected in starfleet
+      type: file
+      source: validation/validate-replica-limit-denied-in-production.sh
+      hint: Bind the policy to namespaces with the label environment=production using Deny. Add deployments/scale to the resources, because kubectl scale uses that subresource.
+    - name: over-limit-deployment-can-shrink
+      description: scout (8 replicas) can be scaled down, but not up
+      type: file
+      source: validation/validate-over-limit-deployment-can-shrink.sh
+      hint: Allow an UPDATE that does not raise the count, with request.operation == 'UPDATE' && object.spec.replicas <= oldObject.spec.replicas.
+    - name: sandbox-warns
+      description: A Deployment above the limit in outpost is accepted with a warning
+      type: file
+      source: validation/validate-sandbox-warns.sh
+      hint: A binding cannot have Deny and Warn together. Create a second binding for environment=sandbox with validationActions Warn. Name the namespace of the ConfigMap in paramRef.
+    - name: limit-comes-from-params
+      description: The limit is read from the replica-limits ConfigMap, not written into the expression
+      type: file
+      source: validation/validate-limit-comes-from-params.sh
+      hint: Set paramKind to v1 ConfigMap in the policy, paramRef.name replica-limits in the bindings, and read params.data.maxReplicas with int().
+
+teardown:
+  keepCluster: false

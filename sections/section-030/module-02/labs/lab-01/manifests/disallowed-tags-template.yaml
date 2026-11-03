@@ -1,0 +1,30 @@
+# A ConstraintTemplate that Gatekeeper stores but cannot use, on purpose. The
+# Rego has two errors: the closing brace of the violation rule is missing, and
+# the built-in function is misspelled (`endwith`). The learner fixes it.
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdisallowedtags
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDisallowedTags
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            tags:
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sdisallowedtags
+
+        violation[{"msg": msg}] {
+          container := input.review.object.spec.containers[_]
+          tag := input.parameters.tags[_]
+          endwith(container.image, concat("", [":", tag]))
+          msg := sprintf("container <%v> uses the disallowed tag <%v>", [container.name, tag])

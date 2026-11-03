@@ -159,3 +159,27 @@ You can now fill in defaults with a mutate rule and its add-if-missing anchors, 
 > - **Expecting a mutate rule to change running pods.** It acts on create and update requests only.
 > - **Expecting a generate rule to fill existing namespaces.** That needs `generateExisting: true`.
 > - **Trusting a PolicyException that was applied without errors.** Check the warning and the controller flag; on a default 1.19.1 installation, exceptions are off.
+
+## Your mission: Validate, Mutate And Generate With Kyverno Lab
+
+You can now write a Kyverno `ClusterPolicy` that validates, mutates and generates, and you know why `Enforce` blocks a request and `Audit` only records it. The mission starts a cluster with Kyverno and no policy, and asks you to refuse pods without CPU and memory limits in `starfleet`, add a default `team` label and create a `default-deny` NetworkPolicy in every new namespace.
+
+Pause the playground first, so the lab has the memory it needs:
+
+```sh
+astrona stop ats-021-playground-030-01
+```
+
+Start the lab, then grade it when you are done:
+
+```sh
+astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-01/labs/lab-01
+astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-01/labs/lab-01
+```
+
+When you are done, remove the lab and start the playground again:
+
+```sh
+astrona destroy ats-021-lab-030-01
+astrona start ats-021-playground-030-01
+```

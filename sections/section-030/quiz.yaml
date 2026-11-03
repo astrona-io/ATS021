@@ -1,0 +1,280 @@
+# Knowledge check for section 030. Listed in astrona.yaml as a `type: quiz` entry after the capstone lab.
+schema_version: 1
+kind: question_bank
+id: ats021-030
+course_id: ATS021
+exam_code: CNPE
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-030
+  title: "Governance With Policy Engines And Admission Control"
+questions:
+  - id: ats021-030-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Read a Kyverno admission rejection and name the policy and rule that blocked it"
+    source_readings:
+      - sections/section-030/module-01/course-01-validate-rules-and-admission.md
+    prompt: |-
+      A developer applies a Pod without limits in `starfleet` and gets:
+
+      `admission webhook "validate.kyverno.svc-fail" denied the request: resource Pod/starfleet/no-limits was blocked due to the following policies require-limits: require-cpu-memory-limits: 'validation error: ... failed at path /spec/containers/0/resources/limits/'`
+
+      Which statement reads this message correctly?
+    options:
+      - id: a
+        text: "The Kyverno validating webhook refused the object. The policy is `require-limits`, the rule is `require-cpu-memory-limits`, and the path shows that the first container has no limits."
+        explanation: "Correct. The message names the webhook, then the policy, then the rule and the failing path. `svc-fail` is the name of the webhook that fails closed. The denial is the policy working."
+      - id: b
+        text: "The webhook `svc-fail` crashed, so Kyverno itself is broken."
+        explanation: "This is not the best answer. The message names the webhook, then the policy, then the rule and the failing path. `svc-fail` is the name of the webhook that fails closed. The denial is the policy working."
+      - id: c
+        text: "Kubernetes RBAC refused the request, and `require-limits` is a Role."
+        explanation: "This is not the best answer. The message names the webhook, then the policy, then the rule and the failing path. `svc-fail` is the name of the webhook that fails closed. The denial is the policy working."
+      - id: d
+        text: "A Gatekeeper constraint named `require-limits` rejected the Pod."
+        explanation: "This is not the best answer. The message names the webhook, then the policy, then the rule and the failing path. `svc-fail` is the name of the webhook that fails closed. The denial is the policy working."
+    correct_option: a
+    explanation: "The message names the webhook, then the policy, then the rule and the failing path. `svc-fail` is the name of the webhook that fails closed. The denial is the policy working."
+
+  - id: ats021-030-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Switch a policy between Enforce and Audit and read the effect in a PolicyReport"
+    source_readings:
+      - sections/section-030/module-01/course-01-validate-rules-and-admission.md
+    prompt: |-
+      The ClusterPolicy `require-limits` has `failureAction: Enforce` and a rule that matches `Pod`. A team runs `kubectl rollout restart deployment probe` for a Deployment that has no limits. The command prints `restarted`, but the new pod never appears. Where is the error, and which component produced it?
+    options:
+      - id: a
+        text: "In the Deployment's audit annotation. Kyverno writes it."
+        explanation: "This is not the best answer. Kyverno's autogen adds rules for Deployment pod templates, but a Deployment that already broke the rule can still be restarted. The restart is accepted, and the pod create request is refused. The rule name on those objects is `autogen-<rule>`."
+      - id: b
+        text: "In the output of `kubectl`. It is only delayed."
+        explanation: "This is not the best answer. Kyverno's autogen adds rules for Deployment pod templates, but a Deployment that already broke the rule can still be restarted. The restart is accepted, and the pod create request is refused. The rule name on those objects is `autogen-<rule>`."
+      - id: c
+        text: "In the `FailedCreate` events of the new ReplicaSet. The ReplicaSet controller sent the pod create request, and Kyverno's webhook refused it."
+        explanation: "Correct. Kyverno's autogen adds rules for Deployment pod templates, but a Deployment that already broke the rule can still be restarted. The restart is accepted, and the pod create request is refused. The rule name on those objects is `autogen-<rule>`."
+      - id: d
+        text: "Nowhere. Enforce never applies to Deployments."
+        explanation: "This is not the best answer. Kyverno's autogen adds rules for Deployment pod templates, but a Deployment that already broke the rule can still be restarted. The restart is accepted, and the pod create request is refused. The rule name on those objects is `autogen-<rule>`."
+    correct_option: c
+    explanation: "Kyverno's autogen adds rules for Deployment pod templates, but a Deployment that already broke the rule can still be restarted. The restart is accepted, and the pod create request is refused. The rule name on those objects is `autogen-<rule>`."
+
+  - id: ats021-030-q03
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Switch a policy between Enforce and Audit and read the effect in a PolicyReport"
+    source_readings:
+      - sections/section-030/module-01/course-02-enforce-audit-and-policy-reports.md
+    prompt: |-
+      A platform engineer wants to know which existing workloads break a new rule before it blocks anything. What is the correct approach?
+    options:
+      - id: a
+        text: "Apply the rule with `failureAction: Audit`, and read the PolicyReports. The background scan lists pass and fail results for objects that existed before the policy."
+        explanation: "Correct. In Audit, a failed validation is recorded in a PolicyReport and as a `PolicyViolation` event, and the request is allowed. The background scan also reports existing objects. The usual order is Audit first, then Enforce after the reports are clean."
+      - id: b
+        text: "Apply the rule with `failureAction: Enforce` and wait for developers to report errors."
+        explanation: "This is not the best answer. In Audit, a failed validation is recorded in a PolicyReport and as a `PolicyViolation` event, and the request is allowed. The background scan also reports existing objects. The usual order is Audit first, then Enforce after the reports are clean."
+      - id: c
+        text: "Apply the rule and read the output of `kubectl apply`. It lists every failing object."
+        explanation: "This is not the best answer. In Audit, a failed validation is recorded in a PolicyReport and as a `PolicyViolation` event, and the request is allowed. The background scan also reports existing objects. The usual order is Audit first, then Enforce after the reports are clean."
+      - id: d
+        text: "Delete all Deployments, apply the rule, and recreate them."
+        explanation: "This is not the best answer. In Audit, a failed validation is recorded in a PolicyReport and as a `PolicyViolation` event, and the request is allowed. The background scan also reports existing objects. The usual order is Audit first, then Enforce after the reports are clean."
+    correct_option: a
+    explanation: "In Audit, a failed validation is recorded in a PolicyReport and as a `PolicyViolation` event, and the request is allowed. The background scan also reports existing objects. The usual order is Audit first, then Enforce after the reports are clean."
+
+  - id: ats021-030-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Write a mutate rule that adds a default label or securityContext field to matching pods"
+    source_readings:
+      - sections/section-030/module-01/course-03-mutate-and-generate-rules.md
+    prompt: |-
+      A mutate rule uses `patchStrategicMerge` with `+(team): unassigned` under `metadata.labels`. A pod that already has the label `team: starfleet` is restarted. A pod without the label is restarted too. What labels do the new pods have?
+    options:
+      - id: a
+        text: "Both pods get `team: unassigned`."
+        explanation: "This is not the best answer. The add-if-missing anchor `+(field)` sets the field only when the object does not have it. A mutate rule acts on create and update requests, so the new pods are changed, and running pods are not."
+      - id: b
+        text: "The first pod keeps `team: starfleet`. The second pod gets `team: unassigned`."
+        explanation: "Correct. The add-if-missing anchor `+(field)` sets the field only when the object does not have it. A mutate rule acts on create and update requests, so the new pods are changed, and running pods are not."
+      - id: c
+        text: "Neither pod changes, because mutate rules act only on running pods."
+        explanation: "This is not the best answer. The add-if-missing anchor `+(field)` sets the field only when the object does not have it. A mutate rule acts on create and update requests, so the new pods are changed, and running pods are not."
+      - id: d
+        text: "The first pod gets no `team` label, because the rule removes existing values."
+        explanation: "This is not the best answer. The add-if-missing anchor `+(field)` sets the field only when the object does not have it. A mutate rule acts on create and update requests, so the new pods are changed, and running pods are not."
+    correct_option: b
+    explanation: "The add-if-missing anchor `+(field)` sets the field only when the object does not have it. A mutate rule acts on create and update requests, so the new pods are changed, and running pods are not."
+
+  - id: ats021-030-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Write a generate rule that creates a default-deny NetworkPolicy in every new namespace"
+    source_readings:
+      - sections/section-030/module-01/course-03-mutate-and-generate-rules.md
+    prompt: |-
+      A ClusterPolicy has a generate rule that matches `Namespace` and creates a `default-deny` NetworkPolicy with `synchronize: true`. The existing namespace `outpost` has no NetworkPolicy. A new namespace `orbit` is created, and a team deletes the generated NetworkPolicy in it. What is the result?
+    options:
+      - id: a
+        text: "`outpost` gets the NetworkPolicy immediately. The one in `orbit` stays deleted."
+        explanation: "This is not the best answer. A generate rule reacts to matching objects that are created. With `synchronize: true`, Kyverno keeps the generated object as the rule says and recreates it after a delete. Existing objects are only covered when `generateExisting: true` is set."
+      - id: b
+        text: "`orbit` gets the NetworkPolicy when it is created, and Kyverno recreates it after the delete. `outpost` gets nothing unless the rule sets `generateExisting: true`."
+        explanation: "Correct. A generate rule reacts to matching objects that are created. With `synchronize: true`, Kyverno keeps the generated object as the rule says and recreates it after a delete. Existing objects are only covered when `generateExisting: true` is set."
+      - id: c
+        text: "No namespace gets a NetworkPolicy until the rule is changed to `Enforce`."
+        explanation: "This is not the best answer. A generate rule reacts to matching objects that are created. With `synchronize: true`, Kyverno keeps the generated object as the rule says and recreates it after a delete. Existing objects are only covered when `generateExisting: true` is set."
+      - id: d
+        text: "`orbit` gets the NetworkPolicy, and the delete is rejected by RBAC."
+        explanation: "This is not the best answer. A generate rule reacts to matching objects that are created. With `synchronize: true`, Kyverno keeps the generated object as the rule says and recreates it after a delete. Existing objects are only covered when `generateExisting: true` is set."
+    correct_option: b
+    explanation: "A generate rule reacts to matching objects that are created. With `synchronize: true`, Kyverno keeps the generated object as the rule says and recreates it after a delete. Existing objects are only covered when `generateExisting: true` is set."
+
+  - id: ats021-030-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Exempt one workload from a rule with a PolicyException instead of weakening the policy"
+    source_readings:
+      - sections/section-030/module-01/course-03-mutate-and-generate-rules.md
+    prompt: |-
+      A team asks for one workload to be allowed to break the `require-limits` rule. On a default Kyverno 1.19.1 installation, the administrator applies a `PolicyException` for it. The command succeeds with a warning, and the workload is still rejected. What explains this?
+    options:
+      - id: a
+        text: "A PolicyException needs the `Audit` action."
+        explanation: "This is not the best answer. The warning says `PolicyException resources would not be processed until it is enabled`. An administrator must set `--enablePolicyException=true` on the Kyverno controllers. Weakening the policy for everyone is the wrong answer."
+      - id: b
+        text: "Exceptions are switched off by default. The controllers run with `--enablePolicyException=false`, so the object is stored and has no effect."
+        explanation: "Correct. The warning says `PolicyException resources would not be processed until it is enabled`. An administrator must set `--enablePolicyException=true` on the Kyverno controllers. Weakening the policy for everyone is the wrong answer."
+      - id: c
+        text: "A PolicyException works only for Gatekeeper constraints."
+        explanation: "This is not the best answer. The warning says `PolicyException resources would not be processed until it is enabled`. An administrator must set `--enablePolicyException=true` on the Kyverno controllers. Weakening the policy for everyone is the wrong answer."
+      - id: d
+        text: "The exception must be applied in `kube-system`."
+        explanation: "This is not the best answer. The warning says `PolicyException resources would not be processed until it is enabled`. An administrator must set `--enablePolicyException=true` on the Kyverno controllers. Weakening the policy for everyone is the wrong answer."
+    correct_option: b
+    explanation: "The warning says `PolicyException resources would not be processed until it is enabled`. An administrator must set `--enablePolicyException=true` on the Kyverno controllers. Weakening the policy for everyone is the wrong answer."
+
+  - id: ats021-030-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find the error in a ConstraintTemplate whose Rego does not compile from its status"
+    source_readings:
+      - sections/section-030/module-02/course-03-audit-status-and-template-errors.md
+    prompt: |-
+      A `ConstraintTemplate` is applied without an error, but `kubectl get crd` does not list its constraint kind. Which check finds the cause fastest?
+    options:
+      - id: a
+        text: "`kubectl get constrainttemplate <name> -o jsonpath='{.status.created}{\"\\n\"}{.status.byPod[0].errors[0].message}'`. A value of `false` and a Rego parse error point at the line of the problem."
+        explanation: "Correct. Gatekeeper stores a template with broken Rego but does not create a usable constraint kind. `status.created: false` and the message under `status.byPod` show the Rego error. Always check the template status before you debug the constraint."
+      - id: b
+        text: "`kubectl get events -n kube-system`."
+        explanation: "This is not the best answer. Gatekeeper stores a template with broken Rego but does not create a usable constraint kind. `status.created: false` and the message under `status.byPod` show the Rego error. Always check the template status before you debug the constraint."
+      - id: c
+        text: "`kubectl auth can-i create constrainttemplates`."
+        explanation: "This is not the best answer. Gatekeeper stores a template with broken Rego but does not create a usable constraint kind. `status.created: false` and the message under `status.byPod` show the Rego error. Always check the template status before you debug the constraint."
+      - id: d
+        text: "Re-apply the Constraint until it works."
+        explanation: "This is not the best answer. Gatekeeper stores a template with broken Rego but does not create a usable constraint kind. `status.created: false` and the message under `status.byPod` show the Rego error. Always check the template status before you debug the constraint."
+    correct_option: a
+    explanation: "Gatekeeper stores a template with broken Rego but does not create a usable constraint kind. `status.created: false` and the message under `status.byPod` show the Rego error. Always check the template status before you debug the constraint."
+
+  - id: ats021-030-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Switch a Constraint between deny, dryrun and warn with enforcementAction"
+    source_readings:
+      - sections/section-030/module-02/course-02-constraints-and-enforcement-actions.md
+    prompt: |-
+      A Gatekeeper `Constraint` of kind `K8sRequiredLabels` has `enforcementAction: dryrun`. A pod without the required label is created in the matching namespace. A pod named `probe` also existed before the constraint. What is true?
+    options:
+      - id: a
+        text: "The new pod is rejected, and `probe` is deleted."
+        explanation: "This is not the best answer. `deny` blocks, `dryrun` records violations without blocking, and `warn` admits and prints a warning. Admission handles only the request in front of it. Audit lists the current state of the cluster, including objects that existed before the constraint. The audit controller runs on an interval, so the status can lag."
+      - id: b
+        text: "The new pod is admitted. The constraint status lists violations in `status.violations` after the audit controller runs, and `probe` appears there too."
+        explanation: "Correct. `deny` blocks, `dryrun` records violations without blocking, and `warn` admits and prints a warning. Admission handles only the request in front of it. Audit lists the current state of the cluster, including objects that existed before the constraint. The audit controller runs on an interval, so the status can lag."
+      - id: c
+        text: "The new pod is admitted with a warning on the command line."
+        explanation: "This is not the best answer. `deny` blocks, `dryrun` records violations without blocking, and `warn` admits and prints a warning. Admission handles only the request in front of it. Audit lists the current state of the cluster, including objects that existed before the constraint. The audit controller runs on an interval, so the status can lag."
+      - id: d
+        text: "The status stays empty because `dryrun` disables audit."
+        explanation: "This is not the best answer. `deny` blocks, `dryrun` records violations without blocking, and `warn` admits and prints a warning. Admission handles only the request in front of it. Audit lists the current state of the cluster, including objects that existed before the constraint. The audit controller runs on an interval, so the status can lag."
+    correct_option: b
+    explanation: "`deny` blocks, `dryrun` records violations without blocking, and `warn` admits and prints a warning. Admission handles only the request in front of it. Audit lists the current state of the cluster, including objects that existed before the constraint. The audit controller runs on an interval, so the status can lag."
+
+  - id: ats021-030-q09
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Write a ValidatingAdmissionPolicy with a CEL expression that limits Deployment replicas"
+    source_readings:
+      - sections/section-030/module-03/course-01-policies-and-cel-expressions.md
+    prompt: |-
+      A `ValidatingAdmissionPolicy` named `max-replicas` with the expression `object.spec.replicas <= 5` for `deployments` is applied. A dry-run patch to 9 replicas still succeeds. After a binding with `validationActions: ["Deny"]` is created, `kubectl scale deployment scout --replicas=9` still succeeds. What are the two causes?
+    options:
+      - id: a
+        text: "The policy needs `failurePolicy: Ignore`, and `kubectl scale` uses the `delete` verb."
+        explanation: "This is not the best answer. The API server stores the policy and checks nothing until a `ValidatingAdmissionPolicyBinding` connects it to namespaces. A rule on `deployments` does not match a request to `deployments/scale`. The `Scale` object also has `spec.replicas`, so the same expression works for both."
+      - id: b
+        text: "The binding is a Gatekeeper resource, and CEL does not support `replicas`."
+        explanation: "This is not the best answer. The API server stores the policy and checks nothing until a `ValidatingAdmissionPolicyBinding` connects it to namespaces. A rule on `deployments` does not match a request to `deployments/scale`. The `Scale` object also has `spec.replicas`, so the same expression works for both."
+      - id: c
+        text: "The policy needs the label `environment: production`, and `kubectl scale` bypasses admission."
+        explanation: "This is not the best answer. The API server stores the policy and checks nothing until a `ValidatingAdmissionPolicyBinding` connects it to namespaces. A rule on `deployments` does not match a request to `deployments/scale`. The `Scale` object also has `spec.replicas`, so the same expression works for both."
+      - id: d
+        text: "A policy checks nothing until a binding names it. And `kubectl scale` writes to the `deployments/scale` subresource, so the policy needs `deployments/scale` in `matchConstraints`."
+        explanation: "Correct. The API server stores the policy and checks nothing until a `ValidatingAdmissionPolicyBinding` connects it to namespaces. A rule on `deployments` does not match a request to `deployments/scale`. The `Scale` object also has `spec.replicas`, so the same expression works for both."
+    correct_option: d
+    explanation: "The API server stores the policy and checks nothing until a `ValidatingAdmissionPolicyBinding` connects it to namespaces. A rule on `deployments` does not match a request to `deployments/scale`. The `Scale` object also has `spec.replicas`, so the same expression works for both."
+
+  - id: ats021-030-q10
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Pass a limit through a params resource instead of hard-coding it"
+    source_readings:
+      - sections/section-030/module-03/course-02-bindings-params-and-validation-actions.md
+    prompt: |-
+      A `ValidatingAdmissionPolicy` limits replicas to the number in a ConfigMap `replica-limits` (`maxReplicas: "5"`). Which setup is correct, and which binding is rejected by the API server?
+    options:
+      - id: a
+        text: "`paramKind` on the policy and `paramRef` with `parameterNotFoundAction` on the binding. The expression uses `int(params.data.maxReplicas)`. A binding with `validationActions: [\"Deny\", \"Warn\"]` is rejected."
+        explanation: "Correct. The policy declares the params kind with `paramKind`. The binding picks the object with `paramRef`, and `parameterNotFoundAction` is required with it. ConfigMap values are strings, so the expression converts with `int()`. A binding with both `Deny` and `Warn` is invalid. `[\"Deny\", \"Audit\"]` and `[\"Warn\", \"Audit\"]` are valid."
+      - id: b
+        text: "`paramKind` on the binding and `paramRef` on the policy. A binding with `[\"Warn\", \"Audit\"]` is rejected."
+        explanation: "This is not the best answer. The policy declares the params kind with `paramKind`. The binding picks the object with `paramRef`, and `parameterNotFoundAction` is required with it. ConfigMap values are strings, so the expression converts with `int()`. A binding with both `Deny` and `Warn` is invalid. `[\"Deny\", \"Audit\"]` and `[\"Warn\", \"Audit\"]` are valid."
+      - id: c
+        text: "`params` in the policy `metadata`. A binding with `[\"Deny\", \"Audit\"]` is rejected."
+        explanation: "This is not the best answer. The policy declares the params kind with `paramKind`. The binding picks the object with `paramRef`, and `parameterNotFoundAction` is required with it. ConfigMap values are strings, so the expression converts with `int()`. A binding with both `Deny` and `Warn` is invalid. `[\"Deny\", \"Audit\"]` and `[\"Warn\", \"Audit\"]` are valid."
+      - id: d
+        text: "The expression uses `params.data.maxReplicas <= object.spec.replicas`. A binding with `[\"Deny\"]` is rejected."
+        explanation: "This is not the best answer. The policy declares the params kind with `paramKind`. The binding picks the object with `paramRef`, and `parameterNotFoundAction` is required with it. ConfigMap values are strings, so the expression converts with `int()`. A binding with both `Deny` and `Warn` is invalid. `[\"Deny\", \"Audit\"]` and `[\"Warn\", \"Audit\"]` are valid."
+    correct_option: a
+    explanation: "The policy declares the params kind with `paramKind`. The binding picks the object with `paramRef`, and `parameterNotFoundAction` is required with it. ConfigMap values are strings, so the expression converts with `int()`. A binding with both `Deny` and `Warn` is invalid. `[\"Deny\", \"Audit\"]` and `[\"Warn\", \"Audit\"]` are valid."
+
+  - id: ats021-030-q11
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Choose between ValidatingAdmissionPolicy, Kyverno and Gatekeeper for a given rule and say why"
+    source_readings:
+      - sections/section-030/module-03/course-03-choosing-the-right-tool.md
+    prompt: |-
+      A team needs a rule that rejects Deployments with a `latest` image tag. They have no policy engine installed. The rule reads only fields of the incoming object, and the team wants no extra pods or webhook that could block the API server. Which tool fits best, and what must they handle in the expression?
+    options:
+      - id: a
+        text: "Kyverno, because only Kyverno can validate image tags."
+        explanation: "This is not the best answer. The built-in policy runs in the API server with no extra software. It validates only and cannot create objects. Kyverno fits when the team also needs mutate, generate or reports. Gatekeeper fits a team that writes Rego. With `failurePolicy: Fail`, a missing key is a runtime error that rejects the request."
+      - id: b
+        text: "Gatekeeper, because built-in admission cannot read container images."
+        explanation: "This is not the best answer. The built-in policy runs in the API server with no extra software. It validates only and cannot create objects. Kyverno fits when the team also needs mutate, generate or reports. Gatekeeper fits a team that writes Rego. With `failurePolicy: Fail`, a missing key is a runtime error that rejects the request."
+      - id: c
+        text: "A `ValidatingAdmissionPolicy`, because it needs nothing installed. A field that may be missing, such as `labels.team`, needs `has()` because reading a missing key is a runtime error."
+        explanation: "Correct. The built-in policy runs in the API server with no extra software. It validates only and cannot create objects. Kyverno fits when the team also needs mutate, generate or reports. Gatekeeper fits a team that writes Rego. With `failurePolicy: Fail`, a missing key is a runtime error that rejects the request."
+      - id: d
+        text: "A `ValidatingAdmissionPolicy`, because it can also create the missing objects. A missing key is treated as `false`."
+        explanation: "This is not the best answer. The built-in policy runs in the API server with no extra software. It validates only and cannot create objects. Kyverno fits when the team also needs mutate, generate or reports. Gatekeeper fits a team that writes Rego. With `failurePolicy: Fail`, a missing key is a runtime error that rejects the request."
+    correct_option: c
+    explanation: "The built-in policy runs in the API server with no extra software. It validates only and cannot create objects. Kyverno fits when the team also needs mutate, generate or reports. Gatekeeper fits a team that writes Rego. With `failurePolicy: Fail`, a missing key is a runtime error that rejects the request."

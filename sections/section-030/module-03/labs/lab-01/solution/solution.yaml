@@ -1,0 +1,54 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: replica-limit
+spec:
+  failurePolicy: Fail
+  paramKind:
+    apiVersion: v1
+    kind: ConfigMap
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["deployments", "deployments/scale"]
+  validations:
+    - expression: >-
+        object.spec.replicas <= int(params.data.maxReplicas) ||
+        (request.operation == 'UPDATE' && object.spec.replicas <= oldObject.spec.replicas)
+      messageExpression: >-
+        object.kind + ' ' + object.metadata.name + ' asks for ' +
+        string(object.spec.replicas) + ' replicas; the limit is ' + params.data.maxReplicas
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: replica-limit-production
+spec:
+  policyName: replica-limit
+  validationActions: ["Deny"]
+  paramRef:
+    name: replica-limits
+    namespace: starfleet
+    parameterNotFoundAction: Deny
+  matchResources:
+    namespaceSelector:
+      matchLabels:
+        environment: production
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: replica-limit-sandbox
+spec:
+  policyName: replica-limit
+  validationActions: ["Warn"]
+  paramRef:
+    name: replica-limits
+    namespace: starfleet
+    parameterNotFoundAction: Deny
+  matchResources:
+    namespaceSelector:
+      matchLabels:
+        environment: sandbox

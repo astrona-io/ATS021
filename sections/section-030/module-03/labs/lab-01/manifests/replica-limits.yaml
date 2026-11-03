@@ -1,0 +1,8 @@
+# A ConfigMap to use as the parameter resource of a ValidatingAdmissionPolicy.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: replica-limits
+  namespace: starfleet
+data:
+  maxReplicas: "5"

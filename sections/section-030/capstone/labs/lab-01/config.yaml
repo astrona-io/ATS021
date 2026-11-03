@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Governance With Policy Engines And Admission Control Capstone (LAB). Graded against the live cluster.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-capstone-030
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - ghcr.io/stefanprodan/podinfo:6.15.0
+      - mccutchen/go-httpbin:2.25.0
+      - curlimages/curl:8.22.0
+
+# Starting state: Kyverno 1.19.1 and Gatekeeper 3.23.1 with their webhooks
+# ready, the working K8sDisallowedTags template and the Starfleet workloads.
+# No ClusterPolicy, no Constraint, no ValidatingAdmissionPolicy exists.
+bootstrap:
+  init:
+    - name: seed-cluster
+      description: Install Kyverno 1.19.1 and Gatekeeper 3.23.1, wait for their webhooks, then create the workloads
+      type: file
+      source: bootstrap/01-seed-cluster.sh
+
+# Applied only by `astrona test`: the reference solution.
+testing:
+  init:
+    - name: apply-solution
+      description: Apply the reference solution
+      type: file
+      source: solution/apply.sh
+    - name: wait-for-policies
+      description: Wait until all three rules are enforced
+      type: file
+      source: testing/wait-for-policies.sh
+
+validation:
+  scripts:
+    - name: limits-enforced
+      description: Pods and Deployments in starfleet without CPU and memory limits are rejected, and outpost is not affected
+      type: file
+      source: validation/validate-limits-enforced.sh
+      hint: Use a Kyverno ClusterPolicy with validate.failureAction Enforce that matches only the namespace starfleet. Both limits.cpu and limits.memory must be required.
+    - name: probe-exempt-only
+      description: Only pods labelled app=probe may run without limits
+      type: file
+      source: validation/validate-probe-exempt-only.sh
+      hint: Keep the rule in Enforce mode and exempt only pods with the label app=probe, for example with a precondition on the label. Do not exclude the whole namespace.
+    - name: latest-tag-denied
+      description: The latest tag is refused in starfleet and pinned tags are accepted
+      type: file
+      source: validation/validate-latest-tag-denied.sh
+      hint: Create a K8sDisallowedTags constraint with enforcementAction deny, match Pod in the namespace starfleet and the parameter tags ["latest"].
+    - name: beacon-fixed-audit-clean
+      description: beacon no longer uses the latest tag and the Gatekeeper audit finds no violation
+      type: file
+      source: validation/validate-beacon-fixed-audit-clean.sh
+      hint: beacon already runs with the latest tag. Change its image to curlimages/curl:8.22.0, then wait for the next audit run (about one minute).
+    - name: replica-limit-in-production
+      description: The API server refuses more than 5 replicas in production namespaces
+      type: file
+      source: validation/validate-replica-limit-in-production.sh
+      hint: Use a ValidatingAdmissionPolicy for deployments and deployments/scale and a binding with validationActions Deny and a namespaceSelector on environment=production.
+    - name: scout-within-limit
+      description: scout runs at most 5 replicas
+      type: file
+      source: validation/validate-scout-within-limit.sh
+      hint: scout runs 8 replicas. Scale it to 5 or fewer after the policy exists.
+
+teardown:
+  keepCluster: false

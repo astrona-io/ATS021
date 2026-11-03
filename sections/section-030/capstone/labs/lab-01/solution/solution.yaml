@@ -1,0 +1,73 @@
+# Rule 1: Kyverno requires CPU and memory limits in starfleet (Enforce). Only
+# pods labelled app=probe (the legacy probe workload) are exempt.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-limits
+spec:
+  rules:
+    - name: require-cpu-memory-limits
+      match:
+        any:
+          - resources:
+              kinds: ["Pod"]
+              namespaces: ["starfleet"]
+      preconditions:
+        all:
+          - key: "{{ request.object.metadata.labels.app || '' }}"
+            operator: NotEquals
+            value: probe
+      validate:
+        failureAction: Enforce
+        message: "Every container in starfleet must set resources.limits.cpu and resources.limits.memory."
+        pattern:
+          spec:
+            containers:
+              - resources:
+                  limits:
+                    cpu: "?*"
+                    memory: "?*"
+---
+# Rule 2: Gatekeeper refuses the latest tag in starfleet.
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sDisallowedTags
+metadata:
+  name: no-latest-tag
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaces: ["starfleet"]
+  parameters:
+    tags: ["latest"]
+---
+# Rule 3: the API server refuses more than 5 replicas in production.
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: replica-limit
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["deployments", "deployments/scale"]
+  validations:
+    - expression: "object.spec.replicas <= 5"
+      message: "Production allows at most 5 replicas."
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: replica-limit-production
+spec:
+  policyName: replica-limit
+  validationActions: ["Deny"]
+  matchResources:
+    namespaceSelector:
+      matchLabels:
+        environment: production

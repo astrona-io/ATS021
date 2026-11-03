@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Secure Service-To-Service Communication Capstone (CAPSTONE). Graded against the live cluster.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-capstone-020
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - ghcr.io/stefanprodan/podinfo:6.15.0
+      - mccutchen/go-httpbin:2.25.0
+      - curlimages/curl:8.22.0
+      - docker.io/istio/pilot:1.31.1
+      - docker.io/istio/proxyv2:1.31.1
+
+# Starting state: Istio 1.31.1 (minimal profile) in PERMISSIVE mode with no
+# policy. starfleet has scout, probe, shuttle, caller and beacon (beacon has
+# the label sidecar.istio.io/inject=false, so it has no sidecar). outpost has
+# drifter (with a sidecar) and drifter-plain (without). The faults stay.
+bootstrap:
+  init:
+    - name: seed-cluster
+      description: Install Istio and create the Starfleet workloads
+      type: file
+      source: bootstrap/01-seed-cluster.sh
+
+# Applied only by `astrona test`: the reference solution.
+testing:
+  init:
+    - name: apply-solution
+      description: Apply the reference solution
+      type: file
+      source: solution/apply.sh
+    - name: wait-for-policies
+      description: Wait until the sidecars enforce the policies
+      type: file
+      source: testing/wait-for-policies.sh
+
+validation:
+  scripts:
+    - name: strict-mtls-required
+      description: starfleet refuses plain-text requests
+      type: file
+      source: validation/validate-strict-mtls-required.sh
+      hint: Create a PeerAuthentication named default in starfleet, without a selector, with mtls mode STRICT. Do not use PERMISSIVE.
+    - name: scout-allows-only-shuttle-get
+      description: scout answers only GET requests from shuttle
+      type: file
+      source: validation/validate-scout-allows-only-shuttle-get.sh
+      hint: Write an ALLOW AuthorizationPolicy for scout with the principal cluster.local/ns/starfleet/sa/shuttle and the method GET.
+    - name: probe-only-from-starfleet
+      description: probe answers callers from starfleet and refuses outpost
+      type: file
+      source: validation/validate-probe-only-from-starfleet.sh
+      hint: drifter in outpost has a sidecar, so STRICT does not stop it. Write an ALLOW AuthorizationPolicy for probe with source namespaces starfleet.
+    - name: beacon-meshed-and-working
+      description: beacon has a sidecar and reaches scout
+      type: file
+      source: validation/validate-beacon-meshed-and-working.sh
+      hint: Find the label on the beacon pod template that keeps the sidecar out and remove it from the Deployment, so the new pods get a sidecar.
+
+teardown:
+  keepCluster: false

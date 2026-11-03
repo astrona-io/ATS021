@@ -1,0 +1,252 @@
+# Knowledge check for section 020. Listed in astrona.yaml as a `type: quiz` entry after the capstone lab.
+schema_version: 1
+kind: question_bank
+id: ats021-020
+course_id: ATS021
+exam_code: CNPE
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-020
+  title: "Secure Service-To-Service Communication"
+questions:
+  - id: ats021-020-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Name the SPIFFE identity a workload presents from its namespace and service account"
+    source_readings:
+      - sections/section-020/module-01/course-01-mesh-identity-and-mtls-modes.md
+    prompt: |-
+      The `scout` pod in `starfleet` runs as the service account `scout`. The mesh uses the default trust domain. Which identity does its Istio sidecar present in its certificate, and which form does an `AuthorizationPolicy` use in `principals`?
+    options:
+      - id: a
+        text: "Certificate: `spiffe://cluster.local/ns/starfleet/sa/scout`. Policy: `cluster.local/ns/starfleet/sa/scout`."
+        explanation: "Correct. The identity is built only from the trust domain, the namespace and the service account. The `principals` field takes the same identity without the `spiffe://` prefix."
+      - id: b
+        text: "Certificate: `spiffe://cluster.local/ns/starfleet/sa/scout`. Policy: `spiffe://cluster.local/ns/starfleet/sa/scout`."
+        explanation: "This is not the best answer. The identity is built only from the trust domain, the namespace and the service account. The `principals` field takes the same identity without the `spiffe://` prefix."
+      - id: c
+        text: "Certificate: `spiffe://cluster.local/deploy/scout`. Policy: `cluster.local/deploy/scout`."
+        explanation: "The identity does not come from the Deployment name."
+      - id: d
+        text: "Certificate: `scout.starfleet.serviceaccount.identity.linkerd.cluster.local`. Policy: `scout.starfleet`."
+        explanation: "This option is the Linkerd form."
+    correct_option: a
+    explanation: "The identity is built only from the trust domain, the namespace and the service account. The `principals` field takes the same identity without the `spiffe://` prefix."
+
+  - id: ats021-020-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Switch a namespace from PERMISSIVE to STRICT mTLS with PeerAuthentication and prove plain-text traffic is refused"
+    source_readings:
+      - sections/section-020/module-01/course-02-requiring-strict-mtls.md
+    prompt: |-
+      In a mesh with default Istio settings, `drifter` in `outpost` has no sidecar. It sends `curl http://scout.starfleet` and gets `200`. The team wants `scout`'s namespace to refuse such callers. What do they apply, and what does `drifter` see afterwards?
+    options:
+      - id: a
+        text: "An `AuthorizationPolicy` with `action: DENY`. `drifter` gets `403` with `RBAC: access denied`."
+        explanation: "This is not the best answer. The receiving namespace sets the mode. In STRICT mode, the sidecar expects a TLS handshake and closes a plain-text connection, so no HTTP status exists. A `403` appears only when the request is read and an `AuthorizationPolicy` refuses it."
+      - id: b
+        text: "A `PeerAuthentication` named `default` in `starfleet` with `mtls.mode: STRICT`. `drifter` gets a reset connection (`curl` exit code `56`, status `000`)."
+        explanation: "Correct. The receiving namespace sets the mode. In STRICT mode, the sidecar expects a TLS handshake and closes a plain-text connection, so no HTTP status exists. A `403` appears only when the request is read and an `AuthorizationPolicy` refuses it."
+      - id: c
+        text: "A `PeerAuthentication` in `outpost` with `mode: STRICT`. `drifter` gets `403`."
+        explanation: "This is not the best answer. The receiving namespace sets the mode. In STRICT mode, the sidecar expects a TLS handshake and closes a plain-text connection, so no HTTP status exists. A `403` appears only when the request is read and an `AuthorizationPolicy` refuses it."
+      - id: d
+        text: "A `PeerAuthentication` in `starfleet` with `mode: DISABLE`. `drifter` gets `404`."
+        explanation: "This is not the best answer. The receiving namespace sets the mode. In STRICT mode, the sidecar expects a TLS handshake and closes a plain-text connection, so no HTTP status exists. A `403` appears only when the request is read and an `AuthorizationPolicy` refuses it."
+    correct_option: b
+    explanation: "The receiving namespace sets the mode. In STRICT mode, the sidecar expects a TLS handshake and closes a plain-text connection, so no HTTP status exists. A `403` appears only when the request is read and an `AuthorizationPolicy` refuses it."
+
+  - id: ats021-020-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find the workload whose sidecar is missing and so breaks STRICT mTLS"
+    source_readings:
+      - sections/section-020/module-01/course-02-requiring-strict-mtls.md
+    prompt: |-
+      After STRICT mode is on in `starfleet`, the new Deployment `beacon` (service account `shuttle`) cannot reach `scout`. `shuttle` itself still works. What is the first thing to check?
+    options:
+      - id: a
+        text: "Whether the `shuttle` service account has a `RoleBinding`."
+        explanation: "This is not the best answer. A service account only becomes a mesh identity through the sidecar. Without a sidecar, `beacon` has no certificate, even though it uses the `shuttle` service account. Kubernetes RBAC is not involved in mesh traffic."
+      - id: b
+        text: "Whether `beacon` has the `istio-proxy` container. Its pod template may carry `sidecar.istio.io/inject: \"false\"`, and `istioctl x check-inject` names the reason."
+        explanation: "Correct. A service account only becomes a mesh identity through the sidecar. Without a sidecar, `beacon` has no certificate, even though it uses the `shuttle` service account. Kubernetes RBAC is not involved in mesh traffic."
+      - id: c
+        text: "Whether the trust domain is `cluster.local`."
+        explanation: "This is not the best answer. A service account only becomes a mesh identity through the sidecar. Without a sidecar, `beacon` has no certificate, even though it uses the `shuttle` service account. Kubernetes RBAC is not involved in mesh traffic."
+      - id: d
+        text: "Whether `scout` has a `selector` in its `PeerAuthentication`."
+        explanation: "This is not the best answer. A service account only becomes a mesh identity through the sidecar. Without a sidecar, `beacon` has no certificate, even though it uses the `shuttle` service account. Kubernetes RBAC is not involved in mesh traffic."
+    correct_option: b
+    explanation: "A service account only becomes a mesh identity through the sidecar. Without a sidecar, `beacon` has no certificate, even though it uses the `shuttle` service account. Kubernetes RBAC is not involved in mesh traffic."
+
+  - id: ats021-020-q04
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Read a 403 RBAC access denied response and name the policy and rule that decided it"
+    source_readings:
+      - sections/section-020/module-01/course-03-authorizing-callers.md
+    prompt: |-
+      `scout` has one policy: `action: ALLOW`, with the principal `cluster.local/ns/starfleet/sa/shuttle` and the method `GET`. A pod that runs as the `probe` service account sends `GET /` over mTLS. What happens, and why?
+    options:
+      - id: a
+        text: "`200`, because the connection used mTLS."
+        explanation: "This is not the best answer. Once a workload has at least one ALLOW policy, a request is allowed only if an ALLOW policy matches it. Envoy's authorization filter, in the receiving sidecar, answers `403` with the body `RBAC: access denied`. The body does not mean Kubernetes RBAC refused anything. `istioctl x authz check deploy/scout -n starfleet` lists the policies that apply."
+      - id: b
+        text: "`403` with `RBAC: access denied`. The workload has an ALLOW policy, and no ALLOW rule matches the principal `probe`."
+        explanation: "Correct. Once a workload has at least one ALLOW policy, a request is allowed only if an ALLOW policy matches it. Envoy's authorization filter, in the receiving sidecar, answers `403` with the body `RBAC: access denied`. The body does not mean Kubernetes RBAC refused anything. `istioctl x authz check deploy/scout -n starfleet` lists the policies that apply."
+      - id: c
+        text: "A reset connection, because `probe` is not the allowed principal."
+        explanation: "This is not the best answer. Once a workload has at least one ALLOW policy, a request is allowed only if an ALLOW policy matches it. Envoy's authorization filter, in the receiving sidecar, answers `403` with the body `RBAC: access denied`. The body does not mean Kubernetes RBAC refused anything. `istioctl x authz check deploy/scout -n starfleet` lists the policies that apply."
+      - id: d
+        text: "`404`, because the policy hides the path."
+        explanation: "This is not the best answer. Once a workload has at least one ALLOW policy, a request is allowed only if an ALLOW policy matches it. Envoy's authorization filter, in the receiving sidecar, answers `403` with the body `RBAC: access denied`. The body does not mean Kubernetes RBAC refused anything. `istioctl x authz check deploy/scout -n starfleet` lists the policies that apply."
+    correct_option: b
+    explanation: "Once a workload has at least one ALLOW policy, a request is allowed only if an ALLOW policy matches it. Envoy's authorization filter, in the receiving sidecar, answers `403` with the body `RBAC: access denied`. The body does not mean Kubernetes RBAC refused anything. `istioctl x authz check deploy/scout -n starfleet` lists the policies that apply."
+
+  - id: ats021-020-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Order ALLOW, DENY and CUSTOM policies and predict the result when several match"
+    source_readings:
+      - sections/section-020/module-01/course-03-authorizing-callers.md
+    prompt: |-
+      `scout` has an ALLOW policy that matches every `GET` from `shuttle`, and a DENY policy with `paths: ["/env"]` for all callers. `shuttle` sends `GET /env`. What is the result?
+    options:
+      - id: a
+        text: "`200`, because ALLOW policies are checked first."
+        explanation: "This is not the best answer. The order is CUSTOM, then DENY, then ALLOW. A matching DENY policy refuses the request before any ALLOW policy is read."
+      - id: b
+        text: "`200`, because the request came over mTLS."
+        explanation: "This is not the best answer. The order is CUSTOM, then DENY, then ALLOW. A matching DENY policy refuses the request before any ALLOW policy is read."
+      - id: c
+        text: "`403`, because the sidecar checks DENY policies before ALLOW policies, and a matching DENY always wins."
+        explanation: "Correct. The order is CUSTOM, then DENY, then ALLOW. A matching DENY policy refuses the request before any ALLOW policy is read."
+      - id: d
+        text: "`403`, because two policies on one workload conflict and both are ignored."
+        explanation: "This is not the best answer. The order is CUSTOM, then DENY, then ALLOW. A matching DENY policy refuses the request before any ALLOW policy is read."
+    correct_option: c
+    explanation: "The order is CUSTOM, then DENY, then ALLOW. A matching DENY policy refuses the request before any ALLOW policy is read."
+
+  - id: ats021-020-q06
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Order ALLOW, DENY and CUSTOM policies and predict the result when several match"
+    source_readings:
+      - sections/section-020/module-01/course-03-authorizing-callers.md
+    prompt: |-
+      A platform engineer applies `spec: {}` as an `AuthorizationPolicy` named `allow-nothing` in `starfleet`. `probe` has no other policy. `scout` has an ALLOW policy for `shuttle`. What does `shuttle` get from `probe` and from `scout`?
+    options:
+      - id: a
+        text: "`200` from both, because an empty policy does nothing."
+        explanation: "This is not the best answer. An empty `spec` selects every workload and has the action `ALLOW` with no rules. Every workload then has an ALLOW policy, so `probe` is closed. An ALLOW policy that matches the request still allows it, so `scout` keeps answering `shuttle`."
+      - id: b
+        text: "`403` from both, because the empty policy denies everything in the namespace."
+        explanation: "This is not the best answer. An empty `spec` selects every workload and has the action `ALLOW` with no rules. Every workload then has an ALLOW policy, so `probe` is closed. An ALLOW policy that matches the request still allows it, so `scout` keeps answering `shuttle`."
+      - id: c
+        text: "`403` from `probe` and `200` from `scout`. The empty policy is an ALLOW policy with no rules, so it matches nothing. `scout` is still allowed by its own matching ALLOW policy."
+        explanation: "Correct. An empty `spec` selects every workload and has the action `ALLOW` with no rules. Every workload then has an ALLOW policy, so `probe` is closed. An ALLOW policy that matches the request still allows it, so `scout` keeps answering `shuttle`."
+      - id: d
+        text: "`200` from `probe` and `403` from `scout`."
+        explanation: "This is not the best answer. An empty `spec` selects every workload and has the action `ALLOW` with no rules. Every workload then has an ALLOW policy, so `probe` is closed. An ALLOW policy that matches the request still allows it, so `scout` keeps answering `shuttle`."
+    correct_option: c
+    explanation: "An empty `spec` selects every workload and has the action `ALLOW` with no rules. Every workload then has an ALLOW policy, so `probe` is closed. An ALLOW policy that matches the request still allows it, so `scout` keeps answering `shuttle`."
+
+  - id: ats021-020-q07
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Inject the Linkerd proxy into a namespace and confirm with linkerd viz edges that connections use mTLS"
+    source_readings:
+      - sections/section-020/module-02/course-01-automatic-mtls-identity-and-default-policy.md
+    prompt: |-
+      In a Linkerd mesh, a team asks which resource turns on mutual TLS between `shuttle` and `scout`. What is the correct answer, and how do you prove the connection is secured?
+    options:
+      - id: a
+        text: "Apply a `PeerAuthentication` with `STRICT`. Prove it with `istioctl proxy-config secret`."
+        explanation: "This is not the best answer. Linkerd has no mTLS switch. The `linkerd-proxy` containers authenticate each other from the moment both pods have a proxy. `linkerd viz tap` shows a `tls` field per request, and `no_tls_from_remote` means the caller sent plain text."
+      - id: b
+        text: "There is no resource for it. Meshed pods always use mTLS with each other. `linkerd viz edges deployment -n starfleet` shows the connection with a check mark in the `SECURED` column."
+        explanation: "Correct. Linkerd has no mTLS switch. The `linkerd-proxy` containers authenticate each other from the moment both pods have a proxy. `linkerd viz tap` shows a `tls` field per request, and `no_tls_from_remote` means the caller sent plain text."
+      - id: c
+        text: "Apply a `Server` with `proxyProtocol: TLS`. Prove it with `kubectl get servers`."
+        explanation: "This is not the best answer. Linkerd has no mTLS switch. The `linkerd-proxy` containers authenticate each other from the moment both pods have a proxy. `linkerd viz tap` shows a `tls` field per request, and `no_tls_from_remote` means the caller sent plain text."
+      - id: d
+        text: "Annotate the namespace with `linkerd.io/mtls: enabled`. Prove it with `kubectl describe namespace`."
+        explanation: "This is not the best answer. Linkerd has no mTLS switch. The `linkerd-proxy` containers authenticate each other from the moment both pods have a proxy. `linkerd viz tap` shows a `tls` field per request, and `no_tls_from_remote` means the caller sent plain text."
+    correct_option: b
+    explanation: "Linkerd has no mTLS switch. The `linkerd-proxy` containers authenticate each other from the moment both pods have a proxy. `linkerd viz tap` shows a `tls` field per request, and `no_tls_from_remote` means the caller sent plain text."
+
+  - id: ats021-020-q08
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Set a default inbound policy (all-unauthenticated, all-authenticated, deny) and predict who is refused"
+    source_readings:
+      - sections/section-020/module-02/course-01-automatic-mtls-identity-and-default-policy.md
+    prompt: |-
+      The namespace `starfleet` in Linkerd edge-26.10.1 is annotated `config.linkerd.io/default-inbound-policy=all-authenticated`. The annotation was added a minute ago, and no workload was restarted. `drifter` (no proxy) still gets `200` from `scout`. What explains this, and what does `drifter` get after `scout` restarts?
+    options:
+      - id: a
+        text: "The proxy reads the annotation only when it starts. After the restart, `drifter` gets `403` with an empty body."
+        explanation: "Correct. The default inbound policy takes effect after the workload restarts. Then the proxy reads the HTTP request, finds no identity and answers `403` with an empty body. Unlike Istio STRICT mode, Linkerd answers the request and does not reset the connection. The value `all-authenticated` admits every meshed identity in the cluster, so it is not a rule for one caller."
+      - id: b
+        text: "`all-authenticated` never refuses plain text. After the restart, `drifter` still gets `200`."
+        explanation: "This is not the best answer. The default inbound policy takes effect after the workload restarts. Then the proxy reads the HTTP request, finds no identity and answers `403` with an empty body. Unlike Istio STRICT mode, Linkerd answers the request and does not reset the connection. The value `all-authenticated` admits every meshed identity in the cluster, so it is not a rule for one caller."
+      - id: c
+        text: "The annotation works only on pods, not on namespaces. After the restart, `drifter` still gets `200`."
+        explanation: "This is not the best answer. The default inbound policy takes effect after the workload restarts. Then the proxy reads the HTTP request, finds no identity and answers `403` with an empty body. Unlike Istio STRICT mode, Linkerd answers the request and does not reset the connection. The value `all-authenticated` admits every meshed identity in the cluster, so it is not a rule for one caller."
+      - id: d
+        text: "The proxy reads the annotation at once. The `200` is a cached answer, and after the restart `drifter` gets a reset connection."
+        explanation: "This is not the best answer. The default inbound policy takes effect after the workload restarts. Then the proxy reads the HTTP request, finds no identity and answers `403` with an empty body. Unlike Istio STRICT mode, Linkerd answers the request and does not reset the connection. The value `all-authenticated` admits every meshed identity in the cluster, so it is not a rule for one caller."
+    correct_option: a
+    explanation: "The default inbound policy takes effect after the workload restarts. Then the proxy reads the HTTP request, finds no identity and answers `403` with an empty body. Unlike Istio STRICT mode, Linkerd answers the request and does not reset the connection. The value `all-authenticated` admits every meshed identity in the cluster, so it is not a rule for one caller."
+
+  - id: ats021-020-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Write a Server and an AuthorizationPolicy with a MeshTLSAuthentication that let only shuttle call scout"
+    source_readings:
+      - sections/section-020/module-02/course-02-servers-and-authorization-policies.md
+    prompt: |-
+      A platform engineer applies only a `Server` named `scout-http` (`podSelector` `app: scout`, `port: http`) to a Linkerd mesh. Nothing else changes. What do `shuttle` and `drifter` get from `scout`?
+    options:
+      - id: a
+        text: "`200` for both, because the default inbound policy still applies."
+        explanation: "This is not the best answer. Once a Server selects a port, the default inbound policy no longer applies to that port. Only an AuthorizationPolicy that targets the Server can allow traffic. Even `shuttle`, with a valid identity, is refused until one exists."
+      - id: b
+        text: "`200` for `shuttle` and `403` for `drifter`."
+        explanation: "This is not the best answer. Once a Server selects a port, the default inbound policy no longer applies to that port. Only an AuthorizationPolicy that targets the Server can allow traffic. Even `shuttle`, with a valid identity, is refused until one exists."
+      - id: c
+        text: "`403` for both. A Server on its own closes the port, and `kubectl get servers` shows `ACCESS POLICY` `deny`."
+        explanation: "Correct. Once a Server selects a port, the default inbound policy no longer applies to that port. Only an AuthorizationPolicy that targets the Server can allow traffic. Even `shuttle`, with a valid identity, is refused until one exists."
+      - id: d
+        text: "`403` for `drifter` and a reset connection for `shuttle`."
+        explanation: "This is not the best answer. Once a Server selects a port, the default inbound policy no longer applies to that port. Only an AuthorizationPolicy that targets the Server can allow traffic. Even `shuttle`, with a valid identity, is refused until one exists."
+    correct_option: c
+    explanation: "Once a Server selects a port, the default inbound policy no longer applies to that port. Only an AuthorizationPolicy that targets the Server can allow traffic. Even `shuttle`, with a valid identity, is refused until one exists."
+
+  - id: ats021-020-q10
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Map each Linkerd resource to the Istio resource that does the same job"
+    source_readings:
+      - sections/section-020/module-02/course-02-servers-and-authorization-policies.md
+    prompt: |-
+      Which set of Linkerd resources lets only `shuttle` call `scout`, and which Istio features do they map to?
+    options:
+      - id: a
+        text: "A `Server` for the port, a `MeshTLSAuthentication` with `identityRefs` to the `shuttle` service account, and an `AuthorizationPolicy` with `targetRef` to the Server and `requiredAuthenticationRefs`. They map to the Istio `selector`, `from.source.principals` and `action: ALLOW`."
+        explanation: "Correct. A `Server` selects a port on pods, a `MeshTLSAuthentication` names the allowed identities, and an `AuthorizationPolicy` connects the two. The Linkerd and Istio `AuthorizationPolicy` share a name but not an API group (`policy.linkerd.io` and `security.istio.io`) or fields."
+      - id: b
+        text: "A `PeerAuthentication` and an `AuthorizationPolicy` in the group `policy.linkerd.io`. They map to the Istio `Gateway`."
+        explanation: "This is not the best answer. A `Server` selects a port on pods, a `MeshTLSAuthentication` names the allowed identities, and an `AuthorizationPolicy` connects the two. The Linkerd and Istio `AuthorizationPolicy` share a name but not an API group (`policy.linkerd.io` and `security.istio.io`) or fields."
+      - id: c
+        text: "A single `MeshTLSAuthentication` that names `scout`. It maps to the Istio `PeerAuthentication`."
+        explanation: "This is not the best answer. A `Server` selects a port on pods, a `MeshTLSAuthentication` names the allowed identities, and an `AuthorizationPolicy` connects the two. The Linkerd and Istio `AuthorizationPolicy` share a name but not an API group (`policy.linkerd.io` and `security.istio.io`) or fields."
+      - id: d
+        text: "A `Server` with `identityRefs`. It maps to the Istio `DestinationRule`."
+        explanation: "This is not the best answer. A `Server` selects a port on pods, a `MeshTLSAuthentication` names the allowed identities, and an `AuthorizationPolicy` connects the two. The Linkerd and Istio `AuthorizationPolicy` share a name but not an API group (`policy.linkerd.io` and `security.istio.io`) or fields."
+    correct_option: a
+    explanation: "A `Server` selects a port on pods, a `MeshTLSAuthentication` names the allowed identities, and an `AuthorizationPolicy` connects the two. The Linkerd and Istio `AuthorizationPolicy` share a name but not an API group (`policy.linkerd.io` and `security.istio.io`) or fields."

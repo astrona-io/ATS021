@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Require Mutual TLS And Authorize Callers With Linkerd (LAB). Graded against the live cluster.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-lab-020-02
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - ghcr.io/stefanprodan/podinfo:6.15.0
+      - mccutchen/go-httpbin:2.25.0
+      - curlimages/curl:8.22.0
+
+# Starting state: Linkerd edge-26.10.1, the Starfleet workloads in starfleet
+# (proxy injection on) and drifter in outpost (no proxy). The default inbound
+# policy is all-unauthenticated and there is no Server or AuthorizationPolicy,
+# so every caller may reach scout and probe. This is the fault the learner fixes.
+bootstrap:
+  init:
+    - name: seed-cluster
+      description: Install Linkerd and create the Starfleet workloads
+      type: file
+      source: bootstrap/01-seed-cluster.sh
+
+# Applied only by `astrona test`: the reference solution.
+testing:
+  init:
+    - name: apply-solution
+      description: Apply the reference solution and restart the workloads
+      type: file
+      source: solution/apply.sh
+    - name: wait-for-policies
+      description: Wait until the proxy of scout enforces the policies
+      type: file
+      source: testing/wait-for-policies.sh
+
+validation:
+  scripts:
+    - name: scout-allows-only-shuttle
+      description: scout answers shuttle and refuses every other caller
+      type: file
+      source: validation/validate-scout-allows-only-shuttle.sh
+      hint: Create a Server for the http port of scout, a MeshTLSAuthentication for the shuttle service account, and an AuthorizationPolicy that targets the Server and requires that authentication.
+    - name: probe-refuses-unmeshed
+      description: probe refuses a client without a proxy
+      type: file
+      source: validation/validate-probe-refuses-unmeshed.sh
+      hint: Set the annotation config.linkerd.io/default-inbound-policy=all-authenticated on the starfleet namespace, then restart the workloads. The proxies read it only when they start.
+    - name: probe-serves-meshed-callers
+      description: probe still answers every meshed caller in starfleet
+      type: file
+      source: validation/validate-probe-serves-meshed-callers.sh
+      hint: Do not create a Server for probe. all-authenticated lets every meshed identity through and refuses callers without one.
+
+teardown:
+  keepCluster: false

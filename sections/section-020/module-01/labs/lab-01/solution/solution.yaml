@@ -1,0 +1,42 @@
+# Reference solution for the Istio lab.
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: starfleet
+spec:
+  mtls:
+    mode: STRICT
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: scout-allow-shuttle
+  namespace: starfleet
+spec:
+  selector:
+    matchLabels:
+      app: scout
+  action: ALLOW
+  rules:
+    - from:
+        - source:
+            principals: ["cluster.local/ns/starfleet/sa/shuttle"]
+      to:
+        - operation:
+            methods: ["GET"]
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: scout-deny-env
+  namespace: starfleet
+spec:
+  selector:
+    matchLabels:
+      app: scout
+  action: DENY
+  rules:
+    - to:
+        - operation:
+            paths: ["/env"]

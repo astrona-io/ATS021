@@ -164,3 +164,27 @@ You can now lock a port with a Server, allow exactly one identity through it wit
 > - **Pointing `port` at the Service port instead of the container port.** A Server selects the pod's port (`http`, `9898` here), not the Service's `80`.
 > - **Using the wrong API version.** In edge-26.10.1, `Server` is `v1beta3`; `AuthorizationPolicy` and `MeshTLSAuthentication` are `v1alpha1`. Check with `kubectl api-resources --api-group=policy.linkerd.io`.
 > - **Confusing Linkerd's and Istio's AuthorizationPolicy.** They share a name but not an API group or fields: `policy.linkerd.io` versus `security.istio.io`.
+
+## Your mission: Require Mutual TLS And Authorize Callers With Linkerd Lab
+
+You can now lock a port with a `Server`, allow one identity through it with a `MeshTLSAuthentication` and an `AuthorizationPolicy`, and set the default inbound policy of a namespace. The mission starts a cluster where every caller reaches `scout` and `probe`, and asks you to let only `shuttle` call `scout` and to refuse callers without a proxy on `probe`.
+
+Pause the playground first, so the lab has the memory it needs:
+
+```sh
+astrona stop ats-021-playground-020-02
+```
+
+Start the lab, then grade it when you are done:
+
+```sh
+astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/module-02/labs/lab-01
+astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/module-02/labs/lab-01
+```
+
+When you are done, remove the lab and start the playground again:
+
+```sh
+astrona destroy ats-021-lab-020-02
+astrona start ats-021-playground-020-02
+```

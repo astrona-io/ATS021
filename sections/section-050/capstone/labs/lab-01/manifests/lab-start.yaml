@@ -1,0 +1,263 @@
+# Starting state of the capstone: namespaces (starfleet and starfleet-prod are
+# labelled), the service account pipeline-runner with an over-broad grant, the
+# platform policy file, three releases, the Tasks deploy-release and
+# report-outcome and an unfinished Pipeline. There is no check Task.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pipelines
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: starfleet
+  labels:
+    environment: development
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: outpost
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: starfleet-prod
+  labels:
+    environment: production
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: pipeline-runner
+  namespace: pipelines
+---
+# The fault: the pipeline got the built-in ClusterRole edit in both team
+# namespaces. It lets the pipeline change workloads and read Secrets there.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pipeline-runner-edit
+  namespace: starfleet
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit
+subjects:
+  - kind: ServiceAccount
+    name: pipeline-runner
+    namespace: pipelines
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pipeline-runner-edit
+  namespace: outpost
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit
+subjects:
+  - kind: ServiceAccount
+    name: pipeline-runner
+    namespace: pipelines
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-policies
+  namespace: pipelines
+data:
+  policies.yaml: |
+    apiVersion: kyverno.io/v1
+    kind: ClusterPolicy
+    metadata:
+      name: release-rules
+    spec:
+      rules:
+        - name: require-cpu-memory-limits
+          match:
+            any:
+              - resources:
+                  kinds: ["Deployment"]
+          validate:
+            failureAction: Enforce
+            message: "Every container must set resources.limits.cpu and resources.limits.memory."
+            pattern:
+              spec:
+                template:
+                  spec:
+                    containers:
+                      - resources:
+                          limits:
+                            cpu: "?*"
+                            memory: "?*"
+        - name: disallow-latest-tag
+          match:
+            any:
+              - resources:
+                  kinds: ["Deployment"]
+          validate:
+            failureAction: Enforce
+            message: "Images must use a fixed tag, not latest."
+            pattern:
+              spec:
+                template:
+                  spec:
+                    containers:
+                      - image: "!*:latest"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-compliant
+  namespace: pipelines
+data:
+  deployment.yaml: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: scout
+      namespace: starfleet
+      labels:
+        app: scout
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: scout
+      template:
+        metadata:
+          labels:
+            app: scout
+        spec:
+          containers:
+            - name: scout
+              image: ghcr.io/stefanprodan/podinfo:6.15.0
+              ports:
+                - containerPort: 9898
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-noncompliant
+  namespace: pipelines
+data:
+  deployment.yaml: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: scout
+      namespace: starfleet
+      labels:
+        app: scout
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: scout
+      template:
+        metadata:
+          labels:
+            app: scout
+        spec:
+          containers:
+            - name: scout
+              image: ghcr.io/stefanprodan/podinfo:latest
+              ports:
+                - containerPort: 9898
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-outpost
+  namespace: pipelines
+data:
+  deployment.yaml: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: scout
+      namespace: outpost
+      labels:
+        app: scout
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: scout
+      template:
+        metadata:
+          labels:
+            app: scout
+        spec:
+          containers:
+            - name: scout
+              image: ghcr.io/stefanprodan/podinfo:6.15.0
+              ports:
+                - containerPort: 9898
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: deploy-release
+  namespace: pipelines
+spec:
+  description: Applies the Deployment in the release workspace to the cluster.
+  workspaces:
+    - name: release
+      readOnly: true
+  steps:
+    - name: apply
+      image: registry.k8s.io/kubectl:v1.35.8
+      args: ["apply", "-f", "$(workspaces.release.path)/deployment.yaml"]
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: report-outcome
+  namespace: pipelines
+spec:
+  description: Prints the status of the pipeline and of the check Task.
+  params:
+    - name: pipeline-status
+    - name: check-status
+  steps:
+    - name: report
+      image: curlimages/curl:8.22.0
+      script: |
+        #!/bin/sh
+        echo "pipeline status: $(params.pipeline-status)"
+        echo "check status:    $(params.check-status)"
+---
+# The unfinished Pipeline: it only deploys. There is no check Task, no
+# policies workspace, no when expression and no finally Task.
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: release-gate
+  namespace: pipelines
+spec:
+  workspaces:
+    - name: release
+  tasks:
+    - name: deploy
+      taskRef:
+        name: deploy-release
+      workspaces:
+        - name: release
+          workspace: release

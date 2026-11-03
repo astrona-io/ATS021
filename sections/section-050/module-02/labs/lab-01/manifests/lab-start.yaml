@@ -1,0 +1,16 @@
+# Starting state of the image policy lab. Two labelled namespaces and one
+# policy that only records: allowed-registries is in Audit mode, so every image
+# is still admitted.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: starfleet
+  labels:
+    environment: development
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: starfleet-prod
+  labels:
+    environment: production

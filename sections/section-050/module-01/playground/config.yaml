@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Gate A Tekton Pipeline On A Compliance Check (PLAYGROUND) — playground
+# environment. A clean sandbox: it starts, installs Tekton Pipelines and the
+# pipeline setup, then stays running for free exploration. No task, no
+# grading, no `astrona submit`.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-playground-050-01
+  docs:
+    guide: docs/overview.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - ghcr.io/stefanprodan/podinfo:6.15.0
+      - curlimages/curl:8.22.0
+      - ghcr.io/kyverno/kyverno-cli:v1.19.1
+      - registry.k8s.io/kubectl:v1.35.8
+
+# What the learner starts with: Tekton Pipelines 1.17.0, the `pipelines`
+# namespace with service account `pipeline-runner` (Deployments in
+# `starfleet` only), the `deploy-release` Task, the platform policy file and
+# two `scout` releases in ConfigMaps (one compliant, one without limits and
+# with the `latest` tag). No check Task and no Pipeline.
+bootstrap:
+  init:
+    - name: prepare
+      description: "Install Tekton Pipelines 1.17.0, then apply the pipeline namespace, service account, deploy Task, policy file and releases"
+      type: file
+      source: bootstrap/prepare.sh
+
+teardown:
+  keepCluster: false

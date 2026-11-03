@@ -1,0 +1,252 @@
+# Knowledge check for section 050. Listed in astrona.yaml as a `type: quiz` entry after the capstone lab.
+schema_version: 1
+kind: question_bank
+id: ats021-050
+course_id: ATS021
+exam_code: CNPE
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-050
+  title: "Security Checks In The Delivery Pipeline"
+questions:
+  - id: ats021-050-q01
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Write a Tekton Task whose step checks the release manifests against the platform's policies and writes the outcome to a Task result"
+    source_readings:
+      - sections/section-050/module-01/course-01-run-a-compliance-check-as-a-tekton-task.md
+    prompt: |-
+      A Tekton `Task` has a `validate` step that runs the Kyverno command line image and exits with an error when a release breaks a rule. A second step, `record-outcome`, must write `pass` or `fail` to a Task result. Without any change to `validate`, the second step never runs and the Task writes no result. What fixes this?
+    options:
+      - id: a
+        text: "Set `onError: continue` on the `validate` step. Tekton then keeps going and writes the exit code to `/tekton/steps/step-validate/exitCode`, which the second step reads."
+        explanation: "Correct. A failing step fails the whole Task unless `onError: continue` is set. The image has no shell, so one script cannot run both commands. `finally` and `when` belong to a `Pipeline`, not to the steps of a Task."
+      - id: b
+        text: "Move both steps into one `script` so one container runs them."
+        explanation: "This is not the best answer. A failing step fails the whole Task unless `onError: continue` is set. The image has no shell, so one script cannot run both commands. `finally` and `when` belong to a `Pipeline`, not to the steps of a Task."
+      - id: c
+        text: "Add a `finally` section to the Task."
+        explanation: "This is not the best answer. A failing step fails the whole Task unless `onError: continue` is set. The image has no shell, so one script cannot run both commands. `finally` and `when` belong to a `Pipeline`, not to the steps of a Task."
+      - id: d
+        text: "Add a `when` expression to the `record-outcome` step."
+        explanation: "This is not the best answer. A failing step fails the whole Task unless `onError: continue` is set. The image has no shell, so one script cannot run both commands. `finally` and `when` belong to a `Pipeline`, not to the steps of a Task."
+    correct_option: a
+    explanation: "A failing step fails the whole Task unless `onError: continue` is set. The image has no shell, so one script cannot run both commands. `finally` and `when` belong to a `Pipeline`, not to the steps of a Task."
+
+  - id: ats021-050-q02
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Stop the deploy Task with a when expression that reads the check Task's result"
+    source_readings:
+      - sections/section-050/module-01/course-02-gate-the-deploy-with-a-when-expression.md
+    prompt: |-
+      A `Pipeline` has the Pipeline Tasks `check` and `deploy`. The team wants `deploy` to run only when the check wrote the result `pass`. Which entry on `deploy` does that?
+    options:
+      - id: a
+        text: "`runAfter: [\"check\"]` alone."
+        explanation: "This is not the best answer. `runAfter` sets only the order, so `deploy` would run after a `fail` result as well. A `when` expression compares the result with a list of values. Tekton skips the Pipeline Task when the condition is false."
+      - id: b
+        text: "A `when` expression with `input: \"$(tasks.check.results.outcome)\"`, `operator: in` and `values: [\"pass\"]`."
+        explanation: "Correct. `runAfter` sets only the order, so `deploy` would run after a `fail` result as well. A `when` expression compares the result with a list of values. Tekton skips the Pipeline Task when the condition is false."
+      - id: c
+        text: "A `finally` entry that names `check`."
+        explanation: "This is not the best answer. `runAfter` sets only the order, so `deploy` would run after a `fail` result as well. A `when` expression compares the result with a list of values. Tekton skips the Pipeline Task when the condition is false."
+      - id: d
+        text: "`onError: continue` on the `deploy` Task."
+        explanation: "This is not the best answer. `runAfter` sets only the order, so `deploy` would run after a `fail` result as well. A `when` expression compares the result with a list of values. Tekton skips the Pipeline Task when the condition is false."
+    correct_option: b
+    explanation: "`runAfter` sets only the order, so `deploy` would run after a `fail` result as well. A `when` expression compares the result with a list of values. Tekton skips the Pipeline Task when the condition is false."
+
+  - id: ats021-050-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Run a PipelineRun and read why a Task failed or was skipped with tkn and kubectl"
+    source_readings:
+      - sections/section-050/module-01/course-02-gate-the-deploy-with-a-when-expression.md
+    prompt: |-
+      A release with the result `fail` is run through the gated pipeline. `tkn pipelinerun describe` shows the run as `Succeeded`, the `check` and `report` TaskRuns as `Succeeded`, and `deploy` under `Skipped Tasks`. A colleague says the pipeline is broken because the run did not fail. What is correct?
+    options:
+      - id: a
+        text: "The colleague is right. A blocked release must always make the run `Failed`."
+        explanation: "This is not the best answer. `kubectl get pipelinerun -o jsonpath='{.status.skippedTasks}'` shows the evaluated condition: the input was `fail` and the condition needed `pass`. A script that checks only the run status cannot see that the gate blocked a release. It has to read the skipped Tasks."
+      - id: b
+        text: "The `report` Task is wrong, because a `finally` Task must not run on this path."
+        explanation: "This is not the best answer. `kubectl get pipelinerun -o jsonpath='{.status.skippedTasks}'` shows the evaluated condition: the input was `fail` and the condition needed `pass`. A script that checks only the run status cannot see that the gate blocked a release. It has to read the skipped Tasks."
+      - id: c
+        text: "The pipeline works. A false `when` expression skips the Task and does not fail the run, so the reason is in `status.skippedTasks` of the PipelineRun."
+        explanation: "Correct. `kubectl get pipelinerun -o jsonpath='{.status.skippedTasks}'` shows the evaluated condition: the input was `fail` and the condition needed `pass`. A script that checks only the run status cannot see that the gate blocked a release. It has to read the skipped Tasks."
+      - id: d
+        text: "The run status shows `Succeeded` only because `deploy` was cancelled."
+        explanation: "This is not the best answer. `kubectl get pipelinerun -o jsonpath='{.status.skippedTasks}'` shows the evaluated condition: the input was `fail` and the condition needed `pass`. A script that checks only the run status cannot see that the gate blocked a release. It has to read the skipped Tasks."
+    correct_option: c
+    explanation: "`kubectl get pipelinerun -o jsonpath='{.status.skippedTasks}'` shows the evaluated condition: the input was `fail` and the condition needed `pass`. A script that checks only the run status cannot see that the gate blocked a release. It has to read the skipped Tasks."
+
+  - id: ats021-050-q04
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Add a finally Task that always reports the outcome, even when the pipeline fails"
+    source_readings:
+      - sections/section-050/module-01/course-03-run-finally-on-every-path.md
+    prompt: |-
+      A `finally` Task in a Pipeline reports the state of the run. Which statement about `finally` is correct?
+    options:
+      - id: a
+        text: "It runs after all other Pipeline Tasks have finished, also when one failed or was skipped. It cannot use `runAfter`."
+        explanation: "Correct. Tekton decides the place of a `finally` Task. It runs on the success path, the blocked path and the failure path. `$(tasks.status)` gives the overall state, for example `Succeeded`, `Completed` or `Failed`. Put decisions in a result and a `when` expression, and use `finally` for reports and clean-up."
+      - id: b
+        text: "It runs only when every other Pipeline Task succeeded."
+        explanation: "This is not the best answer. Tekton decides the place of a `finally` Task. It runs on the success path, the blocked path and the failure path. `$(tasks.status)` gives the overall state, for example `Succeeded`, `Completed` or `Failed`. Put decisions in a result and a `when` expression, and use `finally` for reports and clean-up."
+      - id: c
+        text: "It runs only when a Pipeline Task failed, so it works as an error handler."
+        explanation: "This is not the best answer. Tekton decides the place of a `finally` Task. It runs on the success path, the blocked path and the failure path. `$(tasks.status)` gives the overall state, for example `Succeeded`, `Completed` or `Failed`. Put decisions in a result and a `when` expression, and use `finally` for reports and clean-up."
+      - id: d
+        text: "It runs first, before the Pipeline Task `check`, so it can prepare the workspaces."
+        explanation: "This is not the best answer. Tekton decides the place of a `finally` Task. It runs on the success path, the blocked path and the failure path. `$(tasks.status)` gives the overall state, for example `Succeeded`, `Completed` or `Failed`. Put decisions in a result and a `when` expression, and use `finally` for reports and clean-up."
+    correct_option: a
+    explanation: "Tekton decides the place of a `finally` Task. It runs on the success path, the blocked path and the failure path. `$(tasks.status)` gives the overall state, for example `Succeeded`, `Completed` or `Failed`. Put decisions in a result and a `when` expression, and use `finally` for reports and clean-up."
+
+  - id: ats021-050-q05
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Give the pipeline's service account only the rights its deploy step needs"
+    source_readings:
+      - sections/section-050/module-01/course-04-read-a-failed-task-and-limit-the-service-account.md
+    prompt: |-
+      A Pipeline passes the compliance check, but the PipelineRun ends as `Failed`. The `deploy` TaskRun shows `Failed(StepFailed)`, and the log of the step says `User "system:serviceaccount:pipelines:pipeline-runner" cannot get resource "deployments" in API group "apps" in the namespace "outpost"`. The release names the namespace `outpost`. What is the correct reading, and what is the wrong fix?
+    options:
+      - id: a
+        text: "The check failed. The fix is to bind `cluster-admin` to `pipeline-runner` so every namespace works."
+        explanation: "This is not the best answer. The check passed, so the gate opened. The API server then refused the `get` that `kubectl apply` sends first. Binding `cluster-admin` would let the pipeline deploy anywhere, and the compliance gate would be the only protection. A skipped `deploy` means the gate worked, while a failed `deploy` means something broke."
+      - id: b
+        text: "The `when` expression failed. The fix is to remove it."
+        explanation: "This is not the best answer. The check passed, so the gate opened. The API server then refused the `get` that `kubectl apply` sends first. Binding `cluster-admin` would let the pipeline deploy anywhere, and the compliance gate would be the only protection. A skipped `deploy` means the gate worked, while a failed `deploy` means something broke."
+      - id: c
+        text: "The API server rejected the request because the service account has rights only in `starfleet`. The wrong fix is `cluster-admin`. The correct action is to deploy to the namespace the Role covers, or to add a narrow Role only if the platform team approves."
+        explanation: "Correct. The check passed, so the gate opened. The API server then refused the `get` that `kubectl apply` sends first. Binding `cluster-admin` would let the pipeline deploy anywhere, and the compliance gate would be the only protection. A skipped `deploy` means the gate worked, while a failed `deploy` means something broke."
+      - id: d
+        text: "Tekton lost the workspace. The fix is to create the ConfigMap again."
+        explanation: "This is not the best answer. The check passed, so the gate opened. The API server then refused the `get` that `kubectl apply` sends first. Binding `cluster-admin` would let the pipeline deploy anywhere, and the compliance gate would be the only protection. A skipped `deploy` means the gate worked, while a failed `deploy` means something broke."
+    correct_option: c
+    explanation: "The check passed, so the gate opened. The API server then refused the `get` that `kubectl apply` sends first. Binding `cluster-admin` would let the pipeline deploy anywhere, and the compliance gate would be the only protection. A skipped `deploy` means the gate worked, while a failed `deploy` means something broke."
+
+  - id: ats021-050-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Give the pipeline's service account only the rights its deploy step needs"
+    source_readings:
+      - sections/section-050/module-01/course-04-read-a-failed-task-and-limit-the-service-account.md
+    prompt: |-
+      The service account `pipeline-runner` needs to run `kubectl apply` for one Deployment in `starfleet`. Which Role gives the least privilege that works?
+    options:
+      - id: a
+        text: "A `ClusterRole` with all verbs on all resources."
+        explanation: "This is not the best answer. `kubectl apply` needs `get` first, then `create`, and `patch` for later updates. A Role with only `create` fails on the first `get`. A ConfigMap workspace is mounted by the kubelet and needs no Role. `kubectl auth can-i ... --as=system:serviceaccount:pipelines:pipeline-runner` proves the result."
+      - id: b
+        text: "A `Role` in `starfleet` with only `create` on `deployments`."
+        explanation: "This is not the best answer. `kubectl apply` needs `get` first, then `create`, and `patch` for later updates. A Role with only `create` fails on the first `get`. A ConfigMap workspace is mounted by the kubelet and needs no Role. `kubectl auth can-i ... --as=system:serviceaccount:pipelines:pipeline-runner` proves the result."
+      - id: c
+        text: "A `Role` in `starfleet` with `get`, `list`, `create` and `patch` on `deployments`, bound to `pipeline-runner` with a `RoleBinding`."
+        explanation: "Correct. `kubectl apply` needs `get` first, then `create`, and `patch` for later updates. A Role with only `create` fails on the first `get`. A ConfigMap workspace is mounted by the kubelet and needs no Role. `kubectl auth can-i ... --as=system:serviceaccount:pipelines:pipeline-runner` proves the result."
+      - id: d
+        text: "A `Role` in `starfleet` with `get` on `configmaps`, because the release comes from a ConfigMap."
+        explanation: "This is not the best answer. `kubectl apply` needs `get` first, then `create`, and `patch` for later updates. A Role with only `create` fails on the first `get`. A ConfigMap workspace is mounted by the kubelet and needs no Role. `kubectl auth can-i ... --as=system:serviceaccount:pipelines:pipeline-runner` proves the result."
+    correct_option: c
+    explanation: "`kubectl apply` needs `get` first, then `create`, and `patch` for later updates. A Role with only `create` fails on the first `get`. A ConfigMap workspace is mounted by the kubelet and needs no Role. `kubectl auth can-i ... --as=system:serviceaccount:pipelines:pipeline-runner` proves the result."
+
+  - id: ats021-050-q07
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Explain why a tag can point at different content over time and a digest cannot"
+    source_readings:
+      - sections/section-050/module-02/course-01-read-an-image-reference.md
+    prompt: |-
+      A cluster has no image policy. In a production namespace, a Deployment uses `nginx` as its image. A `--dry-run=server` request is accepted. Which statement about this image reference is correct?
+    options:
+      - id: a
+        text: "The reference has no registry, so the runtime refuses it."
+        explanation: "This is not the best answer. The API server reads only the image string in the pod template. It does not pull or inspect the image. A short name means `docker.io`, and a missing tag means `latest`. A server-side dry run runs authentication, authorization and admission webhooks, and stops before the write to etcd."
+      - id: b
+        text: "The reference has no registry and no tag. The runtime pulls it from `docker.io/library/nginx` with the tag `latest`, so a rule must treat it that way."
+        explanation: "Correct. The API server reads only the image string in the pod template. It does not pull or inspect the image. A short name means `docker.io`, and a missing tag means `latest`. A server-side dry run runs authentication, authorization and admission webhooks, and stops before the write to etcd."
+      - id: c
+        text: "The reference is pinned, because a short name always points at one version."
+        explanation: "This is not the best answer. The API server reads only the image string in the pod template. It does not pull or inspect the image. A short name means `docker.io`, and a missing tag means `latest`. A server-side dry run runs authentication, authorization and admission webhooks, and stops before the write to etcd."
+      - id: d
+        text: "The API server pulls the image and checks it before it accepts the Deployment."
+        explanation: "This is not the best answer. The API server reads only the image string in the pod template. It does not pull or inspect the image. A short name means `docker.io`, and a missing tag means `latest`. A server-side dry run runs authentication, authorization and admission webhooks, and stops before the write to etcd."
+    correct_option: b
+    explanation: "The API server reads only the image string in the pod template. It does not pull or inspect the image. A short name means `docker.io`, and a missing tag means `latest`. A server-side dry run runs authentication, authorization and admission webhooks, and stops before the write to etcd."
+
+  - id: ats021-050-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Read each rejection message and prove the policy with one rejected and one accepted Deployment"
+    source_readings:
+      - sections/section-050/module-02/course-02-allow-only-one-registry-with-kyverno.md
+    prompt: |-
+      A Kyverno `ClusterPolicy` has the rule `only-ghcr` that matches `Pod`, with `failureAction: Enforce` and the pattern `ghcr.io/*` for the container `image`. A user sends `kubectl -n starfleet create deployment image-test --image=nginx:latest --dry-run=server`. What happens, and which part of the message names the rule?
+    options:
+      - id: a
+        text: "The API server accepts it, because the policy matches `Pod` and not `Deployment`."
+        explanation: "This is not the best answer. Kyverno generates matching rules for Deployments and other pod controllers and adds the prefix `autogen-` to the rule name. The same request with an image from `ghcr.io` is accepted, which proves the rule from both sides. In the `default` namespace the request still passes, because the namespace has no `environment` label and so the `match` block does not select it."
+      - id: b
+        text: "The webhook `validate.kyverno.svc-fail` denies the request. Kyverno autogen builds a rule for Deployments from the Pod rule, so the message names `autogen-only-ghcr` and the failing path `/spec/template/spec/containers/0/image/`."
+        explanation: "Correct. Kyverno generates matching rules for Deployments and other pod controllers and adds the prefix `autogen-` to the rule name. The same request with an image from `ghcr.io` is accepted, which proves the rule from both sides. In the `default` namespace the request still passes, because the namespace has no `environment` label and so the `match` block does not select it."
+      - id: c
+        text: "The `validation.gatekeeper.sh` webhook denies it with one line that starts with the Constraint name."
+        explanation: "This is not the best answer. Kyverno generates matching rules for Deployments and other pod controllers and adds the prefix `autogen-` to the rule name. The same request with an image from `ghcr.io` is accepted, which proves the rule from both sides. In the `default` namespace the request still passes, because the namespace has no `environment` label and so the `match` block does not select it."
+      - id: d
+        text: "The API server rejects it with `Forbidden` from RBAC."
+        explanation: "This is not the best answer. Kyverno generates matching rules for Deployments and other pod controllers and adds the prefix `autogen-` to the rule name. The same request with an image from `ghcr.io` is accepted, which proves the rule from both sides. In the `default` namespace the request still passes, because the namespace has no `environment` label and so the `match` block does not select it."
+    correct_option: b
+    explanation: "Kyverno generates matching rules for Deployments and other pod controllers and adds the prefix `autogen-` to the rule name. The same request with an image from `ghcr.io` is accepted, which proves the rule from both sides. In the `default` namespace the request still passes, because the namespace has no `environment` label and so the `match` block does not select it."
+
+  - id: ats021-050-q09
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Reject images with the latest tag or without a tag, and require images pinned by digest in production namespaces"
+    source_readings:
+      - sections/section-050/module-02/course-03-reject-latest-untagged-and-unpinned-images.md
+    prompt: |-
+      The `starfleet-prod` namespace needs two guarantees. No image may use `latest` or have no tag, and every image must be pinned by digest. Which pair of Kyverno patterns does the job in the course?
+    options:
+      - id: a
+        text: "`*:*` and `!*:latest` for the tag rules, and `*@sha256:*` for the production digest rule."
+        explanation: "Correct. `*:*` requires a colon, so an image with no tag fails. `!*:latest` negates the match, so an image that ends in `:latest` fails, but it does not catch an image with no tag, which is why the policy has two rules. `*@sha256:*` requires a digest. The digest rule is limited to namespaces labelled `environment: production`. A tag such as `6.15.0` still passes the tag rules but fails the digest rule."
+      - id: b
+        text: "`ghcr.io/*` for the tag rules, and `*:latest` for the digest rule."
+        explanation: "This is not the best answer. `*:*` requires a colon, so an image with no tag fails. `!*:latest` negates the match, so an image that ends in `:latest` fails, but it does not catch an image with no tag, which is why the policy has two rules. `*@sha256:*` requires a digest. The digest rule is limited to namespaces labelled `environment: production`. A tag such as `6.15.0` still passes the tag rules but fails the digest rule."
+      - id: c
+        text: "`!*:latest` alone, because it also rejects an image with no tag."
+        explanation: "This is not the best answer. `*:*` requires a colon, so an image with no tag fails. `!*:latest` negates the match, so an image that ends in `:latest` fails, but it does not catch an image with no tag, which is why the policy has two rules. `*@sha256:*` requires a digest. The digest rule is limited to namespaces labelled `environment: production`. A tag such as `6.15.0` still passes the tag rules but fails the digest rule."
+      - id: d
+        text: "`*@sha256:*` for the tag rules, and `*:*` for the digest rule."
+        explanation: "This is not the best answer. `*:*` requires a colon, so an image with no tag fails. `!*:latest` negates the match, so an image that ends in `:latest` fails, but it does not catch an image with no tag, which is why the policy has two rules. `*@sha256:*` requires a digest. The digest rule is limited to namespaces labelled `environment: production`. A tag such as `6.15.0` still passes the tag rules but fails the digest rule."
+    correct_option: a
+    explanation: "`*:*` requires a colon, so an image with no tag fails. `!*:latest` negates the match, so an image that ends in `:latest` fails, but it does not catch an image with no tag, which is why the policy has two rules. `*@sha256:*` requires a digest. The digest rule is limited to namespaces labelled `environment: production`. A tag such as `6.15.0` still passes the tag rules but fails the digest rule."
+
+  - id: ats021-050-q10
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Write the same allowed-registry rule as a Gatekeeper ConstraintTemplate and Constraint"
+    source_readings:
+      - sections/section-050/module-02/course-04-allow-only-one-registry-with-gatekeeper.md
+    prompt: |-
+      A Gatekeeper `ConstraintTemplate` creates the kind `K8sAllowedRegistries`. The Constraint `ghcr-only` matches only the kind `Pod` and has `enforcementAction: deny`. A user creates a Deployment with the image `nginx:latest`. `kubectl create` succeeds, but `kubectl get deploy` shows `0/1` and no pods. Where is the rejection message?
+    options:
+      - id: a
+        text: "In the output of `kubectl create`, because Gatekeeper rejects the Deployment."
+        explanation: "This is not the best answer. Gatekeeper does not generate rules for Deployments from a Pod match, as Kyverno does. The API server stores the Deployment, and the ReplicaSet controller fails to create the Pod. Run `kubectl -n starfleet get events --field-selector reason=FailedCreate`. The webhook name is `validation.gatekeeper.sh`. To reject the Deployment itself, the template must also match Deployments and read `spec.template.spec.containers`."
+      - id: b
+        text: "In `status.violations` of the `ConstraintTemplate`."
+        explanation: "This is not the best answer. Gatekeeper does not generate rules for Deployments from a Pod match, as Kyverno does. The API server stores the Deployment, and the ReplicaSet controller fails to create the Pod. Run `kubectl -n starfleet get events --field-selector reason=FailedCreate`. The webhook name is `validation.gatekeeper.sh`. To reject the Deployment itself, the template must also match Deployments and read `spec.template.spec.containers`."
+      - id: c
+        text: "In the PolicyReport of the Deployment."
+        explanation: "This is not the best answer. Gatekeeper does not generate rules for Deployments from a Pod match, as Kyverno does. The API server stores the Deployment, and the ReplicaSet controller fails to create the Pod. Run `kubectl -n starfleet get events --field-selector reason=FailedCreate`. The webhook name is `validation.gatekeeper.sh`. To reject the Deployment itself, the template must also match Deployments and read `spec.template.spec.containers`."
+      - id: d
+        text: "In the `FailedCreate` event of the ReplicaSet, which the ReplicaSet controller records when Gatekeeper rejects the Pod it tries to create. The message starts with `[ghcr-only]`."
+        explanation: "Correct. Gatekeeper does not generate rules for Deployments from a Pod match, as Kyverno does. The API server stores the Deployment, and the ReplicaSet controller fails to create the Pod. Run `kubectl -n starfleet get events --field-selector reason=FailedCreate`. The webhook name is `validation.gatekeeper.sh`. To reject the Deployment itself, the template must also match Deployments and read `spec.template.spec.containers`."
+    correct_option: d
+    explanation: "Gatekeeper does not generate rules for Deployments from a Pod match, as Kyverno does. The API server stores the Deployment, and the ReplicaSet controller fails to create the Pod. Run `kubectl -n starfleet get events --field-selector reason=FailedCreate`. The webhook name is `validation.gatekeeper.sh`. To reject the Deployment itself, the template must also match Deployments and read `spec.template.spec.containers`."

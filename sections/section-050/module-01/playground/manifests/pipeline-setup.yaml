@@ -1,0 +1,215 @@
+# The starting point for the pipeline: namespace `pipelines` with the service
+# account `pipeline-runner`, which may only read, create and update
+# Deployments in `starfleet`. A prepared `deploy-release` Task, the platform
+# policy file, and two releases of `scout` stored in ConfigMaps: a compliant
+# one, and one without resource limits that uses the `latest` tag. A third
+# release is compliant but targets the `outpost` namespace, where
+# `pipeline-runner` has no rights.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pipelines
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: starfleet
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: outpost
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: pipeline-runner
+  namespace: pipelines
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: release-deployer
+  namespace: starfleet
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "create", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pipeline-runner-release-deployer
+  namespace: starfleet
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: release-deployer
+subjects:
+  - kind: ServiceAccount
+    name: pipeline-runner
+    namespace: pipelines
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-policies
+  namespace: pipelines
+data:
+  policies.yaml: |
+    apiVersion: kyverno.io/v1
+    kind: ClusterPolicy
+    metadata:
+      name: release-rules
+    spec:
+      rules:
+        - name: require-cpu-memory-limits
+          match:
+            any:
+              - resources:
+                  kinds: ["Deployment"]
+          validate:
+            failureAction: Enforce
+            message: "Every container must set resources.limits.cpu and resources.limits.memory."
+            pattern:
+              spec:
+                template:
+                  spec:
+                    containers:
+                      - resources:
+                          limits:
+                            cpu: "?*"
+                            memory: "?*"
+        - name: disallow-latest-tag
+          match:
+            any:
+              - resources:
+                  kinds: ["Deployment"]
+          validate:
+            failureAction: Enforce
+            message: "Images must use a fixed tag, not latest."
+            pattern:
+              spec:
+                template:
+                  spec:
+                    containers:
+                      - image: "!*:latest"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-compliant
+  namespace: pipelines
+data:
+  deployment.yaml: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: scout
+      namespace: starfleet
+      labels:
+        app: scout
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: scout
+      template:
+        metadata:
+          labels:
+            app: scout
+        spec:
+          containers:
+            - name: scout
+              image: ghcr.io/stefanprodan/podinfo:6.15.0
+              ports:
+                - containerPort: 9898
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-noncompliant
+  namespace: pipelines
+data:
+  deployment.yaml: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: scout
+      namespace: starfleet
+      labels:
+        app: scout
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: scout
+      template:
+        metadata:
+          labels:
+            app: scout
+        spec:
+          containers:
+            - name: scout
+              image: ghcr.io/stefanprodan/podinfo:latest
+              ports:
+                - containerPort: 9898
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-outpost
+  namespace: pipelines
+data:
+  deployment.yaml: |
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: scout
+      namespace: outpost
+      labels:
+        app: scout
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: scout
+      template:
+        metadata:
+          labels:
+            app: scout
+        spec:
+          containers:
+            - name: scout
+              image: ghcr.io/stefanprodan/podinfo:6.15.0
+              ports:
+                - containerPort: 9898
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: deploy-release
+  namespace: pipelines
+spec:
+  description: Applies the Deployment in the release workspace to the cluster.
+  workspaces:
+    - name: release
+      readOnly: true
+  steps:
+    - name: apply
+      image: registry.k8s.io/kubectl:v1.35.8
+      args: ["apply", "-f", "$(workspaces.release.path)/deployment.yaml"]

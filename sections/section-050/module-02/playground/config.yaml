@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Admit Only Trusted Images (PLAYGROUND) — playground environment. A clean
+# sandbox: it starts, installs Kyverno and Gatekeeper and the example
+# namespaces, then stays running for free exploration. No task, no grading,
+# no `astrona submit`.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-playground-050-02
+  docs:
+    guide: docs/overview.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - ghcr.io/stefanprodan/podinfo:6.15.0
+
+# What the learner starts with: Kyverno 1.19.1 and Gatekeeper 3.23.1 with
+# ready webhooks, the namespaces `starfleet` (environment: development) and
+# `starfleet-prod` (environment: production), and `scout` in `starfleet`.
+# No image policy.
+bootstrap:
+  init:
+    - name: prepare
+      description: "Install Kyverno 1.19.1 and Gatekeeper 3.23.1, then apply the namespaces and scout"
+      type: file
+      source: bootstrap/prepare.sh
+
+teardown:
+  keepCluster: false

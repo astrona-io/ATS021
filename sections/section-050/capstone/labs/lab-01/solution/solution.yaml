@@ -1,0 +1,137 @@
+# Reference solution for the Section 050 capstone.
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: check-release
+  namespace: pipelines
+spec:
+  description: Checks the release against the platform policies and writes pass or fail to a result.
+  workspaces:
+    - name: release
+      readOnly: true
+    - name: policies
+      readOnly: true
+  results:
+    - name: outcome
+      description: pass if the release follows every policy, fail if not
+  steps:
+    - name: validate
+      image: ghcr.io/kyverno/kyverno-cli:v1.19.1
+      onError: continue
+      args:
+        - apply
+        - $(workspaces.policies.path)/policies.yaml
+        - --resource
+        - $(workspaces.release.path)/deployment.yaml
+    - name: record-outcome
+      image: curlimages/curl:8.22.0
+      script: |
+        #!/bin/sh
+        if [ "$(cat /tekton/steps/step-validate/exitCode)" = "0" ]; then
+          printf pass | tee $(results.outcome.path)
+        else
+          printf fail | tee $(results.outcome.path)
+        fi
+---
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: release-gate
+  namespace: pipelines
+spec:
+  workspaces:
+    - name: release
+    - name: policies
+  tasks:
+    - name: check
+      taskRef:
+        name: check-release
+      workspaces:
+        - name: release
+          workspace: release
+        - name: policies
+          workspace: policies
+    - name: deploy
+      runAfter: ["check"]
+      when:
+        - input: "$(tasks.check.results.outcome)"
+          operator: in
+          values: ["pass"]
+      taskRef:
+        name: deploy-release
+      workspaces:
+        - name: release
+          workspace: release
+  finally:
+    - name: report
+      taskRef:
+        name: report-outcome
+      params:
+        - name: pipeline-status
+          value: "$(tasks.status)"
+        - name: check-status
+          value: "$(tasks.check.status)"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: release-deployer
+  namespace: starfleet
+rules:
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "create", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pipeline-runner-release-deployer
+  namespace: starfleet
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: release-deployer
+subjects:
+  - kind: ServiceAccount
+    name: pipeline-runner
+    namespace: pipelines
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: trusted-images
+spec:
+  background: true
+  rules:
+    - name: only-ghcr
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaceSelector:
+                matchLabels:
+                  environment: production
+      validate:
+        failureAction: Enforce
+        message: "Images in production must come from ghcr.io."
+        pattern:
+          spec:
+            containers:
+              - image: "ghcr.io/*"
+    - name: pin-by-digest
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              namespaceSelector:
+                matchLabels:
+                  environment: production
+      validate:
+        failureAction: Enforce
+        message: "Images in production must be pinned by digest (image@sha256:...)."
+        pattern:
+          spec:
+            containers:
+              - image: "*@sha256:*"

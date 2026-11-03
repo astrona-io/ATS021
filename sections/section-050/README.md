@@ -26,14 +26,14 @@ Makes the reader able to stop non-compliant workloads before and at the door of 
 
 ### 1. Gate A Tekton Pipeline On A Compliance Check
 *   **Module Reader:** **[Module 1: Gate A Tekton Pipeline On A Compliance Check](./module-01/course.md)**
-*   **Hands-on Playground:** `sections/section-050/module-01/playground` — kind cluster with Tekton Pipelines 1.17.0 and the tkn 0.46.1 CLI. Namespace `pipelines` with service account `pipeline-runner` that can create Deployments in `starfleet` only. A prepared deploy Task that applies the `scout` Deployment from manifests in a ConfigMap. Two manifest sets to try: a compliant `scout` release and a release without resource limits that uses the `latest` tag. The check step runs the Kyverno CLI image (ghcr.io/kyverno/kyverno-cli:v1.19.1) against a platform policy file; the lesson treats it as one step image, not a tool to learn. No check Task yet.
+*   **Hands-on Playground:** `sections/section-050/module-01/playground` — kind cluster with Tekton Pipelines 1.17.0 and the tkn 0.46.1 CLI. Namespace `pipelines` with service account `pipeline-runner` that can create Deployments in `starfleet` only, a prepared `deploy-release` Task, the ConfigMap `platform-policies` and three release ConfigMaps: a compliant `scout` release, a release without resource limits that uses the `latest` tag, and a compliant release that targets the `outpost` namespace. The `starfleet` and `outpost` namespaces are empty. The reader writes the check Task, which runs the Kyverno CLI image (ghcr.io/kyverno/kyverno-cli:v1.19.1) against the platform policy file as one step image, the Pipeline and the `finally` Task; the module does not teach that CLI.
     ```bash
     astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-01/playground
     ```
 
 ### 2. Admit Only Trusted Images
 *   **Module Reader:** **[Module 2: Admit Only Trusted Images](./module-02/course.md)**
-*   **Hands-on Playground:** `sections/section-050/module-02/playground` — kind cluster with Kyverno 1.19.1 and Gatekeeper 3.23.1 installed, no image policy yet. Namespaces `starfleet` and `starfleet-prod`. podinfo 6.15.0 preloaded under its tag and known digest, plus a `docker.io/library/nginx:latest` reference to try (preloaded). No registry of its own and no signing tools.
+*   **Hands-on Playground:** `sections/section-050/module-02/playground` — kind cluster with Kyverno 1.19.1 and Gatekeeper 3.23.1 installed, no image policy yet. Namespaces `starfleet` and `starfleet-prod`. podinfo 6.15.0 preloaded and its digest used in the examples; images such as `docker.io/library/nginx:latest` are only tried in server-side dry runs, so they need no preload. No registry of its own and no signing tools.
     ```bash
     astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-02/playground
     ```

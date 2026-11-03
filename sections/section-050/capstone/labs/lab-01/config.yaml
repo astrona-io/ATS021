@@ -1,0 +1,80 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Section 050 capstone: Gate A Release Pipeline And Restrict Production Images. Graded against the live cluster.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-capstone-050
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - ghcr.io/stefanprodan/podinfo:6.15.0
+      - curlimages/curl:8.22.0
+      - ghcr.io/kyverno/kyverno-cli:v1.19.1
+      - registry.k8s.io/kubectl:v1.35.8
+
+# Starting state: Tekton Pipelines 1.17.0 and Kyverno 1.19.1, the namespaces
+# (starfleet and starfleet-prod labelled), the service account pipeline-runner
+# with edit rights in two namespaces, the Tasks deploy-release and
+# report-outcome, an unfinished Pipeline release-gate and the ClusterPolicy
+# trusted-images in Audit mode.
+bootstrap:
+  init:
+    - name: seed-cluster
+      description: Install Tekton Pipelines 1.17.0 and Kyverno 1.19.1, then apply the lab start
+      type: file
+      source: bootstrap/01-seed-cluster.sh
+
+# Applied only by `astrona test`: the reference solution.
+testing:
+  init:
+    - name: apply-solution
+      description: Apply the reference solution
+      type: file
+      source: solution/apply.sh
+    - name: wait-for-solution
+      description: Wait until the Pipeline, the Role and the image policy work
+      type: file
+      source: testing/wait-for-solution.sh
+
+validation:
+  scripts:
+    - name: compliant-release-deployed
+      description: A compliant release is checked, the check writes pass and the deploy Task creates the Deployment in starfleet
+      type: file
+      source: validation/validate-compliant-release-deployed.sh
+      hint: Write the Task check-release with a result named outcome. The validate step needs onError continue, so that the second step can write pass or fail. The Pipeline needs the workspace policies too.
+    - name: noncompliant-release-blocked
+      description: A release without limits and a release with the latest tag are not deployed, because the deploy Task is skipped
+      type: file
+      source: validation/validate-noncompliant-release-blocked.sh
+      hint: Add a when expression to the Pipeline Task deploy. Its input is $(tasks.check.results.outcome), the operator is in and the values are [pass].
+    - name: finally-runs-on-every-path
+      description: A finally Task runs after a deployed, a blocked and a failed release
+      type: file
+      source: validation/validate-finally-runs-on-every-path.sh
+      hint: Add a finally list to the Pipeline with one Pipeline Task that uses the Task report-outcome and passes $(tasks.status) and $(tasks.check.status).
+    - name: service-account-least-privilege
+      description: pipeline-runner may get, create and patch Deployments in starfleet and nothing else, and a release for outpost is not deployed
+      type: file
+      source: validation/validate-service-account-least-privilege.sh
+      hint: Remove the RoleBindings pipeline-runner-edit in starfleet and outpost. Create a Role in starfleet for Deployments and bind it to pipeline-runner.
+    - name: production-images-restricted
+      description: starfleet-prod accepts only ghcr.io images that are pinned by digest
+      type: file
+      source: validation/validate-production-images-restricted.sh
+      hint: Set failureAction to Enforce. Add a rule that requires @sha256 in the image, and limit both rules to namespaces with environment=production.
+    - name: other-namespaces-unaffected
+      description: starfleet and default are not restricted, the namespace labels are unchanged and Kyverno runs
+      type: file
+      source: validation/validate-other-namespaces-unaffected.sh
+      hint: Select namespaces with matchLabels environment=production. Do not change namespace labels and do not delete Kyverno.
+
+teardown:
+  keepCluster: false

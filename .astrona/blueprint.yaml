@@ -360,9 +360,13 @@ sections:
         notes: >
           astrona does not expose the kind cluster configuration, so the
           kubeadmConfigPatches/extraMounts route in the kind docs cannot be
-          used. Verify at build: node container name, that editing
-          /etc/kubernetes/manifests/kube-apiserver.yaml restarts the API server
-          cleanly inside the playground, and whether jq exists on the node.
+          used. Verified 2026-10-12: the node is
+          astro-ats-021-playground-040-01-control-plane, includes jq 1.7,
+          and restarts the API server cleanly after audit flags and mounts
+          are added to /etc/kubernetes/manifests/kube-apiserver.yaml.
+          A missing policy path prevents startup; restoring a working
+          manifest recovers the server. Pause the CronJob before manually
+          triggering it to avoid overlapping deletes and creates.
 
       - id: module-02
         title: Produce Compliance Reports From Policy Engines
@@ -471,9 +475,11 @@ sections:
         playground_env: >
           kind cluster with Kyverno 1.19.1 and Gatekeeper 3.23.1 installed,
           no image policy yet. Namespaces `starfleet` and `starfleet-prod`.
-          podinfo 6.15.0 preloaded under its tag and known digest, plus a
-          `docker.io/library/nginx:latest` reference to try (preloaded). No
-          registry of its own and no signing tools.
+          podinfo 6.15.0 preloaded and its digest used in the examples; other
+          references such as `docker.io/library/nginx:latest` are only tried
+          in server-side dry runs, so they need no preload (astrona rejects
+          preloading a latest tag). No registry of its own and no signing
+          tools.
         notes: >
           Official-tool rule: image signing with cosign is not on the CNPE
           list and is dropped; the module teaches admission-time image policy

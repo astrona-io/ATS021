@@ -365,9 +365,16 @@ authorization policies all match on the service account. Never use the
   static pod manifest `/etc/kubernetes/manifests/kube-apiserver.yaml`
   (flags `--audit-policy-file`, `--audit-log-path`, and matching `volumes`
   and `volumeMounts`), and wait for the kubelet to restart the API server.
-  The log is then `/var/log/kubernetes/audit/audit.log` on the node. Status:
-  **to verify at build** (the node container name astrona uses, and that the
-  learner's container engine command works from the playground).
+  The log is then `/var/log/kubernetes/audit/audit.log` on the node.
+  **Verified 2026-10-12 on Kubernetes 1.35.8:** Podman reaches
+  `astro-ats-021-playground-040-01-control-plane`; the node has `jq` 1.7.
+  Adding the flags and directory mounts restarts the API server cleanly.
+  The kubelet may take longer than 25 seconds to replace the static pod;
+  readiness can precede the mirror pod's updated arguments. A missing
+  policy path prevents startup and appears in `crictl logs`; restoring
+  a working manifest outside the watched directory and moving it into
+  place restores the server. Secret reads at `Metadata` contain neither
+  body; Deployment creates at `RequestResponse` contain both bodies.
 - **Never run Istio and Linkerd in the same playground.** The maintainer's
   Podman machine has 10 GiB and also runs the platform stack. Each
   playground installs only what its module needs.

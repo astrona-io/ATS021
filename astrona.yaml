@@ -93,6 +93,26 @@ modules:
         title: "Finding Over-Broad Grants And Extending Roles"
         path: sections/section-010/module-01/course-04-over-broad-grants-and-aggregation.md
       - type: reading
+        title: Question
+        path: sections/section-010/module-01/labs/lab-01/question.md
+      - type: lab
+        title: "Grant Least-Privilege Access With RBAC Lab"
+        path: sections/section-010/module-01/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 20m
+        topic: access-control
+        task_kind: build
+        tags: [rbac, role, rolebinding, clusterrolebinding, serviceaccount, auth-can-i, least-privilege, aggregated-clusterrole]
+        learning_goals:
+          - Write a Role and RoleBinding that give a service account only the Deployment verbs it needs in one namespace
+          - Remove a cluster-admin binding from a service account and replace it with a pod-reading Role
+          - Extend the built-in view ClusterRole through an aggregation label instead of editing it
+        resources:
+          - name: "Kubernetes RBAC reference"
+            url: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+          - name: "Kubernetes service accounts"
+            url: https://kubernetes.io/docs/concepts/security/service-accounts/
+      - type: reading
         title: Summary
         path: sections/section-010/module-01/course-05-summary.md
 
@@ -109,8 +129,57 @@ modules:
         title: "A securityContext That Passes Restricted"
         path: sections/section-010/module-02/course-03-securitycontext-for-restricted.md
       - type: reading
+        title: Question
+        path: sections/section-010/module-02/labs/lab-01/question.md
+      - type: lab
+        title: "Restrict Pods With Pod Security Admission Lab"
+        path: sections/section-010/module-02/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 20m
+        topic: workload-security
+        task_kind: migration
+        tags: [pod-security-admission, pod-security-standards, security-context, run-as-non-root, seccomp, capabilities]
+        learning_goals:
+          - Read a dry-run warning and name the pods that break the restricted level
+          - Write a securityContext that passes restricted for three workloads, including a numeric runAsUser
+          - Enforce the restricted level on a namespace and prove a privileged pod is rejected
+        resources:
+          - name: "Pod Security Admission"
+            url: https://kubernetes.io/docs/concepts/security/pod-security-admission/
+          - name: "Pod Security Standards"
+            url: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+          - name: "Configure a security context"
+            url: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+      - type: reading
         title: Summary
         path: sections/section-010/module-02/course-04-summary.md
+
+      - type: reading
+        title: Question
+        path: sections/section-010/capstone/labs/lab-01/question.md
+      - type: lab
+        title: "Access Control For Platform Resources Capstone"
+        path: sections/section-010/capstone/labs/lab-01
+        difficulty: advanced
+        estimated_duration: 30m
+        topic: access-control
+        task_kind: build
+        tags: [rbac, rolebinding, least-privilege, serviceaccount, pod-security-admission, security-context, run-as-non-root, auth-can-i]
+        learning_goals:
+          - Give a service account only the Deployment and Service rights it needs in one namespace and remove its cluster-admin grant
+          - Enforce the restricted Pod Security level on a namespace
+          - Fix a Deployment so its pods are admitted and available under restricted
+        resources:
+          - name: "Kubernetes RBAC reference"
+            url: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+          - name: "Pod Security Admission"
+            url: https://kubernetes.io/docs/concepts/security/pod-security-admission/
+          - name: "Configure a security context"
+            url: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+      - type: quiz
+        title: "Knowledge Check: Access Control For Platform Resources"
+        path: sections/section-010/quiz.yaml
+        pass_score: 70
 
   - id: module-020
     title: "Secure Service-To-Service Communication"
@@ -140,6 +209,28 @@ modules:
         title: "Authorizing Callers"
         path: sections/section-020/module-01/course-03-authorizing-callers.md
       - type: reading
+        title: Question
+        path: sections/section-020/module-01/labs/lab-01/question.md
+      - type: lab
+        title: "Require Mutual TLS And Authorize Callers With Istio Lab"
+        path: sections/section-020/module-01/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 25m
+        topic: service-mesh
+        task_kind: build
+        tags: [istio, mtls-strict, peerauthentication, authorizationpolicy, spiffe-identity]
+        learning_goals:
+          - Require STRICT mTLS in a namespace with a PeerAuthentication and prove a plain-text client is refused
+          - Write an ALLOW AuthorizationPolicy that admits only the shuttle identity and the GET method
+          - Close one path with a DENY policy and prove DENY is checked before ALLOW
+        resources:
+          - name: "Istio PeerAuthentication reference"
+            url: https://istio.io/latest/docs/reference/config/security/peer_authentication/
+          - name: "Istio AuthorizationPolicy reference"
+            url: https://istio.io/latest/docs/reference/config/security/authorization-policy/
+          - name: "Istio mutual TLS migration"
+            url: https://istio.io/latest/docs/tasks/security/authentication/mtls-migration/
+      - type: reading
         title: Summary
         path: sections/section-020/module-01/course-04-summary.md
 
@@ -153,8 +244,55 @@ modules:
         title: "Servers And Authorization Policies"
         path: sections/section-020/module-02/course-02-servers-and-authorization-policies.md
       - type: reading
+        title: Question
+        path: sections/section-020/module-02/labs/lab-01/question.md
+      - type: lab
+        title: "Require Mutual TLS And Authorize Callers With Linkerd Lab"
+        path: sections/section-020/module-02/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 25m
+        topic: service-mesh
+        task_kind: build
+        tags: [linkerd, linkerd-server, meshtlsauthentication, spiffe-identity]
+        learning_goals:
+          - Allow one mesh identity to call a workload with a Server, a MeshTLSAuthentication and an AuthorizationPolicy
+          - Refuse callers without a proxy by setting the default inbound policy of a namespace
+          - Prove the result from a meshed caller, a wrong identity and a client without a proxy
+        resources:
+          - name: "Linkerd authorization policy"
+            url: https://linkerd.io/2/reference/authorization-policy/
+          - name: "Linkerd automatic mTLS"
+            url: https://linkerd.io/2/features/automatic-mtls/
+      - type: reading
         title: Summary
         path: sections/section-020/module-02/course-03-summary.md
+
+      - type: reading
+        title: Question
+        path: sections/section-020/capstone/labs/lab-01/question.md
+      - type: lab
+        title: "Secure Service-To-Service Communication Capstone"
+        path: sections/section-020/capstone/labs/lab-01
+        difficulty: advanced
+        estimated_duration: 30m
+        topic: service-mesh
+        task_kind: build
+        tags: [istio, mtls-strict, peerauthentication, authorizationpolicy, spiffe-identity]
+        learning_goals:
+          - Require STRICT mTLS in a namespace and restore the sidecar of a workload that lost it
+          - Allow only one identity and one method on scout with an ALLOW policy
+          - Make probe reachable only from its own namespace even for a client that has a sidecar
+        resources:
+          - name: "Istio PeerAuthentication reference"
+            url: https://istio.io/latest/docs/reference/config/security/peer_authentication/
+          - name: "Istio AuthorizationPolicy reference"
+            url: https://istio.io/latest/docs/reference/config/security/authorization-policy/
+          - name: "Istio mutual TLS migration"
+            url: https://istio.io/latest/docs/tasks/security/authentication/mtls-migration/
+      - type: quiz
+        title: "Knowledge Check: Secure Service-To-Service Communication"
+        path: sections/section-020/quiz.yaml
+        pass_score: 70
 
   - id: module-030
     title: "Governance With Policy Engines And Admission Control"
@@ -184,6 +322,28 @@ modules:
         title: "Mutate And Generate Rules"
         path: sections/section-030/module-01/course-03-mutate-and-generate-rules.md
       - type: reading
+        title: Question
+        path: sections/section-030/module-01/labs/lab-01/question.md
+      - type: lab
+        title: "Validate, Mutate And Generate With Kyverno Lab"
+        path: sections/section-030/module-01/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 30m
+        topic: policy-engines
+        task_kind: build
+        tags: [kyverno, clusterpolicy, validate-rule, mutate-rule, generate-rule, enforce-mode]
+        learning_goals:
+          - Write a Kyverno ClusterPolicy in Enforce mode that refuses pods and Deployments without CPU and memory limits in one namespace
+          - Add a default team label with a mutate rule that keeps an existing value
+          - Generate a default-deny NetworkPolicy in every new namespace and skip the system namespaces
+        resources:
+          - name: "Kyverno validate rules"
+            url: https://kyverno.io/docs/policy-types/cluster-policy/validate/
+          - name: "Kyverno mutate rules"
+            url: https://kyverno.io/docs/policy-types/cluster-policy/mutate/
+          - name: "Kyverno generate rules"
+            url: https://kyverno.io/docs/policy-types/cluster-policy/generate/
+      - type: reading
         title: Summary
         path: sections/section-030/module-01/course-04-summary.md
 
@@ -200,6 +360,28 @@ modules:
         title: "Audit Status And Template Errors"
         path: sections/section-030/module-02/course-03-audit-status-and-template-errors.md
       - type: reading
+        title: Question
+        path: sections/section-030/module-02/labs/lab-01/question.md
+      - type: lab
+        title: "Enforce Constraints With Gatekeeper And Rego Lab"
+        path: sections/section-030/module-02/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 30m
+        topic: policy-engines
+        task_kind: build
+        tags: [gatekeeper, constrainttemplate, constraint, rego, gatekeeper-audit]
+        learning_goals:
+          - Find a Rego error in the status of a ConstraintTemplate and fix it
+          - Create a deny Constraint that refuses the latest tag in one namespace and accepts pinned tags
+          - Create a dryrun Constraint and read the existing violation in its audit results
+        resources:
+          - name: "Gatekeeper constraint templates"
+            url: https://open-policy-agent.github.io/gatekeeper/website/docs/constrainttemplates/
+          - name: "Gatekeeper audit"
+            url: https://open-policy-agent.github.io/gatekeeper/website/docs/audit/
+          - name: "Gatekeeper violations"
+            url: https://open-policy-agent.github.io/gatekeeper/website/docs/violations/
+      - type: reading
         title: Summary
         path: sections/section-030/module-02/course-04-summary.md
 
@@ -213,8 +395,284 @@ modules:
         title: "Bindings, Params And Validation Actions"
         path: sections/section-030/module-03/course-02-bindings-params-and-validation-actions.md
       - type: reading
+        title: Question
+        path: sections/section-030/module-03/labs/lab-01/question.md
+      - type: lab
+        title: "Write ValidatingAdmissionPolicies With CEL Lab"
+        path: sections/section-030/module-03/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 30m
+        topic: admission-control
+        task_kind: build
+        tags: [validatingadmissionpolicy, cel, admission-webhook]
+        learning_goals:
+          - Write a ValidatingAdmissionPolicy that reads its limit from a ConfigMap parameter and covers the deployments/scale subresource
+          - Allow a request that lowers the replica count of a workload that is already over the limit
+          - Bind the same policy with Deny to production namespaces and with Warn to sandbox namespaces
+        resources:
+          - name: "ValidatingAdmissionPolicy"
+            url: https://kubernetes.io/docs/reference/access-authn-authz/validating-admission-policy/
+          - name: "CEL in Kubernetes"
+            url: https://kubernetes.io/docs/reference/using-api/cel/
+      - type: reading
         title: "Choosing The Right Tool"
         path: sections/section-030/module-03/course-03-choosing-the-right-tool.md
       - type: reading
         title: Summary
         path: sections/section-030/module-03/course-04-summary.md
+
+      - type: reading
+        title: Question
+        path: sections/section-030/capstone/labs/lab-01/question.md
+      - type: lab
+        title: "Governance With Policy Engines And Admission Control Capstone"
+        path: sections/section-030/capstone/labs/lab-01
+        difficulty: advanced
+        estimated_duration: 45m
+        topic: policy-engines
+        task_kind: build
+        tags: [kyverno, clusterpolicy, enforce-mode, gatekeeper, constraint, gatekeeper-audit, validatingadmissionpolicy, cel]
+        learning_goals:
+          - Enforce resource limits with a Kyverno policy that exempts only one legacy workload
+          - Refuse the latest tag with a Gatekeeper constraint and bring a running workload into line, proved by the audit
+          - Limit replicas in production namespaces with a ValidatingAdmissionPolicy and bring a running workload under the limit
+        resources:
+          - name: "Kyverno validate rules"
+            url: https://kyverno.io/docs/policy-types/cluster-policy/validate/
+          - name: "Gatekeeper audit"
+            url: https://open-policy-agent.github.io/gatekeeper/website/docs/audit/
+          - name: "ValidatingAdmissionPolicy"
+            url: https://kubernetes.io/docs/reference/access-authn-authz/validating-admission-policy/
+      - type: quiz
+        title: "Knowledge Check: Governance With Policy Engines And Admission Control"
+        path: sections/section-030/quiz.yaml
+        pass_score: 70
+
+  - id: module-040
+    title: "Audit Trails And Compliance Evidence"
+    description: >
+      Record API requests with an audit policy, identify who changed a
+      resource, and recover a failed API server restart. Distinguish
+      request history from evidence of current policy compliance.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-040/README.md
+      - type: reading
+        title: "Record API Activity With Audit Logging"
+        path: sections/section-040/module-01/course.md
+      - type: reading
+        title: "Audit Policy Rules, Levels And Stages"
+        path: sections/section-040/module-01/course-01-audit-policy-rules-levels-and-stages.md
+      - type: reading
+        title: "Enable Audit Logging On The API Server"
+        path: sections/section-040/module-01/course-02-enable-audit-logging-on-the-api-server.md
+      - type: reading
+        title: "Find The Caller And The Change"
+        path: sections/section-040/module-01/course-03-find-the-caller-and-the-change.md
+      - type: reading
+        title: "Recover A Failed API Server Restart"
+        path: sections/section-040/module-01/course-04-recover-a-failed-api-server-restart.md
+      - type: reading
+        title: Question
+        path: sections/section-040/module-01/labs/lab-01/question.md
+      - type: lab
+        title: "Record API Activity With Audit Logging Lab"
+        path: sections/section-040/module-01/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 30m
+        topic: audit
+        task_kind: build
+        tags: [audit-policy, audit-log, kube-apiserver, static-pod]
+        learning_goals:
+          - Turn on API server audit logging with a policy file on the control plane node
+          - Record Secrets at Metadata level and Deployments at RequestResponse level, and drop health checks
+          - Identify the caller and the audit ID of a Deployment deletion in the audit log
+        resources:
+          - name: "Kubernetes auditing"
+            url: https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/
+          - name: "Audit policy in kind"
+            url: https://kind.sigs.k8s.io/docs/user/auditing/
+      - type: reading
+        title: "Summary"
+        path: sections/section-040/module-01/course-05-summary.md
+      - type: reading
+        title: "Produce Compliance Reports From Policy Engines"
+        path: sections/section-040/module-02/course.md
+      - type: reading
+        title: "Read Kyverno Policy Reports"
+        path: sections/section-040/module-02/course-01-read-kyverno-policy-reports.md
+      - type: reading
+        title: "Read Gatekeeper Audit Results"
+        path: sections/section-040/module-02/course-02-read-gatekeeper-audit-results.md
+      - type: reading
+        title: "Answer An Auditor With The Right Evidence"
+        path: sections/section-040/module-02/course-03-answer-an-auditor-with-the-right-evidence.md
+      - type: reading
+        title: Question
+        path: sections/section-040/module-02/labs/lab-01/question.md
+      - type: lab
+        title: "Produce Compliance Reports From Policy Engines Lab"
+        path: sections/section-040/module-02/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 30m
+        topic: compliance
+        task_kind: build
+        tags: [compliance-report, policy-audit, kyverno, policyreport, gatekeeper, gatekeeper-audit, audit-log]
+        learning_goals:
+          - Read Kyverno PolicyReports and the Gatekeeper Constraint status to list failing Deployments
+          - Find the caller of a scale change in the audit log and name the source that holds that answer
+        resources:
+          - name: "Kyverno policy reports"
+            url: https://kyverno.io/docs/policy-reports/
+          - name: "Gatekeeper audit"
+            url: https://open-policy-agent.github.io/gatekeeper/website/docs/audit/
+          - name: "Kubernetes auditing"
+            url: https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/
+      - type: reading
+        title: "Summary"
+        path: sections/section-040/module-02/course-04-summary.md
+
+      - type: reading
+        title: Question
+        path: sections/section-040/capstone/labs/lab-01/question.md
+      - type: lab
+        title: "Audit Trails And Compliance Evidence Capstone"
+        path: sections/section-040/capstone/labs/lab-01
+        difficulty: advanced
+        estimated_duration: 45m
+        topic: audit
+        task_kind: build
+        tags: [audit-policy, audit-log, kube-apiserver, kyverno, policyreport, gatekeeper, gatekeeper-audit, compliance-report]
+        learning_goals:
+          - Turn on API server audit logging with a given audit policy
+          - Find the identity that deleted a Deployment in the audit log
+          - Report the Deployments that fail a Kyverno policy and a Gatekeeper constraint from live evidence
+        resources:
+          - name: "Kubernetes auditing"
+            url: https://kubernetes.io/docs/tasks/debug/debug-cluster/audit/
+          - name: "Kyverno policy reports"
+            url: https://kyverno.io/docs/policy-reports/
+          - name: "Gatekeeper audit"
+            url: https://open-policy-agent.github.io/gatekeeper/website/docs/audit/
+      - type: quiz
+        title: "Knowledge Check: Audit Trails And Compliance Evidence"
+        path: sections/section-040/quiz.yaml
+        pass_score: 70
+
+  - id: module-050
+    title: "Security Checks In The Delivery Pipeline"
+    description: >
+      Gate a Tekton pipeline on a compliance check: write the check Task,
+      stop the deploy with a when expression, report with a finally Task and
+      limit the pipeline's service account. Then admit only trusted images:
+      allowed registries, no latest or untagged images and digests in
+      production, with Kyverno and Gatekeeper.
+
+    content:
+      - type: reading
+        title: Section Overview
+        path: sections/section-050/README.md
+      - type: reading
+        title: "Gate A Tekton Pipeline On A Compliance Check"
+        path: sections/section-050/module-01/course.md
+      - type: reading
+        title: "Run A Compliance Check As A Tekton Task"
+        path: sections/section-050/module-01/course-01-run-a-compliance-check-as-a-tekton-task.md
+      - type: reading
+        title: "Gate The Deploy With A when Expression"
+        path: sections/section-050/module-01/course-02-gate-the-deploy-with-a-when-expression.md
+      - type: reading
+        title: "Run finally On Every Path"
+        path: sections/section-050/module-01/course-03-run-finally-on-every-path.md
+      - type: reading
+        title: "Read A Failed Task And Limit The Service Account"
+        path: sections/section-050/module-01/course-04-read-a-failed-task-and-limit-the-service-account.md
+      - type: reading
+        title: Question
+        path: sections/section-050/module-01/labs/lab-01/question.md
+      - type: lab
+        title: "Gate A Tekton Pipeline On A Compliance Check Lab"
+        path: sections/section-050/module-01/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 40m
+        topic: pipeline-security
+        task_kind: build
+        tags: [tekton, tekton-task, tekton-pipeline, pipelinerun, task-result, when-expression, finally-task, least-privilege]
+        learning_goals:
+          - Write a Tekton Task that records pass or fail in a result
+          - Skip the deploy Task for a non-compliant release with a when expression and report every run in a finally Task
+          - Replace a broad grant with a Role that lets the pipeline service account change Deployments in one namespace only
+        resources:
+          - name: "Tekton Tasks"
+            url: https://tekton.dev/docs/pipelines/tasks/
+          - name: "Tekton Pipelines"
+            url: https://tekton.dev/docs/pipelines/pipelines/
+      - type: reading
+        title: Summary
+        path: sections/section-050/module-01/course-05-summary.md
+      - type: reading
+        title: "Admit Only Trusted Images"
+        path: sections/section-050/module-02/course.md
+      - type: reading
+        title: "Read An Image Reference"
+        path: sections/section-050/module-02/course-01-read-an-image-reference.md
+      - type: reading
+        title: "Allow Only One Registry With Kyverno"
+        path: sections/section-050/module-02/course-02-allow-only-one-registry-with-kyverno.md
+      - type: reading
+        title: "Reject Latest, Untagged And Unpinned Images"
+        path: sections/section-050/module-02/course-03-reject-latest-untagged-and-unpinned-images.md
+      - type: reading
+        title: Question
+        path: sections/section-050/module-02/labs/lab-01/question.md
+      - type: lab
+        title: "Admit Only Trusted Images Lab"
+        path: sections/section-050/module-02/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 30m
+        topic: image-policy
+        task_kind: build
+        tags: [kyverno, clusterpolicy, validate-rule, enforce-mode, image-policy, allowed-registries, disallow-latest, image-digest]
+        learning_goals:
+          - Enforce an allowed-registries rule that also refuses look-alike registry names
+          - Refuse latest and untagged images with validate rules
+          - Require a digest in namespaces labelled environment=production only
+        resources:
+          - name: "Kyverno validate rules"
+            url: https://kyverno.io/docs/policy-types/cluster-policy/validate/
+      - type: reading
+        title: "Allow Only One Registry With Gatekeeper"
+        path: sections/section-050/module-02/course-04-allow-only-one-registry-with-gatekeeper.md
+      - type: reading
+        title: Summary
+        path: sections/section-050/module-02/course-05-summary.md
+      - type: reading
+        title: Question
+        path: sections/section-050/capstone/labs/lab-01/question.md
+      - type: lab
+        title: "Security Checks In The Delivery Pipeline Capstone"
+        path: sections/section-050/capstone/labs/lab-01
+        difficulty: advanced
+        estimated_duration: 60m
+        topic: pipeline-security
+        task_kind: build
+        tags: [tekton, tekton-pipeline, when-expression, finally-task, kyverno, clusterpolicy, image-digest, compliance-gate]
+        learning_goals:
+          - Complete a Tekton Pipeline that checks a release, skips a non-compliant deploy and reports in a finally Task
+          - Limit the pipeline service account to Deployments in one namespace
+          - Restrict images in production to the approved registry and digests without affecting other namespaces
+        resources:
+          - name: "Tekton Pipelines"
+            url: https://tekton.dev/docs/pipelines/pipelines/
+          - name: "Kyverno validate rules"
+            url: https://kyverno.io/docs/policy-types/cluster-policy/validate/
+      - type: quiz
+        title: "Knowledge Check: Security Checks In The Delivery Pipeline"
+        path: sections/section-050/quiz.yaml
+        pass_score: 70
+      - type: quiz
+        title: "Final Knowledge Check: Security and Policy Enforcement"
+        path: sections/final-domain-quiz.yaml
+        pass_score: 70

@@ -14,6 +14,11 @@ items:
   status: done
   note: landing + 4 parts + summary; real output kubectl 1.35.8; Leases aggregation and SA-subject default
     verified
+- key: section-010/module-01/lab
+  kind: lab
+  what: 'graded lab for module 1: Grant Least-Privilege Access With RBAC Lab'
+  status: done
+  note: astrona validate ok; astrona test all checks pass; unsolved lab fails; reference solution passes
 - key: section-010/module-02/playground
   kind: playground
   what: 'playground for module 2: Restrict Pods With Pod Security Admission'
@@ -24,16 +29,21 @@ items:
   what: 'chapter for module 2: Restrict Pods With Pod Security Admission'
   status: done
   note: landing + 3 parts + summary; real output; kubelet non-numeric user error captured
+- key: section-010/module-02/lab
+  kind: lab
+  what: 'graded lab for module 2: Restrict Pods With Pod Security Admission Lab'
+  status: done
+  note: astrona validate ok; astrona test all checks pass; unsolved lab fails; reference solution passes
 - key: section-010/quiz
   kind: quiz
   what: 'knowledge check for section-010: Access Control For Platform Resources'
-  status: pending
+  status: done
   note: ''
 - key: section-010/capstone
   kind: capstone
   what: 'capstone lab: Access Control For Platform Resources Capstone'
-  status: pending
-  note: ''
+  status: done
+  note: astrona validate ok; astrona test 5/5 pass; unsolved lab 1/5; reference solution 5/5
 - key: section-020/module-01/playground
   kind: playground
   what: 'playground for module 1: Require Mutual TLS And Authorize Callers With Istio'
@@ -55,16 +65,26 @@ items:
   status: done
   note: 'compact: landing + 2 parts + summary; policy API versions verified (Server v1beta3, AP/MeshTLSAuthn
     v1alpha1)'
+- key: section-020/module-01/lab
+  kind: lab
+  what: 'graded lab for module 1: Require Mutual TLS And Authorize Callers With Istio Lab'
+  status: done
+  note: astrona validate ok; astrona test 4/4 pass; unsolved lab 1/4; reference solution 4/4
+- key: section-020/module-02/lab
+  kind: lab
+  what: 'graded lab for module 2: Require Mutual TLS And Authorize Callers With Linkerd Lab'
+  status: done
+  note: astrona validate ok; astrona test 3/3 pass; unsolved lab 1/3; reference solution 3/3
 - key: section-020/quiz
   kind: quiz
   what: 'knowledge check for section-020: Secure Service-To-Service Communication'
-  status: pending
+  status: done
   note: ''
 - key: section-020/capstone
   kind: capstone
   what: 'capstone lab: Secure Service-To-Service Communication Capstone'
-  status: pending
-  note: ''
+  status: done
+  note: astrona validate ok; astrona test 4/4 pass; unsolved lab 0/4; reference solution 4/4
 - key: section-030/module-01/playground
   kind: playground
   what: 'playground for module 1: Validate, Mutate And Generate With Kyverno'
@@ -76,6 +96,11 @@ items:
   status: done
   note: landing + 3 parts + summary; ClusterPolicy deprecation warning shown; PolicyException off by default,
     enabling not verified (follow-up)
+- key: section-030/module-01/lab
+  kind: lab
+  what: 'graded lab for module 1: Validate, Mutate And Generate With Kyverno Lab'
+  status: done
+  note: astrona validate ok; astrona test 4/4 pass; unsolved lab 1/4; reference solution 4/4
 - key: section-030/module-02/playground
   kind: playground
   what: 'playground for module 2: Enforce Constraints With Gatekeeper And Rego'
@@ -86,6 +111,11 @@ items:
   what: 'chapter for module 2: Enforce Constraints With Gatekeeper And Rego'
   status: done
   note: landing + 3 parts + summary; real output; Rego syntax and broken template status verified
+- key: section-030/module-02/lab
+  kind: lab
+  what: 'graded lab for module 2: Enforce Constraints With Gatekeeper And Rego Lab'
+  status: done
+  note: astrona validate ok; astrona test 4/4 pass; unsolved lab 1/4; reference solution 4/4
 - key: section-030/module-03/playground
   kind: playground
   what: 'playground for module 3: Write ValidatingAdmissionPolicies With CEL'
@@ -97,78 +127,106 @@ items:
   status: done
   note: landing + 3 parts + summary; scale subresource bypass, params, Warn/Audit, has() runtime error
     verified
+- key: section-030/module-03/lab
+  kind: lab
+  what: 'graded lab for module 3: Write ValidatingAdmissionPolicies With CEL Lab'
+  status: done
+  note: astrona validate ok; astrona test 4/4 pass; unsolved lab 0/4; reference solution 4/4
 - key: section-030/quiz
   kind: quiz
   what: 'knowledge check for section-030: Governance With Policy Engines And Admission Control'
-  status: pending
+  status: done
   note: ''
 - key: section-030/capstone
   kind: capstone
   what: 'capstone lab: Governance With Policy Engines And Admission Control Capstone'
-  status: pending
-  note: ''
+  status: done
+  note: astrona validate ok; astrona test 6/6 pass; unsolved lab 0/6; reference solution 6/6; Kyverno, Gatekeeper and ValidatingAdmissionPolicy; narrow label exemption replaces the PolicyException (exceptions are off by default)
 - key: section-040/module-01/playground
   kind: playground
   what: 'playground for module 1: Record API Activity With Audit Logging'
-  status: pending
-  note: ''
+  status: done
+  note: Booted Kubernetes 1.35.8 on 2026-10-12; all workloads and CronJob verified; audit startup, missing-policy
+    failure and recovery verified; jq 1.7 on node; config and playground validators pass
 - key: section-040/module-01/course
   kind: course
   what: 'chapter for module 1: Record API Activity With Audit Logging'
-  status: pending
-  note: ''
+  status: done
+  note: Landing + four parts + summary + guide; every displayed output checked against real runs; Secret
+    body omission, Deployment bodies, first-match read filtering, caller attribution and static pod recovery
+    verified; all required checks pass
 - key: section-040/module-02/playground
   kind: playground
-  what: 'playground for module 2: Produce SBOMs And Compliance Reports'
-  status: pending
-  note: ''
+  what: 'playground for module 2: Produce Compliance Reports From Policy Engines'
+  status: done
+  note: Booted twice on Kubernetes 1.35.8 on 2026-11-02; Kyverno PolicyReports, Gatekeeper dryrun violations and audit log events (bootstrap enables Metadata audit policy via podman exec) verified; astrona validate passes
 - key: section-040/module-02/course
   kind: course
-  what: 'chapter for module 2: Produce SBOMs And Compliance Reports'
-  status: pending
-  note: ''
+  what: 'chapter for module 2: Produce Compliance Reports From Policy Engines'
+  status: done
+  note: Landing + three parts + summary; every displayed output taken from real runs on 2026-11-02; no labs or Your mission sections yet (a later step adds them); no SBOM tool taught
+- key: section-040/module-01/lab
+  kind: lab
+  what: 'graded lab for module 1: Record API Activity With Audit Logging Lab'
+  status: done
+  note: 'UNTESTED: written and statically checked only (astrona validate ok, bash -n ok); astrona test not run yet'
+- key: section-040/module-02/lab
+  kind: lab
+  what: 'graded lab for module 2: Produce Compliance Reports From Policy Engines Lab'
+  status: done
+  note: 'UNTESTED: written and statically checked only (astrona validate ok, bash -n ok); astrona test not run yet'
 - key: section-040/quiz
   kind: quiz
   what: 'knowledge check for section-040: Audit Trails And Compliance Evidence'
-  status: pending
+  status: done
   note: ''
 - key: section-040/capstone
   kind: capstone
   what: 'capstone lab: Audit Trails And Compliance Evidence Capstone'
-  status: pending
-  note: ''
+  status: done
+  note: 'UNTESTED: written and statically checked only (astrona validate ok, bash -n ok); solution.md has no captured output; astrona test not run yet'
 - key: section-050/module-01/playground
   kind: playground
-  what: 'playground for module 1: Gate A Tekton Pipeline On An Image Scan'
-  status: pending
-  note: ''
+  what: 'playground for module 1: Gate A Tekton Pipeline On A Compliance Check'
+  status: done
+  note: 'kindest/node:v1.35.8; Tekton 1.17.0; booted and verified 2026-11-02; check Task = kyverno-cli step (onError continue) + curl step writing the result; extra release-outpost ConfigMap and outpost namespace'
 - key: section-050/module-01/course
   kind: course
-  what: 'chapter for module 1: Gate A Tekton Pipeline On An Image Scan'
-  status: pending
-  note: ''
+  what: 'chapter for module 1: Gate A Tekton Pipeline On A Compliance Check'
+  status: done
+  note: 'landing + 4 parts + summary; real output from compliant, blocked (skipped) and failed (Forbidden in outpost) runs; no labs yet'
 - key: section-050/module-02/playground
   kind: playground
-  what: 'playground for module 2: Sign Images With Cosign And Verify Them With Kyverno'
-  status: pending
-  note: ''
+  what: 'playground for module 2: Admit Only Trusted Images'
+  status: done
+  note: 'kindest/node:v1.35.8; Kyverno 1.19.1 and Gatekeeper 3.23.1; booted and verified 2026-11-02 (nginx:latest cannot be preloaded: astrona rejects latest tags, so only podinfo is preloaded); podinfo 6.15.0 index digest sha256:ec73780a... read from ghcr.io'
 - key: section-050/module-02/course
   kind: course
-  what: 'chapter for module 2: Sign Images With Cosign And Verify Them With Kyverno'
-  status: pending
-  note: ''
+  what: 'chapter for module 2: Admit Only Trusted Images'
+  status: done
+  note: 'landing + four parts + summary; every output from real server-side dry runs on 2026-11-02 (Kyverno registry, tag and digest rules; Gatekeeper registry rule on Pods, Deployment accepted then FailedCreate event); no labs or missions yet'
+- key: section-050/module-01/lab
+  kind: lab
+  what: 'graded lab for module 1: Gate A Tekton Pipeline On A Compliance Check Lab'
+  status: done
+  note: 'UNTESTED: written and statically checked only; solution.md has no captured output of its own; astrona test not run yet'
+- key: section-050/module-02/lab
+  kind: lab
+  what: 'graded lab for module 2: Admit Only Trusted Images Lab'
+  status: done
+  note: 'UNTESTED: written and statically checked only; solution.md has no captured output of its own; astrona test not run yet'
 - key: section-050/quiz
   kind: quiz
   what: 'knowledge check for section-050: Security Checks In The Delivery Pipeline'
-  status: pending
+  status: done
   note: ''
 - key: section-050/capstone
   kind: capstone
   what: 'capstone lab: Security Checks In The Delivery Pipeline Capstone'
-  status: pending
-  note: ''
+  status: done
+  note: 'UNTESTED: written and statically checked only; solution.md has no captured output of its own; astrona test not run yet'
 - key: course/final-quiz
   kind: quiz
   what: final domain quiz across every section
-  status: pending
+  status: done
   note: ''

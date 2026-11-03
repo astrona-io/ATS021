@@ -1,0 +1,708 @@
+# Final domain knowledge check across all five sections.
+schema_version: 1
+kind: question_bank
+id: ats021-final
+course_id: ATS021
+exam_code: CNPE
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: domain
+  id: security-and-policy-enforcement
+  title: "Security and Policy Enforcement"
+questions:
+  - id: ats021-final-q01
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Choose between Role and ClusterRole, and between RoleBinding and ClusterRoleBinding, for a given access requirement"
+    source_readings:
+      - sections/section-010/module-01/course-02-bindings-subjects-and-scope.md
+    prompt: |-
+      The service account `drifter` in `outpost` must read pods in `starfleet` and in no other namespace. The built-in `view` `ClusterRole` already holds the right rules. Which setup is correct?
+    options:
+      - id: a
+        text: "A `ClusterRoleBinding` from `drifter` to `view`."
+        explanation: "This option grants the right in every namespace."
+      - id: b
+        text: "A `RoleBinding` in `starfleet` that points at the `ClusterRole` `view`, with the subject `drifter` and `namespace: outpost` written out."
+        explanation: "Correct. A `RoleBinding` gives the rules of a `ClusterRole` only in the namespace of the binding. The subject lives in another namespace, so the binding must name it. A service account subject without `namespace` defaults to the namespace of the binding, which would be `starfleet`. A `RoleBinding` cannot bind a `Role` from another namespace."
+      - id: c
+        text: "A `RoleBinding` in `outpost` that points at the `ClusterRole` `view`."
+        explanation: "This option grants it in `outpost`."
+      - id: d
+        text: "A `Role` named `view` in `outpost`, bound with a `RoleBinding` in `starfleet`."
+        explanation: "This is not the best answer. A `RoleBinding` gives the rules of a `ClusterRole` only in the namespace of the binding. The subject lives in another namespace, so the binding must name it. A service account subject without `namespace` defaults to the namespace of the binding, which would be `starfleet`. A `RoleBinding` cannot bind a `Role` from another namespace."
+    correct_option: b
+    explanation: "A `RoleBinding` gives the rules of a `ClusterRole` only in the namespace of the binding. The subject lives in another namespace, so the binding must name it. A service account subject without `namespace` defaults to the namespace of the binding, which would be `starfleet`. A `RoleBinding` cannot bind a `Role` from another namespace."
+
+  - id: ats021-final-q02
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Check any permission for another identity with kubectl auth can-i --as, including --list"
+    source_readings:
+      - sections/section-010/module-01/course-03-proving-and-debugging-access.md
+    prompt: |-
+      An engineer must list everything the service account `shuttle` may do in `starfleet`. Which command answers that?
+    options:
+      - id: a
+        text: "`kubectl get rolebinding -n starfleet`"
+        explanation: "This option lists bindings only, not the resulting rules."
+      - id: b
+        text: "`kubectl auth can-i --list -n starfleet`"
+        explanation: "Without `--as`, the answer is about the caller's own rights."
+      - id: c
+        text: "`kubectl auth can-i --list -n starfleet --as=system:serviceaccount:starfleet:shuttle`"
+        explanation: "Correct. `--list` prints the rules for an identity, and `--as` makes the API server answer for that identity."
+      - id: d
+        text: "`kubectl auth can-i create pods -n starfleet`"
+        explanation: "This option checks one verb for the caller."
+    correct_option: c
+    explanation: "`--list` prints the rules for an identity, and `--as` makes the API server answer for that identity."
+
+  - id: ats021-final-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Label a namespace to enforce, audit or warn at the baseline or restricted Pod Security Standards level"
+    source_readings:
+      - sections/section-010/module-02/course-01-levels-modes-and-rejections.md
+    prompt: |-
+      The namespace `starfleet` has the labels `pod-security.kubernetes.io/enforce=baseline`, `pod-security.kubernetes.io/warn=restricted` and `pod-security.kubernetes.io/audit=restricted`. A user creates a pod that is not privileged but runs without `capabilities.drop: ["ALL"]` and without a `seccompProfile`. What happens?
+    options:
+      - id: a
+        text: "The API server admits the pod, `kubectl` prints a warning that names the `restricted` violations, and the audit event carries an annotation about them."
+        explanation: "Correct. Only the `enforce` label rejects a pod. The `warn` mode prints a warning to the user, and the `audit` mode adds an annotation to the audit event. Both admit the pod. The pod passes the enforced level `baseline`, so the API server stores it."
+      - id: b
+        text: "The API server rejects the pod, because `restricted` is the strictest label."
+        explanation: "This is not the best answer. Only the `enforce` label rejects a pod. The `warn` mode prints a warning to the user, and the `audit` mode adds an annotation to the audit event. Both admit the pod. The pod passes the enforced level `baseline`, so the API server stores it."
+      - id: c
+        text: "The API server admits the pod without any message, because it passes `baseline`."
+        explanation: "This is not the best answer. Only the `enforce` label rejects a pod. The `warn` mode prints a warning to the user, and the `audit` mode adds an annotation to the audit event. Both admit the pod. The pod passes the enforced level `baseline`, so the API server stores it."
+      - id: d
+        text: "The kubelet starts the pod and then stops it."
+        explanation: "This is not the best answer. Only the `enforce` label rejects a pod. The `warn` mode prints a warning to the user, and the `audit` mode adds an annotation to the audit event. Both admit the pod. The pod passes the enforced level `baseline`, so the API server stores it."
+    correct_option: a
+    explanation: "Only the `enforce` label rejects a pod. The `warn` mode prints a warning to the user, and the `audit` mode adds an annotation to the audit event. Both admit the pod. The pod passes the enforced level `baseline`, so the API server stores it."
+
+  - id: ats021-final-q04
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Write a securityContext (runAsNonRoot, allowPrivilegeEscalation, capabilities drop ALL, seccompProfile RuntimeDefault) that passes restricted"
+    source_readings:
+      - sections/section-010/module-02/course-03-securitycontext-for-restricted.md
+    prompt: |-
+      In a namespace that enforces `restricted`, the `scout` pod must be admitted and must also start. Its image `podinfo` declares its user by the name `app` (ID `100`). Which `securityContext` achieves both?
+    options:
+      - id: a
+        text: "`runAsNonRoot: true` and `allowPrivilegeEscalation: false` only."
+        explanation: "This option leave out fields that `restricted` requires, so admission rejects the pod."
+      - id: b
+        text: "`privileged: false` and `readOnlyRootFilesystem: true`."
+        explanation: "This option leave out fields that `restricted` requires, so admission rejects the pod."
+      - id: c
+        text: "`runAsNonRoot: true`, `allowPrivilegeEscalation: false`, `capabilities.drop: [\"ALL\"]` and `seccompProfile.type: RuntimeDefault`, with no `runAsUser`."
+        explanation: "This option passes admission, but the kubelet cannot prove that the non-numeric user `app` is not root."
+      - id: d
+        text: "The settings of option C, plus `runAsUser: 100`."
+        explanation: "Correct. The pod then shows `CreateContainerConfigError`. A numeric `runAsUser` removes the doubt."
+    correct_option: d
+    explanation: "The pod then shows `CreateContainerConfigError`. A numeric `runAsUser` removes the doubt."
+
+  - id: ats021-final-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find and remove an over-broad binding such as cluster-admin given to a workload service account"
+    source_readings:
+      - sections/section-010/module-01/course-04-over-broad-grants-and-aggregation.md
+    prompt: |-
+      An audit removes the `ClusterRoleBinding` that gave `cluster-admin` to the service account `legacy-agent` in `starfleet`. Afterwards `kubectl auth can-i create pods -n starfleet --as=system:serviceaccount:starfleet:legacy-agent` still answers `yes`. What is the correct next step?
+    options:
+      - id: a
+        text: "Wait one hour for the API server to refresh its cache."
+        explanation: "This is not the best answer. A grant can come from either kind of binding, so a complete search covers both in all namespaces. The API server answers `can-i` from the current bindings, and no cache delay of an hour exists. Editing a built-in role breaks other subjects, and the API server resets it."
+      - id: b
+        text: "Edit the `cluster-admin` `ClusterRole` and remove its rules."
+        explanation: "This is not the best answer. A grant can come from either kind of binding, so a complete search covers both in all namespaces. The API server answers `can-i` from the current bindings, and no cache delay of an hour exists. Editing a built-in role breaks other subjects, and the API server resets it."
+      - id: c
+        text: "Add `--as-group=system:masters` to the check."
+        explanation: "This is not the best answer. A grant can come from either kind of binding, so a complete search covers both in all namespaces. The API server answers `can-i` from the current bindings, and no cache delay of an hour exists. Editing a built-in role breaks other subjects, and the API server resets it."
+      - id: d
+        text: "Search the `RoleBindings` and `ClusterRoleBindings` in all namespaces for this subject. A `RoleBinding` in `starfleet` to `admin` or `cluster-admin` also gives full rights there. Delete it and run the check again."
+        explanation: "Correct. A grant can come from either kind of binding, so a complete search covers both in all namespaces. The API server answers `can-i` from the current bindings, and no cache delay of an hour exists. Editing a built-in role breaks other subjects, and the API server resets it."
+    correct_option: d
+    explanation: "A grant can come from either kind of binding, so a complete search covers both in all namespaces. The API server answers `can-i` from the current bindings, and no cache delay of an hour exists. Editing a built-in role breaks other subjects, and the API server resets it."
+
+  - id: ats021-final-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why a Deployment is accepted while its pods are rejected, and find the error in the ReplicaSet events"
+    source_readings:
+      - sections/section-010/module-02/course-02-changing-a-namespace-level.md
+    prompt: |-
+      A user applies the Deployment `bad-pod` in a namespace that enforces `restricted`. `kubectl apply` prints `deployment.apps/bad-pod created`, but `kubectl get deploy bad-pod` shows `0/1` and no pods appear. Where is the Pod Security Admission error?
+    options:
+      - id: a
+        text: "In the output of `kubectl logs deploy/bad-pod`."
+        explanation: "This is not the best answer. Pod Security Admission checks pods, not Deployments. The API server stores the Deployment. The controller then fails to create the pod, and the rejection becomes an event on the ReplicaSet. `kubectl describe replicaset` or `kubectl get events` shows it. No pod exists, so there are no logs."
+      - id: b
+        text: "In the output of `kubectl apply`, shown after a delay."
+        explanation: "This is not the best answer. Pod Security Admission checks pods, not Deployments. The API server stores the Deployment. The controller then fails to create the pod, and the rejection becomes an event on the ReplicaSet. `kubectl describe replicaset` or `kubectl get events` shows it. No pod exists, so there are no logs."
+      - id: c
+        text: "In the `FailedCreate` events of the ReplicaSet. The ReplicaSet controller sent the pod create request, and Pod Security Admission rejected it."
+        explanation: "Correct. Pod Security Admission checks pods, not Deployments. The API server stores the Deployment. The controller then fails to create the pod, and the rejection becomes an event on the ReplicaSet. `kubectl describe replicaset` or `kubectl get events` shows it. No pod exists, so there are no logs."
+      - id: d
+        text: "In the labels of the namespace."
+        explanation: "This is not the best answer. Pod Security Admission checks pods, not Deployments. The API server stores the Deployment. The controller then fails to create the pod, and the rejection becomes an event on the ReplicaSet. `kubectl describe replicaset` or `kubectl get events` shows it. No pod exists, so there are no logs."
+    correct_option: c
+    explanation: "Pod Security Admission checks pods, not Deployments. The API server stores the Deployment. The controller then fails to create the pod, and the rejection becomes an event on the ReplicaSet. `kubectl describe replicaset` or `kubectl get events` shows it. No pod exists, so there are no logs."
+
+  - id: ats021-final-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Switch a namespace from PERMISSIVE to STRICT mTLS with PeerAuthentication and prove plain-text traffic is refused"
+    source_readings:
+      - sections/section-020/module-01/course-02-requiring-strict-mtls.md
+    prompt: |-
+      In `starfleet`, the `PeerAuthentication` mode is `PERMISSIVE`. The pod `drifter` in `outpost` has no sidecar and gets `200` from `scout`. The team applies a `PeerAuthentication` named `default` in `starfleet` with `mtls.mode: STRICT`. What do `drifter` and `shuttle` (which has a sidecar) get afterwards?
+    options:
+      - id: a
+        text: "`drifter` gets a reset connection (`curl` exit code `56`). `shuttle` still gets `200`."
+        explanation: "Correct. The sidecar of `scout` expects a TLS handshake in STRICT mode and closes a plain-text connection, so no HTTP status exists. A `403` appears only after the request is read and an `AuthorizationPolicy` refuses it. `shuttle` has a sidecar, so its connection uses mutual TLS (mTLS) and succeeds."
+      - id: b
+        text: "`drifter` gets `403` with `RBAC: access denied`. `shuttle` still gets `200`."
+        explanation: "This is not the best answer. The sidecar of `scout` expects a TLS handshake in STRICT mode and closes a plain-text connection, so no HTTP status exists. A `403` appears only after the request is read and an `AuthorizationPolicy` refuses it. `shuttle` has a sidecar, so its connection uses mutual TLS (mTLS) and succeeds."
+      - id: c
+        text: "Both get a reset connection."
+        explanation: "This is not the best answer. The sidecar of `scout` expects a TLS handshake in STRICT mode and closes a plain-text connection, so no HTTP status exists. A `403` appears only after the request is read and an `AuthorizationPolicy` refuses it. `shuttle` has a sidecar, so its connection uses mutual TLS (mTLS) and succeeds."
+      - id: d
+        text: "`drifter` still gets `200`. `shuttle` gets `403`."
+        explanation: "This is not the best answer. The sidecar of `scout` expects a TLS handshake in STRICT mode and closes a plain-text connection, so no HTTP status exists. A `403` appears only after the request is read and an `AuthorizationPolicy` refuses it. `shuttle` has a sidecar, so its connection uses mutual TLS (mTLS) and succeeds."
+    correct_option: a
+    explanation: "The sidecar of `scout` expects a TLS handshake in STRICT mode and closes a plain-text connection, so no HTTP status exists. A `403` appears only after the request is read and an `AuthorizationPolicy` refuses it. `shuttle` has a sidecar, so its connection uses mutual TLS (mTLS) and succeeds."
+
+  - id: ats021-final-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Read a 403 RBAC access denied response and name the policy and rule that decided it"
+    source_readings:
+      - sections/section-020/module-01/course-03-authorizing-callers.md
+    prompt: |-
+      `shuttle` sends `GET /` to `scout` over mTLS and receives `403` with the body `RBAC: access denied`. Which statement is correct?
+    options:
+      - id: a
+        text: "The Kubernetes API server refused the request. Check the result with `kubectl auth can-i`."
+        explanation: "This is not the best answer. The text `RBAC: access denied` comes from Envoy in the receiving sidecar. It does not mean that Kubernetes RBAC refused anything. `istiod` sends the configuration to the sidecars but does not handle requests."
+      - id: b
+        text: "The Envoy sidecar of `scout` enforced an Istio `AuthorizationPolicy`. Run `istioctl x authz check deploy/scout -n starfleet` to list the policies that apply."
+        explanation: "Correct. The text `RBAC: access denied` comes from Envoy in the receiving sidecar. It does not mean that Kubernetes RBAC refused anything. `istiod` sends the configuration to the sidecars but does not handle requests."
+      - id: c
+        text: "`istiod` rejected the request before it reached `scout`."
+        explanation: "This is not the best answer. The text `RBAC: access denied` comes from Envoy in the receiving sidecar. It does not mean that Kubernetes RBAC refused anything. `istiod` sends the configuration to the sidecars but does not handle requests."
+      - id: d
+        text: "The `podinfo` application returned the error."
+        explanation: "This is not the best answer. The text `RBAC: access denied` comes from Envoy in the receiving sidecar. It does not mean that Kubernetes RBAC refused anything. `istiod` sends the configuration to the sidecars but does not handle requests."
+    correct_option: b
+    explanation: "The text `RBAC: access denied` comes from Envoy in the receiving sidecar. It does not mean that Kubernetes RBAC refused anything. `istiod` sends the configuration to the sidecars but does not handle requests."
+
+  - id: ats021-final-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Order ALLOW, DENY and CUSTOM policies and predict the result when several match"
+    source_readings:
+      - sections/section-020/module-01/course-03-authorizing-callers.md
+    prompt: |-
+      `scout` has two `AuthorizationPolicy` objects. An `ALLOW` policy allows every method from the principal `cluster.local/ns/starfleet/sa/shuttle`. A `DENY` policy refuses the method `DELETE` for all callers. `shuttle` sends `DELETE /`. What is the result?
+    options:
+      - id: a
+        text: "`200`, because the `ALLOW` policy matches the principal."
+        explanation: "This is not the best answer. The order is `CUSTOM`, then `DENY`, then `ALLOW`. A matching `DENY` policy refuses the request before any `ALLOW` policy is read."
+      - id: b
+        text: "A reset connection, because the policies conflict."
+        explanation: "This is not the best answer. The order is `CUSTOM`, then `DENY`, then `ALLOW`. A matching `DENY` policy refuses the request before any `ALLOW` policy is read."
+      - id: c
+        text: "`405`, because `DELETE` is not a method of the application."
+        explanation: "This is not the best answer. The order is `CUSTOM`, then `DENY`, then `ALLOW`. A matching `DENY` policy refuses the request before any `ALLOW` policy is read."
+      - id: d
+        text: "`403`, because the sidecar checks `DENY` policies before `ALLOW` policies, and a matching `DENY` always wins."
+        explanation: "Correct. The order is `CUSTOM`, then `DENY`, then `ALLOW`. A matching `DENY` policy refuses the request before any `ALLOW` policy is read."
+    correct_option: d
+    explanation: "The order is `CUSTOM`, then `DENY`, then `ALLOW`. A matching `DENY` policy refuses the request before any `ALLOW` policy is read."
+
+  - id: ats021-final-q10
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Write a Server and an AuthorizationPolicy with a MeshTLSAuthentication that let only shuttle call scout"
+    source_readings:
+      - sections/section-020/module-02/course-02-servers-and-authorization-policies.md
+    prompt: |-
+      In a Linkerd mesh, a team applies a `Server` for the port of `scout`, a `MeshTLSAuthentication` that names the `shuttle` service account, and an `AuthorizationPolicy` that targets the `Server` and requires that authentication. What do `shuttle` and `drifter` (no proxy) get from `scout`?
+    options:
+      - id: a
+        text: "`200` for both, because the default inbound policy still applies."
+        explanation: "This is not the best answer. The `Server` selects the port, the `MeshTLSAuthentication` names the allowed identity, and the `AuthorizationPolicy` connects the two. The proxy reads the request, finds no mesh identity for `drifter` and answers `403` with an empty body. Unlike Istio STRICT mode, Linkerd answers the request and does not reset the connection."
+      - id: b
+        text: "`200` for `shuttle`. `drifter` gets a reset connection."
+        explanation: "This is not the best answer. The `Server` selects the port, the `MeshTLSAuthentication` names the allowed identity, and the `AuthorizationPolicy` connects the two. The proxy reads the request, finds no mesh identity for `drifter` and answers `403` with an empty body. Unlike Istio STRICT mode, Linkerd answers the request and does not reset the connection."
+      - id: c
+        text: "`200` for `shuttle`. `drifter` gets `403` with an empty body."
+        explanation: "Correct. The `Server` selects the port, the `MeshTLSAuthentication` names the allowed identity, and the `AuthorizationPolicy` connects the two. The proxy reads the request, finds no mesh identity for `drifter` and answers `403` with an empty body. Unlike Istio STRICT mode, Linkerd answers the request and does not reset the connection."
+      - id: d
+        text: "`403` for both, because a `Server` always closes the port."
+        explanation: "This is not the best answer. The `Server` selects the port, the `MeshTLSAuthentication` names the allowed identity, and the `AuthorizationPolicy` connects the two. The proxy reads the request, finds no mesh identity for `drifter` and answers `403` with an empty body. Unlike Istio STRICT mode, Linkerd answers the request and does not reset the connection."
+    correct_option: c
+    explanation: "The `Server` selects the port, the `MeshTLSAuthentication` names the allowed identity, and the `AuthorizationPolicy` connects the two. The proxy reads the request, finds no mesh identity for `drifter` and answers `403` with an empty body. Unlike Istio STRICT mode, Linkerd answers the request and does not reset the connection."
+
+  - id: ats021-final-q11
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Set a default inbound policy (all-unauthenticated, all-authenticated, deny) and predict who is refused"
+    source_readings:
+      - sections/section-020/module-02/course-01-automatic-mtls-identity-and-default-policy.md
+    prompt: |-
+      A team moves a namespace from Istio to Linkerd. Under Istio, STRICT mode refused callers without a sidecar. Which Linkerd setting does the same job for a whole namespace, and when does it take effect?
+    options:
+      - id: a
+        text: "A `PeerAuthentication` with `mode: STRICT`. It takes effect at once."
+        explanation: "This is not the best answer. Linkerd has no mTLS switch resource. Meshed pods use mTLS with each other from the start, and the default inbound policy sets who may connect. The proxy reads the annotation only when it starts. Injection alone does not refuse plain-text callers."
+      - id: b
+        text: "The namespace annotation `config.linkerd.io/default-inbound-policy=all-authenticated`. It takes effect after the workloads restart."
+        explanation: "Correct. Linkerd has no mTLS switch resource. Meshed pods use mTLS with each other from the start, and the default inbound policy sets who may connect. The proxy reads the annotation only when it starts. Injection alone does not refuse plain-text callers."
+      - id: c
+        text: "A `MeshTLSAuthentication` with `mode: STRICT`. It takes effect at once."
+        explanation: "This is not the best answer. Linkerd has no mTLS switch resource. Meshed pods use mTLS with each other from the start, and the default inbound policy sets who may connect. The proxy reads the annotation only when it starts. Injection alone does not refuse plain-text callers."
+      - id: d
+        text: "Injecting the proxy into the pods. Plain-text callers are refused from then on."
+        explanation: "This is not the best answer. Linkerd has no mTLS switch resource. Meshed pods use mTLS with each other from the start, and the default inbound policy sets who may connect. The proxy reads the annotation only when it starts. Injection alone does not refuse plain-text callers."
+    correct_option: b
+    explanation: "Linkerd has no mTLS switch resource. Meshed pods use mTLS with each other from the start, and the default inbound policy sets who may connect. The proxy reads the annotation only when it starts. Injection alone does not refuse plain-text callers."
+
+  - id: ats021-final-q12
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find the workload whose sidecar is missing and so breaks STRICT mTLS"
+    source_readings:
+      - sections/section-020/module-01/course-02-requiring-strict-mtls.md
+    prompt: |-
+      After STRICT mode is on in `starfleet`, the new Deployment `beacon` (service account `shuttle`) cannot reach `scout`, while `shuttle` itself works. What is the first check?
+    options:
+      - id: a
+        text: "Whether the pod of `beacon` has the `istio-proxy` container. Its pod template may carry `sidecar.istio.io/inject: \"false\"`, and `istioctl x check-inject` names the reason."
+        explanation: "Correct. A service account becomes a mesh identity only through the sidecar certificate. Without the sidecar, `beacon` has no certificate and plain text is refused. Kubernetes RBAC is not part of mesh traffic."
+      - id: b
+        text: "Whether the service account `shuttle` has a `RoleBinding`."
+        explanation: "This is not the best answer. A service account becomes a mesh identity only through the sidecar certificate. Without the sidecar, `beacon` has no certificate and plain text is refused. Kubernetes RBAC is not part of mesh traffic."
+      - id: c
+        text: "Whether `scout` has an `AuthorizationPolicy` of the action `CUSTOM`."
+        explanation: "This is not the best answer. A service account becomes a mesh identity only through the sidecar certificate. Without the sidecar, `beacon` has no certificate and plain text is refused. Kubernetes RBAC is not part of mesh traffic."
+      - id: d
+        text: "Whether the cluster trust domain is `cluster.local`."
+        explanation: "This is not the best answer. A service account becomes a mesh identity only through the sidecar certificate. Without the sidecar, `beacon` has no certificate and plain text is refused. Kubernetes RBAC is not part of mesh traffic."
+    correct_option: a
+    explanation: "A service account becomes a mesh identity only through the sidecar certificate. Without the sidecar, `beacon` has no certificate and plain text is refused. Kubernetes RBAC is not part of mesh traffic."
+
+  - id: ats021-final-q13
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Switch a policy between Enforce and Audit and read the effect in a PolicyReport"
+    source_readings:
+      - sections/section-030/module-01/course-02-enforce-audit-and-policy-reports.md
+    prompt: |-
+      The Kyverno `ClusterPolicy` `require-limits` runs with `failureAction: Audit`, and the `PolicyReport` shows that `probe` fails it. An administrator changes the policy to `Enforce`. What happens?
+    options:
+      - id: a
+        text: "Kyverno deletes the running pods of `probe` at once."
+        explanation: "This is not the best answer. Admission decides on a request at the moment it arrives. It does not remove objects that are already stored. The Deployment can still be restarted, and the ReplicaSet controller's request for a new pod meets the Kyverno webhook. The usual order is Audit first and Enforce after the reports are clean."
+      - id: b
+        text: "Nothing changes until the policy is deleted and applied again."
+        explanation: "This is not the best answer. Admission decides on a request at the moment it arrives. It does not remove objects that are already stored. The Deployment can still be restarted, and the ReplicaSet controller's request for a new pod meets the Kyverno webhook. The usual order is Audit first and Enforce after the reports are clean."
+      - id: c
+        text: "The running pods keep running. A new pod for `probe`, for example after a restart, is refused, and the error appears as a `FailedCreate` event on the ReplicaSet."
+        explanation: "Correct. Admission decides on a request at the moment it arrives. It does not remove objects that are already stored. The Deployment can still be restarted, and the ReplicaSet controller's request for a new pod meets the Kyverno webhook. The usual order is Audit first and Enforce after the reports are clean."
+      - id: d
+        text: "The API server marks the existing Deployment as invalid."
+        explanation: "This is not the best answer. Admission decides on a request at the moment it arrives. It does not remove objects that are already stored. The Deployment can still be restarted, and the ReplicaSet controller's request for a new pod meets the Kyverno webhook. The usual order is Audit first and Enforce after the reports are clean."
+    correct_option: c
+    explanation: "Admission decides on a request at the moment it arrives. It does not remove objects that are already stored. The Deployment can still be restarted, and the ReplicaSet controller's request for a new pod meets the Kyverno webhook. The usual order is Audit first and Enforce after the reports are clean."
+
+  - id: ats021-final-q14
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Write a mutate rule that adds a default label or securityContext field to matching pods"
+    source_readings:
+      - sections/section-030/module-01/course-03-mutate-and-generate-rules.md
+    prompt: |-
+      A team wants every new pod to get the label `team: unassigned` only when the pod has no `team` label. A pod that already carries `team: starfleet` must keep it. Which Kyverno rule type does this?
+    options:
+      - id: a
+        text: "A `validate` rule with `failureAction: Audit`."
+        explanation: "This is not the best answer. A mutate rule changes the object during admission. The add-if-missing anchor `+(field)` sets a field only when the object does not have it. A validate rule can only accept or reject. A generate rule creates other objects."
+      - id: b
+        text: "A `mutate` rule that uses `patchStrategicMerge` with the anchor `+(team): unassigned` under `metadata.labels`."
+        explanation: "Correct. A mutate rule changes the object during admission. The add-if-missing anchor `+(field)` sets a field only when the object does not have it. A validate rule can only accept or reject. A generate rule creates other objects."
+      - id: c
+        text: "A `generate` rule with `synchronize: true`."
+        explanation: "This is not the best answer. A mutate rule changes the object during admission. The add-if-missing anchor `+(field)` sets a field only when the object does not have it. A validate rule can only accept or reject. A generate rule creates other objects."
+      - id: d
+        text: "A `PolicyException` for the label."
+        explanation: "This is not the best answer. A mutate rule changes the object during admission. The add-if-missing anchor `+(field)` sets a field only when the object does not have it. A validate rule can only accept or reject. A generate rule creates other objects."
+    correct_option: b
+    explanation: "A mutate rule changes the object during admission. The add-if-missing anchor `+(field)` sets a field only when the object does not have it. A validate rule can only accept or reject. A generate rule creates other objects."
+
+  - id: ats021-final-q15
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Exempt one workload from a rule with a PolicyException instead of weakening the policy"
+    source_readings:
+      - sections/section-030/module-01/course-03-mutate-and-generate-rules.md
+    prompt: |-
+      On a default Kyverno 1.19.1 installation, an administrator applies a `PolicyException` for one workload. The command succeeds, but the workload is still rejected. What is the cause, and what is the right response?
+    options:
+      - id: a
+        text: "The `PolicyException` must be created in `kube-system`. Move it there."
+        explanation: "This is not the best answer. The API server stores the `PolicyException` object, but Kyverno does not process it while the feature flag is off. Changing the whole policy to `Audit` removes the protection for every workload."
+      - id: b
+        text: "Kyverno caches policies for one hour. Wait for it."
+        explanation: "This is not the best answer. The API server stores the `PolicyException` object, but Kyverno does not process it while the feature flag is off. Changing the whole policy to `Audit` removes the protection for every workload."
+      - id: c
+        text: "The policy must be changed to `Audit` for all workloads, so that the exception is no longer needed."
+        explanation: "This is not the best answer. The API server stores the `PolicyException` object, but Kyverno does not process it while the feature flag is off. Changing the whole policy to `Audit` removes the protection for every workload."
+      - id: d
+        text: "Exceptions are off by default, because the Kyverno controllers run with `--enablePolicyException=false`. Check the controller arguments. Weakening the policy for everyone is not the answer."
+        explanation: "Correct. The API server stores the `PolicyException` object, but Kyverno does not process it while the feature flag is off. Changing the whole policy to `Audit` removes the protection for every workload."
+    correct_option: d
+    explanation: "The API server stores the `PolicyException` object, but Kyverno does not process it while the feature flag is off. Changing the whole policy to `Audit` removes the protection for every workload."
+
+  - id: ats021-final-q16
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Create a Constraint that applies the template to selected kinds and namespaces with parameters"
+    source_readings:
+      - sections/section-030/module-02/course-02-constraints-and-enforcement-actions.md
+    prompt: |-
+      A team needs a Gatekeeper rule that allows only images from a registry list that can differ per environment. Where does each part belong?
+    options:
+      - id: a
+        text: "The `ConstraintTemplate` holds the Rego `violation` rule and the schema of the parameters, and creates a new kind. A Constraint of that kind holds `match`, `parameters` and `enforcementAction`."
+        explanation: "Correct. The template defines the rule once, and each Constraint turns it on for chosen objects with its own parameters. Results of the audit also live on each Constraint, not on the template."
+      - id: b
+        text: "The Constraint holds the Rego rule, and the `ConstraintTemplate` holds the registry list."
+        explanation: "This is not the best answer. The template defines the rule once, and each Constraint turns it on for chosen objects with its own parameters. Results of the audit also live on each Constraint, not on the template."
+      - id: c
+        text: "Both the Rego rule and the registry list belong in the Constraint."
+        explanation: "This is not the best answer. The template defines the rule once, and each Constraint turns it on for chosen objects with its own parameters. Results of the audit also live on each Constraint, not on the template."
+      - id: d
+        text: "The Rego rule belongs in a `ConfigMap` in `gatekeeper-system`."
+        explanation: "This is not the best answer. The template defines the rule once, and each Constraint turns it on for chosen objects with its own parameters. Results of the audit also live on each Constraint, not on the template."
+    correct_option: a
+    explanation: "The template defines the rule once, and each Constraint turns it on for chosen objects with its own parameters. Results of the audit also live on each Constraint, not on the template."
+
+  - id: ats021-final-q17
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Switch a Constraint between deny, dryrun and warn with enforcementAction"
+    source_readings:
+      - sections/section-030/module-02/course-02-constraints-and-enforcement-actions.md
+    prompt: |-
+      A new Gatekeeper Constraint must not block anyone yet. Developers must see a message on the command line when their object breaks the rule, and the platform team wants existing violations listed in the Constraint `status`. Which `enforcementAction` fits?
+    options:
+      - id: a
+        text: "`deny`, because it reports every violation."
+        explanation: "This is not the best answer. `deny` rejects the request. `dryrun` records violations but shows the user nothing. `warn` admits and prints a warning. Audit lists the current state of the cluster for every action."
+      - id: b
+        text: "`dryrun`, because it prints a warning to the user."
+        explanation: "This is not the best answer. `deny` rejects the request. `dryrun` records violations but shows the user nothing. `warn` admits and prints a warning. Audit lists the current state of the cluster for every action."
+      - id: c
+        text: "`warn`, because it admits the object, prints a warning to the user and still records violations in the audit status."
+        explanation: "Correct. `deny` rejects the request. `dryrun` records violations but shows the user nothing. `warn` admits and prints a warning. Audit lists the current state of the cluster for every action."
+      - id: d
+        text: "No `enforcementAction`, because Gatekeeper records violations by default."
+        explanation: "This is not the best answer. `deny` rejects the request. `dryrun` records violations but shows the user nothing. `warn` admits and prints a warning. Audit lists the current state of the cluster for every action."
+    correct_option: c
+    explanation: "`deny` rejects the request. `dryrun` records violations but shows the user nothing. `warn` admits and prints a warning. Audit lists the current state of the cluster for every action."
+
+  - id: ats021-final-q18
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Write a ValidatingAdmissionPolicy with a CEL expression that limits Deployment replicas"
+    source_readings:
+      - sections/section-030/module-03/course-01-policies-and-cel-expressions.md
+    prompt: |-
+      A `ValidatingAdmissionPolicy` uses the expression `object.spec.replicas <= 5` for `deployments`. A `ValidatingAdmissionPolicyBinding` with `validationActions: ["Deny"]` selects `starfleet`. `kubectl apply` with `replicas: 9` is rejected, but `kubectl scale deployment scout --replicas=9` succeeds. Why?
+    options:
+      - id: a
+        text: "The binding must use `Warn` for `kubectl scale`."
+        explanation: "This is not the best answer. A rule on `deployments` does not match a request to `deployments/scale`. The same expression works for both objects. A policy without a binding checks nothing, but here the binding exists, as the rejected `apply` shows."
+      - id: b
+        text: "CEL cannot read `replicas` in a `Scale` request."
+        explanation: "This is not the best answer. A rule on `deployments` does not match a request to `deployments/scale`. The same expression works for both objects. A policy without a binding checks nothing, but here the binding exists, as the rejected `apply` shows."
+      - id: c
+        text: "The policy works only after Gatekeeper audit has run."
+        explanation: "This is not the best answer. A rule on `deployments` does not match a request to `deployments/scale`. The same expression works for both objects. A policy without a binding checks nothing, but here the binding exists, as the rejected `apply` shows."
+      - id: d
+        text: "`kubectl scale` writes to the `deployments/scale` subresource. The policy must list `deployments/scale` in its `matchConstraints`. The `Scale` object also has `spec.replicas`."
+        explanation: "Correct. A rule on `deployments` does not match a request to `deployments/scale`. The same expression works for both objects. A policy without a binding checks nothing, but here the binding exists, as the rejected `apply` shows."
+    correct_option: d
+    explanation: "A rule on `deployments` does not match a request to `deployments/scale`. The same expression works for both objects. A policy without a binding checks nothing, but here the binding exists, as the rejected `apply` shows."
+
+  - id: ats021-final-q19
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Choose between ValidatingAdmissionPolicy, Kyverno and Gatekeeper for a given rule and say why"
+    source_readings:
+      - sections/section-030/module-03/course-03-choosing-the-right-tool.md
+    prompt: |-
+      A `ValidatingAdmissionPolicy` must require the label `team` on Deployments, and some Deployments carry no labels at all. Which CEL expression rejects them cleanly and does not raise a runtime error?
+    options:
+      - id: a
+        text: "`object.metadata.labels.team != ''`"
+        explanation: "This is not the best answer. Reading a missing key is a runtime error. With `failurePolicy: Fail`, the error denies the request, but the message is not the rule's message. `has()` guards the read. The built-in policy needs no extra software and only validates. It cannot mutate or generate objects."
+      - id: b
+        text: "`has(object.metadata.labels) && has(object.metadata.labels.team)`"
+        explanation: "Correct. Reading a missing key is a runtime error. With `failurePolicy: Fail`, the error denies the request, but the message is not the rule's message. `has()` guards the read. The built-in policy needs no extra software and only validates. It cannot mutate or generate objects."
+      - id: c
+        text: "`object.metadata.labels.team.size() > 0`"
+        explanation: "This is not the best answer. Reading a missing key is a runtime error. With `failurePolicy: Fail`, the error denies the request, but the message is not the rule's message. `has()` guards the read. The built-in policy needs no extra software and only validates. It cannot mutate or generate objects."
+      - id: d
+        text: "`object.spec.team != ''`"
+        explanation: "This is not the best answer. Reading a missing key is a runtime error. With `failurePolicy: Fail`, the error denies the request, but the message is not the rule's message. `has()` guards the read. The built-in policy needs no extra software and only validates. It cannot mutate or generate objects."
+    correct_option: b
+    explanation: "Reading a missing key is a runtime error. With `failurePolicy: Fail`, the error denies the request, but the message is not the rule's message. `has()` guards the read. The built-in policy needs no extra software and only validates. It cannot mutate or generate objects."
+
+  - id: ats021-final-q20
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Name the audit level and stage of a given event and say why a rule matched it"
+    source_readings:
+      - sections/section-040/module-01/course-01-audit-policy-rules-levels-and-stages.md
+    prompt: |-
+      An audit policy has these rules in order: (1) `Metadata` for `secrets`; (2) `RequestResponse` for the verbs `create`, `update`, `patch` and `delete` on `deployments`; (3) `None` for the verbs `get`, `list` and `watch`; (4) `Metadata` for everything else. A client sends `GET` for the Deployment `probe`, and later `PATCH` for the same Deployment. What does the log hold?
+    options:
+      - id: a
+        text: "A `Metadata` event for each request."
+        explanation: "This is not the best answer. The API server uses the first matching rule. The `GET` does not match rule 2, because the verbs differ. It matches rule 3, so no event exists. The `PATCH` matches rule 2."
+      - id: b
+        text: "A `RequestResponse` event for each request."
+        explanation: "This is not the best answer. The API server uses the first matching rule. The `GET` does not match rule 2, because the verbs differ. It matches rule 3, so no event exists. The `PATCH` matches rule 2."
+      - id: c
+        text: "A `Metadata` event for the `GET` and no event for the `PATCH`."
+        explanation: "This is not the best answer. The API server uses the first matching rule. The `GET` does not match rule 2, because the verbs differ. It matches rule 3, so no event exists. The `PATCH` matches rule 2."
+      - id: d
+        text: "No event for the `GET`, because rule 3 matches and sets `None`. A `RequestResponse` event for the `PATCH`, because rule 2 matches first."
+        explanation: "Correct. The API server uses the first matching rule. The `GET` does not match rule 2, because the verbs differ. It matches rule 3, so no event exists. The `PATCH` matches rule 2."
+    correct_option: d
+    explanation: "The API server uses the first matching rule. The `GET` does not match rule 2, because the verbs differ. It matches rule 3, so no event exists. The `PATCH` matches rule 2."
+
+  - id: ats021-final-q21
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Confirm the API server restarted with the new flags and find the problem when it does not come back"
+    source_readings:
+      - sections/section-040/module-01/course-04-recover-a-failed-api-server-restart.md
+    prompt: |-
+      An administrator adds audit flags to `/etc/kubernetes/manifests/kube-apiserver.yaml`, and `kubectl` then fails with `Unable to connect to the server: EOF` for several minutes. What is the correct way to find the cause?
+    options:
+      - id: a
+        text: "Open a shell in the control plane node container, list the API server containers with `crictl ps -a --name kube-apiserver`, and read the newest container's log with `crictl logs`."
+        explanation: "Correct. `kubectl` needs the API server, and `crictl` talks to the container runtime on the node, so it works without it. The log names the exact path that failed. The kubelet retries but cannot create a missing file. A working copy of the manifest, staged outside the watched directory and then moved into place, restores the server."
+      - id: b
+        text: "Run `kubectl -n kube-system logs kube-apiserver-<node>`."
+        explanation: "This is not the best answer. `kubectl` needs the API server, and `crictl` talks to the container runtime on the node, so it works without it. The log names the exact path that failed. The kubelet retries but cannot create a missing file. A working copy of the manifest, staged outside the watched directory and then moved into place, restores the server."
+      - id: c
+        text: "Delete the mirror pod with `kubectl delete pod`."
+        explanation: "This is not the best answer. `kubectl` needs the API server, and `crictl` talks to the container runtime on the node, so it works without it. The log names the exact path that failed. The kubelet retries but cannot create a missing file. A working copy of the manifest, staged outside the watched directory and then moved into place, restores the server."
+      - id: d
+        text: "Wait. The kubelet creates a missing policy file after a few retries."
+        explanation: "This is not the best answer. `kubectl` needs the API server, and `crictl` talks to the container runtime on the node, so it works without it. The log names the exact path that failed. The kubelet retries but cannot create a missing file. A working copy of the manifest, staged outside the watched directory and then moved into place, restores the server."
+    correct_option: a
+    explanation: "`kubectl` needs the API server, and `crictl` talks to the container runtime on the node, so it works without it. The log names the exact path that failed. The kubelet retries but cannot create a missing file. A working copy of the manifest, staged outside the watched directory and then moved into place, restores the server."
+
+  - id: ats021-final-q22
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find who deleted a Deployment, with which identity and when, in the audit log with jq"
+    source_readings:
+      - sections/section-040/module-01/course-03-find-the-caller-and-the-change.md
+    prompt: |-
+      The audit log holds two events with `verb: delete`, `objectRef.name: probe` and `stage: ResponseComplete`. One was sent by `kubernetes-admin` with `responseStatus.code` `404`. The other was sent by `system:serviceaccount:outpost:deck-cleaner` with code `200`. Who deleted `probe` in `starfleet`?
+    options:
+      - id: a
+        text: "`kubernetes-admin`, because it appears first."
+        explanation: "This is not the best answer. The code `200` at `ResponseComplete` proves the deletion. The namespace in `system:serviceaccount:outpost:deck-cleaner` is the namespace of the service account, not of the target. `objectRef.namespace` holds the target namespace."
+      - id: b
+        text: "The workload that uses the service account `deck-cleaner` in `outpost`. The `404` event was a failed attempt on an object that was already gone. The log names the workload credential, not the person who changed the workload."
+        explanation: "Correct. The code `200` at `ResponseComplete` proves the deletion. The namespace in `system:serviceaccount:outpost:deck-cleaner` is the namespace of the service account, not of the target. `objectRef.namespace` holds the target namespace."
+      - id: c
+        text: "A person in `outpost`, because the identity names the namespace."
+        explanation: "This is not the best answer. The code `200` at `ResponseComplete` proves the deletion. The namespace in `system:serviceaccount:outpost:deck-cleaner` is the namespace of the service account, not of the target. `objectRef.namespace` holds the target namespace."
+      - id: d
+        text: "Nobody. The log cannot prove a deletion."
+        explanation: "This is not the best answer. The code `200` at `ResponseComplete` proves the deletion. The namespace in `system:serviceaccount:outpost:deck-cleaner` is the namespace of the service account, not of the target. `objectRef.namespace` holds the target namespace."
+    correct_option: b
+    explanation: "The code `200` at `ResponseComplete` proves the deletion. The namespace in `system:serviceaccount:outpost:deck-cleaner` is the namespace of the service account, not of the target. `objectRef.namespace` holds the target namespace."
+
+  - id: ats021-final-q23
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why an Audit-mode policy and Gatekeeper audit report existing objects that admission never saw"
+    source_readings:
+      - sections/section-040/module-02/course-02-read-gatekeeper-audit-results.md
+    prompt: |-
+      The Gatekeeper Constraint `deployments-need-owner` has `enforcementAction: dryrun`. Its `status.violations` list names `legacy-beacon`, a Deployment that existed before the Constraint was created. Which component found it, and how?
+    options:
+      - id: a
+        text: "The admission webhook, which replays old requests when a Constraint is created."
+        explanation: "This is not the best answer. Admission sees a request only when it arrives. The audit controller checks what is already stored, so it finds objects created before the Constraint, objects admitted by `dryrun` and objects admitted while the webhook was down. The list stops at 20 entries by default, and `status.auditTimestamp` shows its age."
+      - id: b
+        text: "The `ConstraintTemplate`, which scans the cluster once after it is applied."
+        explanation: "This is not the best answer. Admission sees a request only when it arrives. The audit controller checks what is already stored, so it finds objects created before the Constraint, objects admitted by `dryrun` and objects admitted while the webhook was down. The list stops at 20 entries by default, and `status.auditTimestamp` shows its age."
+      - id: c
+        text: "The `gatekeeper-audit` controller, which lists the stored objects that the Constraint matches on an interval (60 seconds by default). Admission never saw `legacy-beacon`."
+        explanation: "Correct. Admission sees a request only when it arrives. The audit controller checks what is already stored, so it finds objects created before the Constraint, objects admitted by `dryrun` and objects admitted while the webhook was down. The list stops at 20 entries by default, and `status.auditTimestamp` shows its age."
+      - id: d
+        text: "Kyverno, which copies its reports into the Constraint."
+        explanation: "This is not the best answer. Admission sees a request only when it arrives. The audit controller checks what is already stored, so it finds objects created before the Constraint, objects admitted by `dryrun` and objects admitted while the webhook was down. The list stops at 20 entries by default, and `status.auditTimestamp` shows its age."
+    correct_option: c
+    explanation: "Admission sees a request only when it arrives. The audit controller checks what is already stored, so it finds objects created before the Constraint, objects admitted by `dryrun` and objects admitted while the webhook was down. The list stops at 20 entries by default, and `status.auditTimestamp` shows its age."
+
+  - id: ats021-final-q24
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Choose which source answers a given auditor question (what breaks policy now, what changed, who did it)"
+    source_readings:
+      - sections/section-040/module-02/course-03-answer-an-auditor-with-the-right-evidence.md
+    prompt: |-
+      An auditor asks: "Which Deployments in `starfleet` break the `require-limits` rule now, and who created `probe`?" Which sources answer the two parts?
+    options:
+      - id: a
+        text: "The first from the Kyverno `PolicyReport` results. The second from the API server audit log."
+        explanation: "Correct. Policy reports and Constraint status scan stored objects and say what is wrong now. The audit log records requests and says who did what, but not whether an object follows a rule. A complete answer joins both."
+      - id: b
+        text: "The first from the audit log. The second from the `PolicyReport`."
+        explanation: "This is not the best answer. Policy reports and Constraint status scan stored objects and say what is wrong now. The audit log records requests and says who did what, but not whether an object follows a rule. A complete answer joins both."
+      - id: c
+        text: "Both from the `PolicyReport`."
+        explanation: "This is not the best answer. Policy reports and Constraint status scan stored objects and say what is wrong now. The audit log records requests and says who did what, but not whether an object follows a rule. A complete answer joins both."
+      - id: d
+        text: "Both from the audit log."
+        explanation: "This is not the best answer. Policy reports and Constraint status scan stored objects and say what is wrong now. The audit log records requests and says who did what, but not whether an object follows a rule. A complete answer joins both."
+    correct_option: a
+    explanation: "Policy reports and Constraint status scan stored objects and say what is wrong now. The audit log records requests and says who did what, but not whether an object follows a rule. A complete answer joins both."
+
+  - id: ats021-final-q25
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Run a PipelineRun and read why a Task failed or was skipped with tkn and kubectl"
+    source_readings:
+      - sections/section-050/module-01/course-02-gate-the-deploy-with-a-when-expression.md
+    prompt: |-
+      A Tekton pipeline has the Pipeline Tasks `check` and `deploy`. `deploy` has a `when` expression on the result of `check`. How does the pipeline owner tell a release that the gate blocked from a release where the deploy broke?
+    options:
+      - id: a
+        text: "Both end as `Failed`, so the owner reads the logs."
+        explanation: "This is not the best answer. A false `when` expression skips the Task. It does not fail the run. A script that reads only the run status cannot see the block. Alert on a failed run, and report on a skipped one."
+      - id: b
+        text: "A blocked release has a `deploy` TaskRun with `Failed(StepFailed)`."
+        explanation: "This is not the best answer. A false `when` expression skips the Task. It does not fail the run. A script that reads only the run status cannot see the block. Alert on a failed run, and report on a skipped one."
+      - id: c
+        text: "A blocked release has no `deploy` TaskRun. `deploy` appears in `status.skippedTasks` with the evaluated condition, and the run does not fail. A broken deploy has a TaskRun with `Failed(StepFailed)`, and the run is `Failed`."
+        explanation: "Correct. A false `when` expression skips the Task. It does not fail the run. A script that reads only the run status cannot see the block. Alert on a failed run, and report on a skipped one."
+      - id: d
+        text: "A blocked release makes the whole PipelineRun `Failed`, and a broken deploy makes it `Succeeded`."
+        explanation: "This is not the best answer. A false `when` expression skips the Task. It does not fail the run. A script that reads only the run status cannot see the block. Alert on a failed run, and report on a skipped one."
+    correct_option: c
+    explanation: "A false `when` expression skips the Task. It does not fail the run. A script that reads only the run status cannot see the block. Alert on a failed run, and report on a skipped one."
+
+  - id: ats021-final-q26
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Add a finally Task that always reports the outcome, even when the pipeline fails"
+    source_readings:
+      - sections/section-050/module-01/course-03-run-finally-on-every-path.md
+    prompt: |-
+      A pipeline has a `finally` Task named `report` that prints `$(tasks.status)`. The `deploy` Task fails because its service account is forbidden to `get` Deployments. Does `report` run, and what does it print?
+    options:
+      - id: a
+        text: "It does not run, because `finally` Tasks run only after success."
+        explanation: "This is not the best answer. `$(tasks.status)` is the overall state of the other Tasks. A `finally` Task reports a state and does not decide. Put the decision in a result and a `when` expression."
+      - id: b
+        text: "It does not run, because the failed Task cancels all later Tasks."
+        explanation: "This is not the best answer. `$(tasks.status)` is the overall state of the other Tasks. A `finally` Task reports a state and does not decide. Put the decision in a result and a `when` expression."
+      - id: c
+        text: "It runs and prints `Succeeded`, because its own step succeeded."
+        explanation: "This is not the best answer. `$(tasks.status)` is the overall state of the other Tasks. A `finally` Task reports a state and does not decide. Put the decision in a result and a `when` expression."
+      - id: d
+        text: "It runs and prints `Failed`. A `finally` Task runs after all other Pipeline Tasks, whether they succeeded, failed or were skipped."
+        explanation: "Correct. `$(tasks.status)` is the overall state of the other Tasks. A `finally` Task reports a state and does not decide. Put the decision in a result and a `when` expression."
+    correct_option: d
+    explanation: "`$(tasks.status)` is the overall state of the other Tasks. A `finally` Task reports a state and does not decide. Put the decision in a result and a `when` expression."
+
+  - id: ats021-final-q27
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Give the pipeline's service account only the rights its deploy step needs"
+    source_readings:
+      - sections/section-050/module-01/course-04-read-a-failed-task-and-limit-the-service-account.md
+    prompt: |-
+      The service account `pipeline-runner` deploys one Deployment to `starfleet`. A reviewer runs four checks with `--as=system:serviceaccount:pipelines:pipeline-runner`: `can-i create deployments -n starfleet`, `can-i create deployments -n outpost`, `can-i delete deployments -n starfleet` and `can-i get secrets -n starfleet`. Which answers show the least privilege that the deploy step needs?
+    options:
+      - id: a
+        text: "`yes`, `no`, `no`, `no`"
+        explanation: "Correct. The deploy step needs `get`, `list`, `create` and `patch` on Deployments in one namespace. It needs no `delete`, no other namespace and no Secrets. Binding `cluster-admin` would turn all four answers into `yes`."
+      - id: b
+        text: "`yes`, `yes`, `yes`, `yes`"
+        explanation: "This is not the best answer. The deploy step needs `get`, `list`, `create` and `patch` on Deployments in one namespace. It needs no `delete`, no other namespace and no Secrets. Binding `cluster-admin` would turn all four answers into `yes`."
+      - id: c
+        text: "`no`, `no`, `no`, `no`"
+        explanation: "This is not the best answer. The deploy step needs `get`, `list`, `create` and `patch` on Deployments in one namespace. It needs no `delete`, no other namespace and no Secrets. Binding `cluster-admin` would turn all four answers into `yes`."
+      - id: d
+        text: "`yes`, `yes`, `no`, `no`"
+        explanation: "This is not the best answer. The deploy step needs `get`, `list`, `create` and `patch` on Deployments in one namespace. It needs no `delete`, no other namespace and no Secrets. Binding `cluster-admin` would turn all four answers into `yes`."
+    correct_option: a
+    explanation: "The deploy step needs `get`, `list`, `create` and `patch` on Deployments in one namespace. It needs no `delete`, no other namespace and no Secrets. Binding `cluster-admin` would turn all four answers into `yes`."
+
+  - id: ats021-final-q28
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why a tag can point at different content over time and a digest cannot"
+    source_readings:
+      - sections/section-050/module-02/course-01-read-an-image-reference.md
+    prompt: |-
+      In `starfleet-prod`, a Kyverno rule with the pattern `*@sha256:*` rejects `ghcr.io/stefanprodan/podinfo:6.15.0` but accepts the same image with a digest. Why does a pinned tag fail this rule, and what does the digest still not prove?
+    options:
+      - id: a
+        text: "A tag is a hash of the image, but the rule needs a name."
+        explanation: "This is not the best answer. The API server sees only the image string, so a rule can check the registry, the tag and the digest. It cannot check what is inside the image. The rule applies through the namespace label `environment: production`."
+      - id: b
+        text: "A tag is a name that the repository owner can move to other content. A digest is the hash of the image manifest and always points at the same content. It does not prove that the content is safe."
+        explanation: "Correct. The API server sees only the image string, so a rule can check the registry, the tag and the digest. It cannot check what is inside the image. The rule applies through the namespace label `environment: production`."
+      - id: c
+        text: "Kyverno cannot read tags."
+        explanation: "This is not the best answer. The API server sees only the image string, so a rule can check the registry, the tag and the digest. It cannot check what is inside the image. The rule applies through the namespace label `environment: production`."
+      - id: d
+        text: "A digest proves that the image has no known vulnerabilities."
+        explanation: "This is not the best answer. The API server sees only the image string, so a rule can check the registry, the tag and the digest. It cannot check what is inside the image. The rule applies through the namespace label `environment: production`."
+    correct_option: b
+    explanation: "The API server sees only the image string, so a rule can check the registry, the tag and the digest. It cannot check what is inside the image. The rule applies through the namespace label `environment: production`."
+
+  - id: ats021-final-q29
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Write the same allowed-registry rule as a Gatekeeper ConstraintTemplate and Constraint"
+    source_readings:
+      - sections/section-050/module-02/course-04-allow-only-one-registry-with-gatekeeper.md
+    prompt: |-
+      Gatekeeper's `K8sAllowedRegistries` Constraint `ghcr-only` matches only the kind `Pod`. `kubectl create deployment bad-nginx --image=nginx:latest` succeeds, and the Deployment shows `0/1`. Which change makes Gatekeeper reject the Deployment request itself?
+    options:
+      - id: a
+        text: "Set `enforcementAction: warn`."
+        explanation: "This is not the best answer. Gatekeeper does not generate rules for Deployments from a Pod rule, as Kyverno does. Today the Deployment is stored, and the ReplicaSet records the rejection of its pod as a `FailedCreate` event. Matching Deployments moves the decision to the request."
+      - id: b
+        text: "Match the kind `Deployment` too, and make the Rego rule read `spec.template.spec.containers`."
+        explanation: "Correct. Gatekeeper does not generate rules for Deployments from a Pod rule, as Kyverno does. Today the Deployment is stored, and the ReplicaSet records the rejection of its pod as a `FailedCreate` event. Matching Deployments moves the decision to the request."
+      - id: c
+        text: "Add the namespace to the `match` block again."
+        explanation: "This is not the best answer. Gatekeeper does not generate rules for Deployments from a Pod rule, as Kyverno does. Today the Deployment is stored, and the ReplicaSet records the rejection of its pod as a `FailedCreate` event. Matching Deployments moves the decision to the request."
+      - id: d
+        text: "Label the namespace `environment: production`."
+        explanation: "This is not the best answer. Gatekeeper does not generate rules for Deployments from a Pod rule, as Kyverno does. Today the Deployment is stored, and the ReplicaSet records the rejection of its pod as a `FailedCreate` event. Matching Deployments moves the decision to the request."
+    correct_option: b
+    explanation: "Gatekeeper does not generate rules for Deployments from a Pod rule, as Kyverno does. Today the Deployment is stored, and the ReplicaSet records the rejection of its pod as a `FailedCreate` event. Matching Deployments moves the decision to the request."

@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Record API Activity With Audit Logging (PLAYGROUND) — playground
+# environment. A clean sandbox: it starts, applies the Starfleet workloads and
+# a background CronJob that reads a Secret and deletes and recreates a
+# Deployment, then stays running for free exploration. No task, no grading,
+# no `astrona submit`.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-playground-040-01
+  docs:
+    guide: docs/overview.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - ghcr.io/stefanprodan/podinfo:6.15.0
+      - mccutchen/go-httpbin:2.25.0
+      - curlimages/curl:8.22.0
+
+# What the learner starts with: no audit logging on the API server, the
+# Starfleet workloads, and the `deck-cleaner` CronJob in `outpost` (service
+# account `deck-cleaner`) that every two minutes reads the Secret
+# `scout-db-credentials` and deletes and recreates `probe` in `starfleet`.
+bootstrap:
+  manifests:
+    - name: starfleet
+      type: file
+      source: manifests/starfleet.yaml
+    - name: deck-cleaner
+      type: file
+      source: manifests/deck-cleaner.yaml
+  waitFor:
+    - resource: deploy/scout
+      namespace: starfleet
+    - resource: deploy/probe
+      namespace: starfleet
+    - resource: deploy/shuttle
+      namespace: starfleet
+    - resource: deploy/drifter
+      namespace: outpost
+
+teardown:
+  keepCluster: false

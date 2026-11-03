@@ -1,40 +1,31 @@
 # Record API Activity With Audit Logging
 
-<!-- astrona:playground -->
-> [!NOTE]
-> This module has a playground — a throwaway environment to run the commands in.
-> ```bash
-> astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-040/module-01/playground
-> ```
+A Deployment has disappeared, but its current state does not say who deleted it. Kubernetes audit logging records requests to the application programming interface (API). An audit event records the caller, the action, the target and the result, so you can answer that question after the request has finished.
 
-<!-- TODO(build): opening framing — what this module settles, and the contrast that sharpens its boundary. -->
+Keep one sentence in mind for this module: **the audit policy chooses what to record, and the API server writes the evidence.** You will record Secret access without its contents, record Deployment changes with their bodies, and find the identity that deleted `probe`.
+
+The module has four parts. **Audit Policy Rules, Levels And Stages** writes a policy with ordered rules. **Enable Audit Logging On The API Server** adds the flags and file mounts to the API server's static pod. **Find The Caller And The Change** searches real events and checks which bodies were recorded. **Recover A Failed API Server Restart** diagnoses a missing policy file and restores a working manifest.
 
 ## Learning objectives
 
-- Write an audit policy that records Secret access at Metadata level, Deployment changes at RequestResponse and drops noisy read events
-- Turn on audit logging by editing the kube-apiserver static pod manifest with the policy file, log path and volumes
-- Confirm the API server restarted with the new flags and find the problem when it does not come back
-- Find who deleted a Deployment, with which identity and when, in the audit log with jq
-- Name the audit level and stage of a given event and say why a rule matched it
+After this module you can:
+
+- Write an audit policy that records Secret access at `Metadata`, Deployment changes at `RequestResponse`, and drops noisy reads.
+- Enable audit logging with the API server's static pod manifest, flags and volumes.
+- Confirm the restart and recover when the policy file prevents the API server from starting.
+- Find who deleted a Deployment and when, using the audit log.
+- Explain an event's level and stage and identify the first policy rule that matched it.
 
 ## Before you start
 
-<!-- TODO(build): assumed knowledge, and what the playground already provides. -->
+You need namespaces, Deployments, Secrets, service accounts and basic `kubectl` commands. A service account is the identity a pod uses when it calls the Kubernetes API. A Secret is a Kubernetes object that stores sensitive data, such as a password.
 
-## Outline
+Your playground is a single-node kind cluster running Kubernetes 1.35.8. The `starfleet` namespace runs `scout`, `probe` and `shuttle`; `outpost` runs `drifter`. Each workload has its own service account. Audit logging starts disabled. The `deck-cleaner` CronJob in `outpost` reads `scout-db-credentials` and deletes and recreates the `probe` Deployment every two minutes.
 
-<!-- TODO(build): each beat below becomes a section of this module (or a deep-dive part via /astrona-course-deep-dive). Delete this Outline section once written. -->
+A CronJob creates a Job on a schedule; a Job runs pods until its task completes. The `deck-cleaner` service account has permission to perform those actions in `starfleet`. Its activity is deliberate: you will find it in the log.
 
-- What an audit event holds; levels and stages
-- Audit policy rules: first match wins, omitStages, levels per resource and user
-- Turning it on - the kube-apiserver static pod, flags, volumes, waiting for the restart
-- Searching the log with jq for one action
+Use an empty folder on your machine for the files you write. You need access to the playground's node container through Podman; Docker users can replace `podman` with `docker`. These commands target only `astro-ats-021-playground-040-01-control-plane`. The node includes `jq`, a command that selects fields from JavaScript Object Notation (JSON) documents. The examples copy the log to your machine, where you also need `jq`.
 
-## Diagrams planned
+Launch your playground now, and keep it running next to you while you read the parts:
 
-<!-- TODO(build): mermaid `sequence` — One request through the API server and the audit events written at each stage -->
-<!-- TODO(build): mermaid `flowchart` — Audit policy rule matching - first matching rule decides the level, otherwise None -->
-
-<!-- playground provides: kind cluster with no audit logging configured. Starfleet workloads in `starfleet`. A background `CronJob` named `deck-cleaner` in `outpost` running as service account `deck-cleaner` with rights to read Secrets and delete Deployments in `starfleet`, which every few minutes reads a Secret and deletes and recreates the `probe` Deployment (the activity to find in the log). The reader opens a shell on the control plane node container with docker exec or podman exec; `jq` is available on the node or the reader copies the log out. -->
-
-<!-- module section-040/module-01 (Module 1) — stub written by /astrona-course-domain-scaffold, prose written by /astrona-course-domain-build. -->
+<!-- astrona:playground -->

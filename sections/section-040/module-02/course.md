@@ -1,39 +1,31 @@
 # Produce Compliance Reports From Policy Engines
 
-<!-- astrona:playground -->
-> [!NOTE]
-> This module has a playground — a throwaway environment to run the commands in.
-> ```bash
-> astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-040/module-02/playground
-> ```
+An auditor asks which workloads in `starfleet` break the platform's policies today. The API server cannot answer that from the objects alone, because it does not remember which rules those objects were checked against. Two policy engines, Kyverno and Gatekeeper, keep that evidence in Kubernetes objects. The API server audit log keeps a third kind of evidence: who changed what.
 
-<!-- TODO(build): opening framing — what this module settles, and the contrast that sharpens its boundary. -->
+Keep one sentence in mind for this module: **a policy report says what breaks a rule now, and an audit event says who changed it and when.** You will read both kinds of evidence from a cluster that has already produced them, and you will see why they contain objects that admission never checked.
+
+The module has three parts. **Read Kyverno Policy Reports** lists failing workloads per rule with `kubectl`, custom columns and `jq`. **Read Gatekeeper Audit Results** reads the violations in a Constraint status and explains the audit interval and its limit. **Answer An Auditor With The Right Evidence** pulls audit events for one question and matches each kind of question to its source.
 
 ## Learning objectives
 
-- Read a Kyverno PolicyReport and list which workloads fail which rule, with kubectl and with custom columns
-- Read Gatekeeper audit results from a Constraint's status and name each violating object
-- Pull the audit events for one compliance question (who changed a Deployment, who read a Secret) as evidence
-- Choose which source answers a given auditor question (what breaks policy now, what changed, who did it)
-- Explain why an Audit-mode policy and Gatekeeper audit report existing objects that admission never saw
+After this module you can:
+
+- Read a Kyverno `PolicyReport` and list which workloads fail which rule, with `kubectl` and with custom columns.
+- Read Gatekeeper audit results from a Constraint's `status` and name each violating object.
+- Pull the audit events for one compliance question (who changed a Deployment, who read a Secret) as evidence.
+- Choose which source answers a given auditor question: what breaks policy now, what changed, who did it.
+- Explain why an `Audit`-mode policy and the Gatekeeper audit report existing objects that admission never saw.
 
 ## Before you start
 
-<!-- TODO(build): assumed knowledge, and what the playground already provides. -->
+You need `kubectl`, namespaces, Deployments and labels. You also need the idea of a policy engine: software that checks objects against rules. An admission controller is code in the API server that checks an object before the API server stores it. An object created before a policy existed never went through that check.
 
-## Outline
+Your playground is a single-node kind cluster running Kubernetes 1.35.8 with Kyverno 1.19.1 and Gatekeeper 3.23.1. The `starfleet` namespace runs `scout`, `probe`, `shuttle` and `legacy-beacon`. The `outpost` namespace runs `drifter`. Two Kyverno `ClusterPolicy` objects (`require-limits` and `disallow-latest-tag`) run in `Audit` mode. One Gatekeeper Constraint (`deployments-need-owner`) runs with enforcement action `dryrun`. None of them blocks anything.
 
-<!-- TODO(build): each beat below becomes a section of this module (or a deep-dive part via /astrona-course-deep-dive). Delete this Outline section once written. -->
+On purpose, `probe` has no resource limits and no `owner` label. `legacy-beacon` uses an image with the `latest` tag and has no `owner` label. These are the violations you will find. API server audit logging is on, with a short policy that records every request at the `Metadata` level. You read the log through the control plane node container, `astro-ats-021-playground-040-02-control-plane`, with Podman; Docker users can replace `podman` with `docker`. You also need `jq`, a command that selects fields from JavaScript Object Notation (JSON) documents, on your machine.
 
-- Compliance evidence a platform can produce without extra tools - policy reports, audit results, audit events
-- Kyverno PolicyReports and ClusterPolicyReports - results, summary, background scans
-- Gatekeeper audit - Constraint status, totalViolations, the audit interval and its limit
-- Turning reports into one answer for an auditor
+The module teaches no scanner for images or software bills of materials. The platform keeps its own evidence in policy reports, Constraint status and audit events, and that is what you read here.
 
-## Diagrams planned
+Launch your playground now, and keep it running next to you while you read the parts:
 
-<!-- TODO(build): mermaid `flowchart` — Existing objects scanned by Kyverno background scan and Gatekeeper audit, plus API requests recorded as audit events, feeding three evidence sources -->
-
-<!-- playground provides: kind cluster with Kyverno 1.19.1 and Gatekeeper 3.23.1 installed. Two Kyverno ClusterPolicies in Audit mode (require resource limits, disallow the latest tag) and one Gatekeeper ConstraintTemplate with a Constraint in dryrun enforcement (require an `owner` label on Deployments), all already producing results. Starfleet workloads in `starfleet`; `probe` has no limits and no `owner` label, and a `legacy-beacon` Deployment uses an image with the `latest` tag (the violations to find). API server audit logging already turned on by the bootstrap with a short Metadata-level policy, so audit events exist to read. No SBOM or vulnerability scanner. -->
-
-<!-- module section-040/module-02 (Module 2) — stub written by /astrona-course-domain-scaffold, prose written by /astrona-course-domain-build. -->
+<!-- astrona:playground -->

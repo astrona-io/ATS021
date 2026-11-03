@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Audit Trails And Compliance Evidence Capstone (LAB). Graded against the live cluster.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-capstone-040
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - ghcr.io/stefanprodan/podinfo:6.15.0
+      - mccutchen/go-httpbin:2.25.0
+      - curlimages/curl:8.22.0
+
+# Starting state: Kyverno 1.19.1 and Gatekeeper 3.23.1 with two Audit-mode
+# ClusterPolicies and one dryrun Constraint, the Starfleet workloads with known
+# violations, and the `deck-cleaner` CronJob that deletes and recreates
+# `beacon` every two minutes. API server audit logging is off.
+bootstrap:
+  init:
+    - name: seed-cluster
+      description: Install Kyverno and Gatekeeper, apply workloads, policies and the deck-cleaner CronJob
+      type: file
+      source: bootstrap/01-seed-cluster.sh
+
+# Applied only by `astrona test`: the reference solution turns on audit logging
+# on the node, reads the three evidence sources and writes the answers.
+testing:
+  init:
+    - name: apply-solution
+      description: Turn on audit logging, wait for the deletion of beacon, then write the answers
+      type: file
+      source: solution/apply.sh
+
+validation:
+  scripts:
+    - name: audit-logging-enabled
+      description: The API server runs with an audit policy file and writes /var/log/kubernetes/audit/audit.log
+      type: file
+      source: validation/validate-audit-logging-enabled.sh
+      hint: Add --audit-policy-file and --audit-log-path to the kube-apiserver static pod manifest, with volumes and volumeMounts for both directories, then wait for the restart.
+    - name: secret-metadata-only
+      description: A Secret read is recorded at Metadata level, with no request or response body
+      type: file
+      source: validation/validate-secret-metadata-only.sh
+      hint: Use the policy from the task. The Secret rule must come before the catch-all rule.
+    - name: deployment-bodies-recorded
+      description: Deployment changes are recorded at RequestResponse, with both bodies
+      type: file
+      source: validation/validate-deployment-bodies-recorded.sh
+      hint: Use the policy from the task. The Deployment rule has level RequestResponse and group apps.
+    - name: noise-dropped
+      description: Health checks and the RequestReceived stage are not recorded
+      type: file
+      source: validation/validate-noise-dropped.sh
+      hint: Use omitStages RequestReceived and a level None rule for /healthz*, /livez* and /readyz*.
+    - name: deletion-answer
+      description: The answers name the caller and the audit ID of a successful deletion of beacon
+      type: file
+      source: validation/validate-deletion-answer.sh
+      hint: Wait for the next deck-cleaner run, then select the delete event for beacon in the audit log with jq. Use user.username and auditID.
+    - name: kyverno-answer
+      description: The answer lists the Deployments that fail a Kyverno policy in the policy reports
+      type: file
+      source: validation/validate-kyverno-answer.sh
+      hint: Read the PolicyReports of kind Deployment in all namespaces and select the results with result fail. Use namespace/name, separated by commas.
+    - name: gatekeeper-answer
+      description: The answer lists the Deployments in the Gatekeeper Constraint status
+      type: file
+      source: validation/validate-gatekeeper-answer.sh
+      hint: Read status.violations of the Constraint deployments-need-owner.
+    - name: evidence-intact
+      description: The policies, the Constraint, the workloads and audit logging are unchanged
+      type: file
+      source: validation/validate-evidence-intact.sh
+      hint: Do not fix the violating workloads and do not change the enforcement of the policies. Report what is wrong, do not repair it.
+
+teardown:
+  keepCluster: false

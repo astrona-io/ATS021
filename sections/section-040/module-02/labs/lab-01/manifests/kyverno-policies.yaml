@@ -1,0 +1,46 @@
+# Two Kyverno ClusterPolicies in Audit mode: they block nothing, and the
+# background scan writes their results for existing pods to PolicyReports.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-limits
+spec:
+  background: true
+  rules:
+    - name: require-cpu-memory-limits
+      match:
+        any:
+          - resources:
+              kinds: ["Pod"]
+              namespaces: ["starfleet", "outpost"]
+      validate:
+        failureAction: Audit
+        message: "Every container must set resources.limits.cpu and resources.limits.memory."
+        pattern:
+          spec:
+            containers:
+              - resources:
+                  limits:
+                    cpu: "?*"
+                    memory: "?*"
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-latest-tag
+spec:
+  background: true
+  rules:
+    - name: require-image-tag-not-latest
+      match:
+        any:
+          - resources:
+              kinds: ["Pod"]
+              namespaces: ["starfleet", "outpost"]
+      validate:
+        failureAction: Audit
+        message: "Images must use a fixed tag, not latest."
+        pattern:
+          spec:
+            containers:
+              - image: "!*:latest"

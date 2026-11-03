@@ -1,0 +1,252 @@
+# Knowledge check for section 040. Listed in astrona.yaml as a `type: quiz` entry after the capstone lab.
+schema_version: 1
+kind: question_bank
+id: ats021-040
+course_id: ATS021
+exam_code: CNPE
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-040
+  title: "Audit Trails And Compliance Evidence"
+questions:
+  - id: ats021-040-q01
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Name the audit level and stage of a given event and say why a rule matched it"
+    source_readings:
+      - sections/section-040/module-01/course-01-audit-policy-rules-levels-and-stages.md
+    prompt: |-
+      An audit policy has these rules in order: (1) `None` for the verbs `get`, `list` and `watch`; (2) `Metadata` for `secrets`; (3) `Metadata` for everything else. A workload reads the Secret `scout-db-credentials` with `get`. What does the audit log hold for that request?
+    options:
+      - id: a
+        text: "One `Metadata` event, because the Secret rule is more specific than the read rule."
+        explanation: "This is not the best answer. The API server uses the first matching rule. It does not combine rules or choose the most detailed one. A `None` rule for reads placed before the Secret rule hides Secret reads. The fix is to put the Secret rule first."
+      - id: b
+        text: "One `RequestResponse` event, because Secrets always get the most detail."
+        explanation: "This is not the best answer. The API server uses the first matching rule. It does not combine rules or choose the most detailed one. A `None` rule for reads placed before the Secret rule hides Secret reads. The fix is to put the Secret rule first."
+      - id: c
+        text: "No event, because the API server uses the first matching rule and rule 1 matches first."
+        explanation: "Correct. The API server uses the first matching rule. It does not combine rules or choose the most detailed one. A `None` rule for reads placed before the Secret rule hides Secret reads. The fix is to put the Secret rule first."
+      - id: d
+        text: "One event for each rule that matches, so two events."
+        explanation: "This is not the best answer. The API server uses the first matching rule. It does not combine rules or choose the most detailed one. A `None` rule for reads placed before the Secret rule hides Secret reads. The fix is to put the Secret rule first."
+    correct_option: c
+    explanation: "The API server uses the first matching rule. It does not combine rules or choose the most detailed one. A `None` rule for reads placed before the Secret rule hides Secret reads. The fix is to put the Secret rule first."
+
+  - id: ats021-040-q02
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Write an audit policy that records Secret access at Metadata level, Deployment changes at RequestResponse and drops noisy read events"
+    source_readings:
+      - sections/section-040/module-01/course-01-audit-policy-rules-levels-and-stages.md
+    prompt: |-
+      A team must keep Secret data out of the audit log but still prove who read each Secret. Which rule does that?
+    options:
+      - id: a
+        text: "`level: RequestResponse` for `secrets`, because the response proves the read happened."
+        explanation: "This is not the best answer. A Secret response body contains the Secret data, so `RequestResponse` would copy the password into the log. `None` records no event at all. `Metadata` records who did what without any body."
+      - id: b
+        text: "`level: Request` for `secrets`, because Secrets have no response body."
+        explanation: "This is not the best answer. A Secret response body contains the Secret data, so `RequestResponse` would copy the password into the log. `None` records no event at all. `Metadata` records who did what without any body."
+      - id: c
+        text: "`level: None` for `secrets`, because the Secret itself is the evidence."
+        explanation: "This is not the best answer. A Secret response body contains the Secret data, so `RequestResponse` would copy the password into the log. `None` records no event at all. `Metadata` records who did what without any body."
+      - id: d
+        text: "`level: Metadata` for `secrets`, because the event holds the caller, verb, target, time and status, but no request or response body."
+        explanation: "Correct. A Secret response body contains the Secret data, so `RequestResponse` would copy the password into the log. `None` records no event at all. `Metadata` records who did what without any body."
+    correct_option: d
+    explanation: "A Secret response body contains the Secret data, so `RequestResponse` would copy the password into the log. `None` records no event at all. `Metadata` records who did what without any body."
+
+  - id: ats021-040-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Turn on audit logging by editing the kube-apiserver static pod manifest with the policy file, log path and volumes"
+    source_readings:
+      - sections/section-040/module-01/course-01-audit-policy-rules-levels-and-stages.md
+    prompt: |-
+      An administrator saves `audit-policy.yaml` and runs `kubectl apply -f audit-policy.yaml`. The API server records nothing. What is the cause, and what is the correct way to install the policy?
+    options:
+      - id: a
+        text: "The API server cannot read `audit.k8s.io/v1`. The policy must use `audit.k8s.io/v2`."
+        explanation: "This is not the best answer. The API server reads the policy file from its own file system at startup. The file must be on the node, the manifest must carry `--audit-policy-file` and `--audit-log-path`, and the container must mount both directories. The API server is a static pod, not a Deployment."
+      - id: b
+        text: "An audit policy is not an API object. The file must be on the control plane node, and the `--audit-policy-file` flag of the API server must point to it."
+        explanation: "Correct. The API server reads the policy file from its own file system at startup. The file must be on the node, the manifest must carry `--audit-policy-file` and `--audit-log-path`, and the container must mount both directories. The API server is a static pod, not a Deployment."
+      - id: c
+        text: "The policy needs a `ClusterRoleBinding` so the API server may read it."
+        explanation: "This is not the best answer. The API server reads the policy file from its own file system at startup. The file must be on the node, the manifest must carry `--audit-policy-file` and `--audit-log-path`, and the container must mount both directories. The API server is a static pod, not a Deployment."
+      - id: d
+        text: "The policy takes effect only after the Deployment `kube-apiserver` is scaled to zero and back."
+        explanation: "This is not the best answer. The API server reads the policy file from its own file system at startup. The file must be on the node, the manifest must carry `--audit-policy-file` and `--audit-log-path`, and the container must mount both directories. The API server is a static pod, not a Deployment."
+    correct_option: b
+    explanation: "The API server reads the policy file from its own file system at startup. The file must be on the node, the manifest must carry `--audit-policy-file` and `--audit-log-path`, and the container must mount both directories. The API server is a static pod, not a Deployment."
+
+  - id: ats021-040-q04
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Turn on audit logging by editing the kube-apiserver static pod manifest with the policy file, log path and volumes"
+    source_readings:
+      - sections/section-040/module-01/course-02-enable-audit-logging-on-the-api-server.md
+    prompt: |-
+      An administrator adds `--audit-policy-file=/etc/kubernetes/audit/audit-policy.yaml` and `--audit-log-path=/var/log/kubernetes/audit/audit.log` to the `kube-apiserver` static pod manifest. The policy file exists on the node. The API server restarts and becomes ready, but the log file never appears. Which part is most likely missing?
+    options:
+      - id: a
+        text: "A `hostPath` volume with a matching `volumeMounts` entry in the API server container for each directory."
+        explanation: "Correct. A path on the node is not visible inside the API server container unless a volume and a mount expose it. `volumes` belongs to `spec`, and `volumeMounts` belongs to the container. A ready response alone does not prove auditing works. Check the flags on the mirror pod and look for a real event."
+      - id: b
+        text: "A `PersistentVolumeClaim` for the log."
+        explanation: "This is not the best answer. A path on the node is not visible inside the API server container unless a volume and a mount expose it. `volumes` belongs to `spec`, and `volumeMounts` belongs to the container. A ready response alone does not prove auditing works. Check the flags on the mirror pod and look for a real event."
+      - id: c
+        text: "A `ServiceAccount` for the audit log."
+        explanation: "This is not the best answer. A path on the node is not visible inside the API server container unless a volume and a mount expose it. `volumes` belongs to `spec`, and `volumeMounts` belongs to the container. A ready response alone does not prove auditing works. Check the flags on the mirror pod and look for a real event."
+      - id: d
+        text: "A `--audit-log-format=json` flag, because the default format is binary."
+        explanation: "This is not the best answer. A path on the node is not visible inside the API server container unless a volume and a mount expose it. `volumes` belongs to `spec`, and `volumeMounts` belongs to the container. A ready response alone does not prove auditing works. Check the flags on the mirror pod and look for a real event."
+    correct_option: a
+    explanation: "A path on the node is not visible inside the API server container unless a volume and a mount expose it. `volumes` belongs to `spec`, and `volumeMounts` belongs to the container. A ready response alone does not prove auditing works. Check the flags on the mirror pod and look for a real event."
+
+  - id: ats021-040-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Confirm the API server restarted with the new flags and find the problem when it does not come back"
+    source_readings:
+      - sections/section-040/module-01/course-04-recover-a-failed-api-server-restart.md
+    prompt: |-
+      After an edit to `/etc/kubernetes/manifests/kube-apiserver.yaml`, `kubectl` returns `Unable to connect to the server: EOF` for several minutes. The edit changed `--audit-policy-file` to a path that does not exist. How do you find the cause?
+    options:
+      - id: a
+        text: "Run `kubectl -n kube-system logs kube-apiserver-<node>`."
+        explanation: "This is not the best answer. `kubectl` needs the API server, which is down. `crictl` talks to the container runtime on the node, so it works without the API server. The kubelet retries a failed container but cannot create a missing file. The fix is to restore a working manifest, staged outside the watched directory and then moved into place."
+      - id: b
+        text: "Run `kubectl describe node` and read the events."
+        explanation: "This is not the best answer. `kubectl` needs the API server, which is down. `crictl` talks to the container runtime on the node, so it works without the API server. The kubelet retries a failed container but cannot create a missing file. The fix is to restore a working manifest, staged outside the watched directory and then moved into place."
+      - id: c
+        text: "Open a shell on the node container and run `crictl ps -a --name kube-apiserver` and `crictl logs` on the newest container. The error names the missing path."
+        explanation: "Correct. `kubectl` needs the API server, which is down. `crictl` talks to the container runtime on the node, so it works without the API server. The kubelet retries a failed container but cannot create a missing file. The fix is to restore a working manifest, staged outside the watched directory and then moved into place."
+      - id: d
+        text: "Wait. The kubelet creates the missing policy file after a few retries."
+        explanation: "This is not the best answer. `kubectl` needs the API server, which is down. `crictl` talks to the container runtime on the node, so it works without the API server. The kubelet retries a failed container but cannot create a missing file. The fix is to restore a working manifest, staged outside the watched directory and then moved into place."
+    correct_option: c
+    explanation: "`kubectl` needs the API server, which is down. `crictl` talks to the container runtime on the node, so it works without the API server. The kubelet retries a failed container but cannot create a missing file. The fix is to restore a working manifest, staged outside the watched directory and then moved into place."
+
+  - id: ats021-040-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find who deleted a Deployment, with which identity and when, in the audit log with jq"
+    source_readings:
+      - sections/section-040/module-01/course-03-find-the-caller-and-the-change.md
+    prompt: |-
+      A platform engineer needs to find who deleted the `probe` Deployment in `starfleet`. The audit log has one JSON event per line. Which `jq` filter gives the best evidence of a successful deletion?
+    options:
+      - id: a
+        text: "Select `stage == \"RequestReceived\"` and `verb == \"delete\"` for `probe`, because this stage proves the caller."
+        explanation: "This is not the best answer. Only `ResponseComplete` carries the outcome. The code `200` excludes a failed attempt, which returns `404` when the object is already gone. The authenticated `user.username` is the identity the API server used. Counting events mixes stages and verbs, and a `get` shows a read, not a deletion."
+      - id: b
+        text: "Select `stage == \"ResponseComplete\"`, `verb == \"delete\"`, `objectRef.resource == \"deployments\"`, `objectRef.name == \"probe\"` and `responseStatus.code == 200`, then read `user.username` and `stageTimestamp`."
+        explanation: "Correct. Only `ResponseComplete` carries the outcome. The code `200` excludes a failed attempt, which returns `404` when the object is already gone. The authenticated `user.username` is the identity the API server used. Counting events mixes stages and verbs, and a `get` shows a read, not a deletion."
+      - id: c
+        text: "Select `verb == \"get\"` for `probe` and read `sourceIPs`."
+        explanation: "This is not the best answer. Only `ResponseComplete` carries the outcome. The code `200` excludes a failed attempt, which returns `404` when the object is already gone. The authenticated `user.username` is the identity the API server used. Counting events mixes stages and verbs, and a `get` shows a read, not a deletion."
+      - id: d
+        text: "Select every event with `objectRef.namespace == \"starfleet\"` and count them."
+        explanation: "This is not the best answer. Only `ResponseComplete` carries the outcome. The code `200` excludes a failed attempt, which returns `404` when the object is already gone. The authenticated `user.username` is the identity the API server used. Counting events mixes stages and verbs, and a `get` shows a read, not a deletion."
+    correct_option: b
+    explanation: "Only `ResponseComplete` carries the outcome. The code `200` excludes a failed attempt, which returns `404` when the object is already gone. The authenticated `user.username` is the identity the API server used. Counting events mixes stages and verbs, and a `get` shows a read, not a deletion."
+
+  - id: ats021-040-q07
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Pull the audit events for one compliance question (who changed a Deployment, who read a Secret) as evidence"
+    source_readings:
+      - sections/section-040/module-01/course-03-find-the-caller-and-the-change.md
+    prompt: |-
+      A `jq` query on the audit log shows the user `system:serviceaccount:outpost:deck-cleaner` deleted a Deployment with `objectRef.namespace` set to `starfleet`. A colleague says the Deployment was deleted by a pod in `starfleet`. What is correct?
+    options:
+      - id: a
+        text: "The colleague is right, because the object was in `starfleet`."
+        explanation: "This is not the best answer. A service account identity has the form `system:serviceaccount:<namespace>:<name>`, where the namespace is the service account's own. RBAC can grant it rights in other namespaces. The log also shows a workload credential, not the human who changed the workload."
+      - id: b
+        text: "The log is wrong, because a service account can only change objects in its own namespace."
+        explanation: "This is not the best answer. A service account identity has the form `system:serviceaccount:<namespace>:<name>`, where the namespace is the service account's own. RBAC can grant it rights in other namespaces. The log also shows a workload credential, not the human who changed the workload."
+      - id: c
+        text: "The caller's namespace is `outpost`, taken from the service account identity. The `starfleet` namespace is the target of the request, so a pod in `outpost` deleted it."
+        explanation: "Correct. A service account identity has the form `system:serviceaccount:<namespace>:<name>`, where the namespace is the service account's own. RBAC can grant it rights in other namespaces. The log also shows a workload credential, not the human who changed the workload."
+      - id: d
+        text: "The namespace in `user.username` is always the namespace of the object."
+        explanation: "This is not the best answer. A service account identity has the form `system:serviceaccount:<namespace>:<name>`, where the namespace is the service account's own. RBAC can grant it rights in other namespaces. The log also shows a workload credential, not the human who changed the workload."
+    correct_option: c
+    explanation: "A service account identity has the form `system:serviceaccount:<namespace>:<name>`, where the namespace is the service account's own. RBAC can grant it rights in other namespaces. The log also shows a workload credential, not the human who changed the workload."
+
+  - id: ats021-040-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Read a Kyverno PolicyReport and list which workloads fail which rule, with kubectl and with custom columns"
+    source_readings:
+      - sections/section-040/module-02/course-01-read-kyverno-policy-reports.md
+    prompt: |-
+      The Kyverno `require-limits` and `disallow-latest-tag` policies run with `failureAction: Audit`. `kubectl get policyreport -n starfleet` shows `FAIL 1` for the Deployment `probe`, for its ReplicaSet and for its pod. How many workloads break a rule, and why do three reports exist?
+    options:
+      - id: a
+        text: "Three workloads, because each report is a separate workload."
+        explanation: "This is not the best answer. The rule matches `Pod`, and autogen adds `autogen-` rules for Deployments and ReplicaSets. Count Deployments, or filter on `scope.kind`, to avoid a count three times too high. The `FAIL` column is only a summary. The `results` list names the policy and the rule."
+      - id: b
+        text: "One workload. Kyverno autogen creates matching rules for pod controllers from rules written for pods, so one problem appears for the Deployment, its ReplicaSet and its pod."
+        explanation: "Correct. The rule matches `Pod`, and autogen adds `autogen-` rules for Deployments and ReplicaSets. Count Deployments, or filter on `scope.kind`, to avoid a count three times too high. The `FAIL` column is only a summary. The `results` list names the policy and the rule."
+      - id: c
+        text: "Zero workloads, because `Audit` mode does not produce failures."
+        explanation: "This is not the best answer. The rule matches `Pod`, and autogen adds `autogen-` rules for Deployments and ReplicaSets. Count Deployments, or filter on `scope.kind`, to avoid a count three times too high. The `FAIL` column is only a summary. The `results` list names the policy and the rule."
+      - id: d
+        text: "One workload, but only the Deployment report is real. Kyverno writes the other two in error."
+        explanation: "This is not the best answer. The rule matches `Pod`, and autogen adds `autogen-` rules for Deployments and ReplicaSets. Count Deployments, or filter on `scope.kind`, to avoid a count three times too high. The `FAIL` column is only a summary. The `results` list names the policy and the rule."
+    correct_option: b
+    explanation: "The rule matches `Pod`, and autogen adds `autogen-` rules for Deployments and ReplicaSets. Count Deployments, or filter on `scope.kind`, to avoid a count three times too high. The `FAIL` column is only a summary. The `results` list names the policy and the rule."
+
+  - id: ats021-040-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Read Gatekeeper audit results from a Constraint's status and name each violating object"
+    source_readings:
+      - sections/section-040/module-02/course-02-read-gatekeeper-audit-results.md
+    prompt: |-
+      Gatekeeper's `deployments-need-owner` Constraint has enforcement action `dryrun`. A team creates the Deployment `relay` without the `owner` label. The API server accepts it. What does the Constraint show, and which component finds `relay`?
+    options:
+      - id: a
+        text: "The Constraint shows `relay` at once, because the admission webhook records every request."
+        explanation: "This is not the best answer. Admission sees a request only when it arrives, and `dryrun` admits it. The audit controller lists stored objects on an interval and writes `status.totalViolations`, `status.auditTimestamp` and `status.violations` on the Constraint. Results live on each Constraint, not on the template. The list is as old as `auditTimestamp` and stops at 20 entries by default, while `totalViolations` keeps the full count."
+      - id: b
+        text: "The Constraint never shows `relay`, because `dryrun` ignores new objects."
+        explanation: "This is not the best answer. Admission sees a request only when it arrives, and `dryrun` admits it. The audit controller lists stored objects on an interval and writes `status.totalViolations`, `status.auditTimestamp` and `status.violations` on the Constraint. Results live on each Constraint, not on the template. The list is as old as `auditTimestamp` and stops at 20 entries by default, while `totalViolations` keeps the full count."
+      - id: c
+        text: "The Constraint shows `relay` in `status.violations` after the next run of the `gatekeeper-audit` controller, which lists the stored Deployments. The default interval is 60 seconds."
+        explanation: "Correct. Admission sees a request only when it arrives, and `dryrun` admits it. The audit controller lists stored objects on an interval and writes `status.totalViolations`, `status.auditTimestamp` and `status.violations` on the Constraint. Results live on each Constraint, not on the template. The list is as old as `auditTimestamp` and stops at 20 entries by default, while `totalViolations` keeps the full count."
+      - id: d
+        text: "The `ConstraintTemplate` shows `relay` in its status after the next audit."
+        explanation: "This is not the best answer. Admission sees a request only when it arrives, and `dryrun` admits it. The audit controller lists stored objects on an interval and writes `status.totalViolations`, `status.auditTimestamp` and `status.violations` on the Constraint. Results live on each Constraint, not on the template. The list is as old as `auditTimestamp` and stops at 20 entries by default, while `totalViolations` keeps the full count."
+    correct_option: c
+    explanation: "Admission sees a request only when it arrives, and `dryrun` admits it. The audit controller lists stored objects on an interval and writes `status.totalViolations`, `status.auditTimestamp` and `status.violations` on the Constraint. Results live on each Constraint, not on the template. The list is as old as `auditTimestamp` and stops at 20 entries by default, while `totalViolations` keeps the full count."
+
+  - id: ats021-040-q10
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Choose which source answers a given auditor question (what breaks policy now, what changed, who did it)"
+    source_readings:
+      - sections/section-040/module-02/course-03-answer-an-auditor-with-the-right-evidence.md
+    prompt: |-
+      An auditor asks two questions. First: "Which Deployments in `starfleet` break the `owner` label rule right now?" Second: "Who created the Deployment `relay`, and when?" Which sources answer them?
+    options:
+      - id: a
+        text: "Both from the Gatekeeper Constraint `status`, because it lists the objects and their creators."
+        explanation: "This is not the best answer. Policy engines scan stored objects and say what is wrong now. The audit log records requests and says what was done, but not whether an object follows a rule. A complete answer joins both. The report names the object, and the log names the caller. Evidence that must last has to be copied out before it changes."
+      - id: b
+        text: "Both from the Kyverno `PolicyReport`, because it stores the creator in `results`."
+        explanation: "This is not the best answer. Policy engines scan stored objects and say what is wrong now. The audit log records requests and says what was done, but not whether an object follows a rule. A complete answer joins both. The report names the object, and the log names the caller. Evidence that must last has to be copied out before it changes."
+      - id: c
+        text: "The first from the audit log, and the second from the Constraint `status`."
+        explanation: "This is not the best answer. Policy engines scan stored objects and say what is wrong now. The audit log records requests and says what was done, but not whether an object follows a rule. A complete answer joins both. The report names the object, and the log names the caller. Evidence that must last has to be copied out before it changes."
+      - id: d
+        text: "The first from the Gatekeeper Constraint `status`, which lists violating objects. The second from the API server audit log, which records the user, the verb and the time."
+        explanation: "Correct. Policy engines scan stored objects and say what is wrong now. The audit log records requests and says what was done, but not whether an object follows a rule. A complete answer joins both. The report names the object, and the log names the caller. Evidence that must last has to be copied out before it changes."
+    correct_option: d
+    explanation: "Policy engines scan stored objects and say what is wrong now. The audit log records requests and says what was done, but not whether an object follows a rule. A complete answer joins both. The report names the object, and the log names the caller. Evidence that must last has to be copied out before it changes."

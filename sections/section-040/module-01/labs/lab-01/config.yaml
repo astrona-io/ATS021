@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Record API Activity With Audit Logging (LAB). Graded against the live cluster.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-lab-040-01
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - ghcr.io/stefanprodan/podinfo:6.15.0
+      - mccutchen/go-httpbin:2.25.0
+      - curlimages/curl:8.22.0
+
+# Starting state: no audit logging on the API server, the Starfleet workloads
+# and the `deck-cleaner` CronJob in `outpost`, which every two minutes reads
+# the Secret `scout-db-credentials` and deletes and recreates `probe`.
+bootstrap:
+  init:
+    - name: seed-cluster
+      description: Create the Starfleet workloads and the deck-cleaner CronJob
+      type: file
+      source: bootstrap/01-seed-cluster.sh
+
+# Applied only by `astrona test`: the reference solution turns on audit
+# logging on the control plane node and records the deletion.
+testing:
+  init:
+    - name: apply-solution
+      description: Turn on audit logging on the node and record who deleted probe
+      type: file
+      source: solution/apply.sh
+
+validation:
+  scripts:
+    - name: audit-logging-enabled
+      description: The API server runs with an audit policy file and writes /var/log/kubernetes/audit/audit.log
+      type: file
+      source: validation/validate-audit-logging-enabled.sh
+      hint: Add --audit-policy-file and --audit-log-path to the kube-apiserver static pod manifest, with volumes and volumeMounts for both directories, then wait for the restart.
+    - name: secret-metadata-only
+      description: A Secret read is recorded at Metadata level, with no request or response body
+      type: file
+      source: validation/validate-secret-metadata-only.sh
+      hint: Put the Secret rule before any rule that gives a higher level. Metadata keeps the body out of the log.
+    - name: deployment-bodies-recorded
+      description: Deployment changes are recorded at RequestResponse, with both bodies
+      type: file
+      source: validation/validate-deployment-bodies-recorded.sh
+      hint: Add a rule for the resource deployments in the group apps with level RequestResponse, before the catch-all rule.
+    - name: noise-dropped
+      description: Health checks and the RequestReceived stage are not recorded
+      type: file
+      source: validation/validate-noise-dropped.sh
+      hint: Use omitStages RequestReceived and a level None rule for the nonResourceURLs /healthz*, /livez* and /readyz*.
+    - name: probe-deletion-evidence
+      description: The ConfigMap probe-deletion in starfleet names the caller and the audit ID of a real deletion of probe
+      type: file
+      source: validation/validate-probe-deletion-evidence.sh
+      hint: Wait for the next deck-cleaner run, then select the delete event for probe in the log with jq. Use the user.username and auditID fields.
+
+teardown:
+  keepCluster: false

@@ -1,0 +1,8 @@
+# Reference solution, final step: enforce the restricted level on starfleet.
+# The securityContext patches and the removal of privileged-debug are in apply.sh.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: starfleet
+  labels:
+    pod-security.kubernetes.io/enforce: restricted

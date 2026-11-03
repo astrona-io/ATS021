@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Access Control For Platform Resources Capstone (LAB). Graded against the live cluster.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-capstone-010
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - ghcr.io/stefanprodan/podinfo:6.15.0
+      - curlimages/curl:8.22.0
+
+# Starting state: a new team namespace `orbit` with the beacon workload, a
+# ci-deployer service account bound to cluster-admin, and no Pod Security
+# labels. The faults are left in place on purpose.
+bootstrap:
+  init:
+    - name: seed-cluster
+      description: Create the orbit namespace and the faulty access setup
+      type: file
+      source: bootstrap/01-seed-cluster.sh
+
+# Applied only by `astrona test`: the reference solution.
+testing:
+  init:
+    - name: apply-solution
+      description: Apply the reference solution
+      type: file
+      source: solution/apply.sh
+
+validation:
+  scripts:
+    - name: ci-deployer-manages-orbit
+      description: ci-deployer manages Deployments and Services in orbit
+      type: file
+      source: validation/validate-ci-deployer-manages-orbit.sh
+      hint: Create a Role in orbit for deployments (apps) and services with get, list, watch, create, update, patch and delete, and a RoleBinding to the service account.
+    - name: ci-deployer-least-privilege
+      description: ci-deployer has no other rights
+      type: file
+      source: validation/validate-ci-deployer-least-privilege.sh
+      hint: Use a Role and a RoleBinding in orbit only. Do not bind admin, edit or cluster-admin, and do not use a wildcard.
+    - name: cluster-admin-removed
+      description: ci-deployer is not bound to cluster-admin
+      type: file
+      source: validation/validate-cluster-admin-removed.sh
+      hint: Find the ClusterRoleBinding that names ci-deployer and delete it. Keep the service account.
+    - name: orbit-enforces-restricted
+      description: orbit enforces the restricted level
+      type: file
+      source: validation/validate-orbit-enforces-restricted.sh
+      hint: Label the namespace pod-security.kubernetes.io/enforce=restricted.
+    - name: beacon-admitted-and-running
+      description: beacon meets restricted and is available
+      type: file
+      source: validation/validate-beacon-admitted-and-running.sh
+      hint: Add the four restricted settings to the beacon pod template. The image user is a name, so set a numeric runAsUser.
+
+teardown:
+  keepCluster: false

@@ -1,0 +1,81 @@
+# Starting state for the section 010 capstone: a new team namespace `orbit`.
+# - ci-deployer has an inherited cluster-admin binding (the over-broad grant).
+# - orbit has no Pod Security labels (the learner enforces restricted).
+# - beacon runs without a securityContext (the learner fixes it).
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: orbit
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ci-deployer
+  namespace: orbit
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: beacon
+  namespace: orbit
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: orbit-ci-deployer-admin
+subjects:
+  - kind: ServiceAccount
+    name: ci-deployer
+    namespace: orbit
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: beacon
+  namespace: orbit
+  labels:
+    app: beacon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: beacon
+  template:
+    metadata:
+      labels:
+        app: beacon
+    spec:
+      serviceAccountName: beacon
+      containers:
+        - name: beacon
+          image: ghcr.io/stefanprodan/podinfo:6.15.0
+          ports:
+            - name: http
+              containerPort: 9898
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: http
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: beacon
+  namespace: orbit
+spec:
+  selector:
+    app: beacon
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

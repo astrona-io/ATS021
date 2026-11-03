@@ -1,0 +1,252 @@
+# Knowledge check for section 010. Listed in astrona.yaml as a `type: quiz` entry after the capstone lab.
+schema_version: 1
+kind: question_bank
+id: ats021-010
+course_id: ATS021
+exam_code: CNPE
+status: draft
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: section
+  id: section-010
+  title: "Access Control For Platform Resources"
+questions:
+  - id: ats021-010-q01
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Create a Role and RoleBinding that give a service account exactly the verbs it needs on one resource in one namespace"
+    source_readings:
+      - sections/section-010/module-01/course-01-request-path-and-role-rules.md
+    prompt: |-
+      A deploy pipeline runs as the service account `ci-deployer` in `starfleet`. It must create and update Deployments in `starfleet` and read Services there. It must not delete anything and must not touch other namespaces. Which design meets this?
+    options:
+      - id: a
+        text: "A `ClusterRole` with `get`, `list`, `create`, `update` and `patch` on `deployments`, bound with a `ClusterRoleBinding`."
+        explanation: "This option grants the rules in every namespace."
+      - id: b
+        text: "A `Role` in `starfleet` with `get`, `list`, `watch`, `create`, `update` and `patch` on `deployments` in the `apps` group and `get` and `list` on `services` in the core group, bound with a `RoleBinding` in `starfleet`."
+        explanation: "Correct. A `Role` is valid in one namespace, and a `RoleBinding` in that namespace gives it to the service account. Deployments are in the `apps` API group and Services are in the core group `\"\"`."
+      - id: c
+        text: "A `Role` in `starfleet` with the rule `apiGroups: [\"\"]` and `resources: [\"deployments\"]`, bound with a `RoleBinding` in `starfleet`."
+        explanation: "This option uses the wrong API group, so the rule matches nothing."
+      - id: d
+        text: "The built-in `edit` `ClusterRole`, bound with a `RoleBinding` in `starfleet`."
+        explanation: "This option works, but `edit` allows far more verbs and resources than the pipeline needs, including `delete`."
+    correct_option: b
+    explanation: "A `Role` is valid in one namespace, and a `RoleBinding` in that namespace gives it to the service account. Deployments are in the `apps` API group and Services are in the core group `\"\"`."
+
+  - id: ats021-010-q02
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Choose between Role and ClusterRole, and between RoleBinding and ClusterRoleBinding, for a given access requirement"
+    source_readings:
+      - sections/section-010/module-01/course-02-bindings-subjects-and-scope.md
+    prompt: |-
+      The `developers` group must read the pods in `starfleet` and in `outpost`, and in no other namespace. One `view` definition must be reused. What is the correct setup?
+    options:
+      - id: a
+        text: "One `ClusterRoleBinding` to `view` for the group `developers`."
+        explanation: "A `ClusterRoleBinding` grants the rules in every namespace."
+      - id: b
+        text: "One `RoleBinding` in `starfleet` to the `ClusterRole` `view`, because a binding in one namespace covers the cluster."
+        explanation: "A `RoleBinding` never reaches outside its own namespace."
+      - id: c
+        text: "One `RoleBinding` to the `ClusterRole` `view` in `starfleet` and one in `outpost`, both naming the group `developers`."
+        explanation: "Correct. A `RoleBinding` that points at a `ClusterRole` gives its rules only in the binding's namespace, so you need one binding per namespace."
+      - id: d
+        text: "One `Role` named `view` in `starfleet`, bound with a `ClusterRoleBinding`."
+        explanation: "A `ClusterRoleBinding` can only point at a `ClusterRole`, never at a `Role`."
+    correct_option: c
+    explanation: "A `RoleBinding` that points at a `ClusterRole` gives its rules only in the binding's namespace, so you need one binding per namespace."
+
+  - id: ats021-010-q03
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Check any permission for another identity with kubectl auth can-i --as, including --list"
+    source_readings:
+      - sections/section-010/module-01/course-03-proving-and-debugging-access.md
+    prompt: |-
+      You run `kubectl auth can-i patch deployments/scale -n starfleet --as=system:serviceaccount:starfleet:ci-deployer` and get `yes`. The pipeline still fails on `kubectl scale` with `cannot patch resource "deployments/scale"`. What explains this?
+    options:
+      - id: a
+        text: "`can-i` reads `deployments/scale` as the Deployment named `scale`, so the answer is about a different question. The check needs `--subresource=scale`."
+        explanation: "Correct. A subresource such as `deployments/scale` has its own RBAC entry. `kubectl auth can-i verb resource/name` reads the part after the slash as an object name, so use `--subresource`. `--as` works for service accounts, and `can-i` does not always answer `yes`."
+      - id: b
+        text: "`can-i` always answers `yes` for service accounts in the namespace they belong to."
+        explanation: "This is not the best answer. A subresource such as `deployments/scale` has its own RBAC entry. `kubectl auth can-i verb resource/name` reads the part after the slash as an object name, so use `--subresource`. `--as` works for service accounts, and `can-i` does not always answer `yes`."
+      - id: c
+        text: "The `--as` flag is ignored for service accounts, so the answer shows the rights of the administrator."
+        explanation: "This is not the best answer. A subresource such as `deployments/scale` has its own RBAC entry. `kubectl auth can-i verb resource/name` reads the part after the slash as an object name, so use `--subresource`. `--as` works for service accounts, and `can-i` does not always answer `yes`."
+      - id: d
+        text: "`kubectl scale` uses the `delete` verb, which the pipeline does not have."
+        explanation: "The error message names the verb `patch`, so this option is wrong."
+    correct_option: a
+    explanation: "A subresource such as `deployments/scale` has its own RBAC entry. `kubectl auth can-i verb resource/name` reads the part after the slash as an object name, so use `--subresource`. `--as` works for service accounts, and `can-i` does not always answer `yes`."
+
+  - id: ats021-010-q04
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Read a Forbidden error and name the missing verb, resource and API group"
+    source_readings:
+      - sections/section-010/module-01/course-03-proving-and-debugging-access.md
+    prompt: |-
+      A controller logs this error: `deployments.apps "scout" is forbidden: User "system:serviceaccount:starfleet:ci-deployer" cannot delete resource "deployments" in API group "apps" in the namespace "starfleet"`. Which rule field values fix it, with the smallest change?
+    options:
+      - id: a
+        text: "`apiGroups: [\"\"]`, `resources: [\"deployments\"]`, `verbs: [\"delete\"]`, in a `Role` in `starfleet`."
+        explanation: "This option uses the core group."
+      - id: b
+        text: "`apiGroups: [\"apps\"]`, `resources: [\"deployments\"]`, `verbs: [\"delete\"]`, in a `ClusterRole` with a `ClusterRoleBinding`."
+        explanation: "This option grants the right in every namespace."
+      - id: c
+        text: "`apiGroups: [\"apps\"]`, `resources: [\"deployments\"]`, `verbs: [\"delete\"]`, in a `Role` in `starfleet` and bound to the service account in `starfleet`."
+        explanation: "Correct. The message gives the subject, the verb (`delete`), the resource (`deployments`), the API group (`apps`) and the namespace where the binding must live."
+      - id: d
+        text: "`apiGroups: [\"apps\"]`, `resources: [\"deployments\"]`, `verbs: [\"deletecollection\"]`, in a `Role` in `starfleet`."
+        explanation: "This option uses a different verb, and `delete` is what the message names."
+    correct_option: c
+    explanation: "The message gives the subject, the verb (`delete`), the resource (`deployments`), the API group (`apps`) and the namespace where the binding must live."
+
+  - id: ats021-010-q05
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Find and remove an over-broad binding such as cluster-admin given to a workload service account"
+    source_readings:
+      - sections/section-010/module-01/course-04-over-broad-grants-and-aggregation.md
+    prompt: |-
+      An audit finds a `ClusterRoleBinding` named `legacy-agent-admin` that gives `cluster-admin` to the service account `legacy-agent` in `starfleet`. You must remove the over-broad right and be sure nothing else grants it. What do you do?
+    options:
+      - id: a
+        text: "Edit the `cluster-admin` `ClusterRole` and remove its rules."
+        explanation: "Editing the built-in `cluster-admin` role is reset by the API server and breaks other subjects."
+      - id: b
+        text: "List the `RoleBindings` and `ClusterRoleBindings` in all namespaces that name the service account, delete the over-broad binding, and run `kubectl auth can-i` with `--as` to prove the result."
+        explanation: "Correct. A grant can also come from a `RoleBinding`, which gives full rights inside its namespace, so you search both kinds in all namespaces. Then you delete the binding and prove the change with `can-i`."
+      - id: c
+        text: "Delete the `legacy-agent` service account and keep the binding, so the right has no subject."
+        explanation: "Deleting the service account while keeping the binding leaves a dangling grant that a new service account with the same name would get."
+      - id: d
+        text: "Search only the `ClusterRoleBindings`, delete the binding and treat the case as closed."
+        explanation: "This option can miss a second grant."
+    correct_option: b
+    explanation: "A grant can also come from a `RoleBinding`, which gives full rights inside its namespace, so you search both kinds in all namespaces. Then you delete the binding and prove the change with `can-i`."
+
+  - id: ats021-010-q06
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Extend a ClusterRole through aggregation labels instead of editing a built-in role"
+    source_readings:
+      - sections/section-010/module-01/course-04-over-broad-grants-and-aggregation.md
+    prompt: |-
+      The `developers` group is bound to `view` and must also list Leases (`coordination.k8s.io`). A colleague proposes editing `view`. What is the better way?
+    options:
+      - id: a
+        text: "Edit `view` with `kubectl edit clusterrole view`. The change stays forever."
+        explanation: "The API server resets edits to built-in roles when it starts, so this option does not last."
+      - id: b
+        text: "Create a new `ClusterRoleBinding` from `developers` to `cluster-admin`."
+        explanation: "This option give too much or do not change what the existing `RoleBinding` points at."
+      - id: c
+        text: "Add a `Role` named `view` in every namespace."
+        explanation: "This option give too much or do not change what the existing `RoleBinding` points at."
+      - id: d
+        text: "Create a small `ClusterRole` with the label `rbac.authorization.k8s.io/aggregate-to-view: \"true\"` and a rule for `leases`. The control plane adds the rule to `view`."
+        explanation: "Correct. `view` is an aggregated ClusterRole: a controller fills its rules from every ClusterRole with the aggregation label."
+    correct_option: d
+    explanation: "`view` is an aggregated ClusterRole: a controller fills its rules from every ClusterRole with the aggregation label."
+
+  - id: ats021-010-q07
+    type: single_choice
+    difficulty: beginner
+    learning_objective: "Read a Pod Security Admission rejection and name each field that violates the level"
+    source_readings:
+      - sections/section-010/module-02/course-01-levels-modes-and-rejections.md
+    prompt: |-
+      A `Pod` is rejected in `outpost` with: `violates PodSecurity "baseline:latest": privileged (container "test" must not set securityContext.privileged=true)`. The user is the cluster administrator. Which statement is correct?
+    options:
+      - id: a
+        text: "RBAC rejected the request, so the administrator needs the `create` verb on `pods`."
+        explanation: "This is not the best answer. The text `violates PodSecurity` names Pod Security Admission. RBAC already allowed the request. The `warn` mode never blocks, and the kubelet is not involved at this stage because the pod was never stored."
+      - id: b
+        text: "Pod Security Admission rejected the pod because the namespace enforces `baseline`. It checks the pod content and not the user, so the administrator is not exempt."
+        explanation: "Correct. The text `violates PodSecurity` names Pod Security Admission. RBAC already allowed the request. The `warn` mode never blocks, and the kubelet is not involved at this stage because the pod was never stored."
+      - id: c
+        text: "The kubelet rejected the container when it tried to start it."
+        explanation: "This is not the best answer. The text `violates PodSecurity` names Pod Security Admission. RBAC already allowed the request. The `warn` mode never blocks, and the kubelet is not involved at this stage because the pod was never stored."
+      - id: d
+        text: "The namespace label `warn=baseline` blocked the pod."
+        explanation: "This is not the best answer. The text `violates PodSecurity` names Pod Security Admission. RBAC already allowed the request. The `warn` mode never blocks, and the kubelet is not involved at this stage because the pod was never stored."
+    correct_option: b
+    explanation: "The text `violates PodSecurity` names Pod Security Admission. RBAC already allowed the request. The `warn` mode never blocks, and the kubelet is not involved at this stage because the pod was never stored."
+
+  - id: ats021-010-q08
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Test a level change against existing workloads with a server-side dry run before enforcing it"
+    source_readings:
+      - sections/section-010/module-02/course-02-changing-a-namespace-level.md
+    prompt: |-
+      You want to raise `starfleet` to `restricted`. The namespace runs pods that may break it. What is the safe order?
+    options:
+      - id: a
+        text: "Label the namespace `enforce=restricted` now. Running pods keep running, so nothing can go wrong."
+        explanation: "This option hides the problem until the next rollout, when replacement pods are rejected."
+      - id: b
+        text: "Run `kubectl label --dry-run=server --overwrite namespace starfleet pod-security.kubernetes.io/enforce=restricted`, read the warning for each pod, set `warn` and `audit` to `restricted` while you fix the pod templates, then enforce."
+        explanation: "Correct. A server-side dry run checks every existing pod against the new level and prints a warning for each pod that would break it, without changing anything. The `warn` and `audit` modes report without blocking."
+      - id: c
+        text: "Delete all pods first, then label the namespace."
+        explanation: "This option do not test anything."
+      - id: d
+        text: "Set `pod-security.kubernetes.io/enforce-version=latest` and wait for the next upgrade."
+        explanation: "This option do not test anything."
+    correct_option: b
+    explanation: "A server-side dry run checks every existing pod against the new level and prints a warning for each pod that would break it, without changing anything. The `warn` and `audit` modes report without blocking."
+
+  - id: ats021-010-q09
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: "Explain why a Deployment is accepted while its pods are rejected, and find the error in the ReplicaSet events"
+    source_readings:
+      - sections/section-010/module-02/course-02-changing-a-namespace-level.md
+    prompt: |-
+      After `enforce=baseline` is set on `starfleet`, you run `kubectl -n starfleet rollout restart deployment privileged-debug`. The command prints `restarted`, but the `READY` column shows `1/1` with `UP-TO-DATE` `0`. Where is the Pod Security Admission error?
+    options:
+      - id: a
+        text: "In the output of `kubectl rollout restart`, which prints it after a delay."
+        explanation: "This is not the best answer. Pod Security Admission does not enforce on Deployments, only on pods. The Deployment is accepted. The ReplicaSet controller then sends the pod create request, and the rejection becomes a `FailedCreate` event on the ReplicaSet. The old pod keeps running, so `Available=True` and `ReplicaFailure=True` appear together."
+      - id: b
+        text: "In the audit log only."
+        explanation: "This is not the best answer. Pod Security Admission does not enforce on Deployments, only on pods. The Deployment is accepted. The ReplicaSet controller then sends the pod create request, and the rejection becomes a `FailedCreate` event on the ReplicaSet. The old pod keeps running, so `Available=True` and `ReplicaFailure=True` appear together."
+      - id: c
+        text: "In the `FailedCreate` events of the new ReplicaSet, from the `replicaset-controller`. `kubectl describe replicaset` shows them."
+        explanation: "Correct. Pod Security Admission does not enforce on Deployments, only on pods. The Deployment is accepted. The ReplicaSet controller then sends the pod create request, and the rejection becomes a `FailedCreate` event on the ReplicaSet. The old pod keeps running, so `Available=True` and `ReplicaFailure=True` appear together."
+      - id: d
+        text: "In the events of the old pod."
+        explanation: "This is not the best answer. Pod Security Admission does not enforce on Deployments, only on pods. The Deployment is accepted. The ReplicaSet controller then sends the pod create request, and the rejection becomes a `FailedCreate` event on the ReplicaSet. The old pod keeps running, so `Available=True` and `ReplicaFailure=True` appear together."
+    correct_option: c
+    explanation: "Pod Security Admission does not enforce on Deployments, only on pods. The Deployment is accepted. The ReplicaSet controller then sends the pod create request, and the rejection becomes a `FailedCreate` event on the ReplicaSet. The old pod keeps running, so `Available=True` and `ReplicaFailure=True` appear together."
+
+  - id: ats021-010-q10
+    type: single_choice
+    difficulty: advanced
+    learning_objective: "Write a securityContext (runAsNonRoot, allowPrivilegeEscalation, capabilities drop ALL, seccompProfile RuntimeDefault) that passes restricted"
+    source_readings:
+      - sections/section-010/module-02/course-03-securitycontext-for-restricted.md
+    prompt: |-
+      The `scout` Deployment sets `runAsNonRoot: true`, drops `ALL` capabilities, blocks privilege escalation and uses `seccompProfile: RuntimeDefault`. Admission accepts it at `restricted`, but the new pod shows `CreateContainerConfigError` with `container has runAsNonRoot and image has non-numeric user (app)`. What fixes it?
+    options:
+      - id: a
+        text: "Set `runAsUser: 100`, the numeric ID of the `app` user, in the pod `securityContext`."
+        explanation: "Correct. The kubelet checks the real user. The image declares its user by name, so the kubelet cannot prove the user is non-root. A numeric `runAsUser` removes the doubt. User ID `0` is root and breaks `runAsNonRoot`. Changing the namespace label or enabling privilege escalation does not address the error and weakens the security."
+      - id: b
+        text: "Set `runAsUser: 0` so that the kubelet can verify the user."
+        explanation: "This is not the best answer. The kubelet checks the real user. The image declares its user by name, so the kubelet cannot prove the user is non-root. A numeric `runAsUser` removes the doubt. User ID `0` is root and breaks `runAsNonRoot`. Changing the namespace label or enabling privilege escalation does not address the error and weakens the security."
+      - id: c
+        text: "Label the namespace `enforce=baseline`."
+        explanation: "This is not the best answer. The kubelet checks the real user. The image declares its user by name, so the kubelet cannot prove the user is non-root. A numeric `runAsUser` removes the doubt. User ID `0` is root and breaks `runAsNonRoot`. Changing the namespace label or enabling privilege escalation does not address the error and weakens the security."
+      - id: d
+        text: "Set `allowPrivilegeEscalation: true`."
+        explanation: "This is not the best answer. The kubelet checks the real user. The image declares its user by name, so the kubelet cannot prove the user is non-root. A numeric `runAsUser` removes the doubt. User ID `0` is root and breaks `runAsNonRoot`. Changing the namespace label or enabling privilege escalation does not address the error and weakens the security."
+    correct_option: a
+    explanation: "The kubelet checks the real user. The image declares its user by name, so the kubelet cannot prove the user is non-root. A numeric `runAsUser` removes the doubt. User ID `0` is root and breaks `runAsNonRoot`. Changing the namespace label or enabling privilege escalation does not address the error and weakens the security."

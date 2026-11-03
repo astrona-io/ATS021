@@ -160,3 +160,27 @@ You can now find every grant of `cluster-admin`, list every binding of one ident
 > - **Editing a built-in ClusterRole such as `view` or `edit`.** The API server resets it. Add a labelled ClusterRole instead.
 > - **Labelling a broad role `aggregate-to-view`.** Every subject bound to `view` in every namespace gets its rules at once. Keep aggregated roles small and read-only for `view`.
 > - **Removing a grant without checking what still needs it.** Watch for `Forbidden` errors from the workload afterwards and give it a precise Role.
+
+## Your mission: Grant Least-Privilege Access With RBAC Lab
+
+You can now write a Role and a RoleBinding for exactly the verbs a service account needs, remove a `cluster-admin` grant and extend a built-in role through aggregation. The mission starts a cluster where `ci-deployer` has no rights, `legacy-agent` has `cluster-admin` and the `developers` group cannot list Leases, and asks you to fix all three.
+
+Pause the playground first, so the lab has the memory it needs:
+
+```sh
+astrona stop ats-021-playground-010-01
+```
+
+Start the lab, then grade it when you are done:
+
+```sh
+astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-010/module-01/labs/lab-01
+astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-010/module-01/labs/lab-01
+```
+
+When you are done, remove the lab and start the playground again:
+
+```sh
+astrona destroy ats-021-lab-010-01
+astrona start ats-021-playground-010-01
+```

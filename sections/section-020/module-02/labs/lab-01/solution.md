@@ -1,6 +1,6 @@
 # Solution
 
-Solve this lab on `terminal`. Each step ends with `astrona submit`. The `--keep` flag keeps the lab running so you can continue after a failed check. The output below comes from a real run of this lab.
+Solve this lab on `terminal`. The output below comes from a real run of this lab.
 
 Start the lab if it is not running:
 
@@ -8,7 +8,15 @@ Start the lab if it is not running:
 astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/module-02/labs/lab-01
 ```
 
-`astrona submit` right after the start shows one check that already passes. `probe-serves-meshed-callers` passes because every caller may reach `probe`. It stays your guard: it fails if a policy locks `probe` for everyone.
+Keep this command running in a second host terminal. It grades the lab every few seconds and records nothing:
+
+```sh
+astrona submit --watch --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/module-02/labs/lab-01
+```
+
+Use `--watch` until the end, because a plain `astrona submit` finishes the attempt and deletes the lab. Run the plain command once, in the last step.
+
+The watch terminal right after the start shows one check that already passes. `probe-serves-meshed-callers` passes because every caller may reach `probe`. It stays your guard: it fails if a policy locks `probe` for everyone.
 
 ## Step 1: Allow only shuttle to call scout
 
@@ -91,13 +99,7 @@ You should see:
 403
 ```
 
-Grade it:
-
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/module-02/labs/lab-01 --keep
-```
-
-The check `scout-allows-only-shuttle` now passes.
+The watch terminal now shows the check `scout-allows-only-shuttle` passing.
 
 ## Step 2: Refuse callers without a proxy on probe
 
@@ -139,7 +141,7 @@ You should see:
 
 The first line is the empty body of the `403` from `drifter`. If the first request times out right after the restart, run it again. The `scout` Server from step 1 still decides who reaches `scout`, because a Server replaces the default for its port.
 
-Run the grader one last time without `--keep`:
+Press Ctrl-C to stop the watch, then run the grader once:
 
 ```sh
 astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/module-02/labs/lab-01

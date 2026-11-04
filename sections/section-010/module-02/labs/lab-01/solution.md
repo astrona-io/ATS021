@@ -1,12 +1,20 @@
 # Solution
 
-Solve this lab on `terminal`. Each step ends with `astrona submit`. The `--keep` flag keeps the lab running so you can continue after a failed check. The output below comes from a real run of this lab.
+Solve this lab on `terminal`. The output below comes from a real run of this lab.
 
 Start the lab if it is not running:
 
 ```sh
 astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-010/module-02/labs/lab-01
 ```
+
+Keep this command running in a second host terminal. It grades the lab every few seconds and records nothing:
+
+```sh
+astrona submit --watch --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-010/module-02/labs/lab-01
+```
+
+Use `--watch` until the end, because a plain `astrona submit` finishes the attempt and deletes the lab. Run the plain command once, in the last step.
 
 ## Step 1: Find what restricted would reject
 
@@ -67,13 +75,9 @@ kubectl -n starfleet rollout status deployment/probe
 kubectl -n starfleet rollout status deployment/shuttle
 ```
 
-Each command ends with a line like `deployment "scout" successfully rolled out`. Grade it:
+Each command ends with a line like `deployment "scout" successfully rolled out`.
 
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-010/module-02/labs/lab-01 --keep
-```
-
-The checks `privileged-debug-removed`, `workloads-comply-and-run` and `scout-still-serves` now pass.
+The watch terminal now shows the checks `privileged-debug-removed`, `workloads-comply-and-run` and `scout-still-serves` passing.
 
 ## Step 4: Enforce restricted
 
@@ -110,7 +114,7 @@ You should see something like (shortened):
 Error from server (Forbidden): error when creating "pod-privileged-test.yaml": pods "privileged-test" is forbidden: violates PodSecurity "restricted:latest": privileged (container "debug" must not set securityContext.privileged=true), allowPrivilegeEscalation != false (container "debug" must set securityContext.allowPrivilegeEscalation=false) ...
 ```
 
-Run the grader one last time without `--keep`:
+Press Ctrl-C to stop the watch, then run the grader once:
 
 ```sh
 astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-010/module-02/labs/lab-01

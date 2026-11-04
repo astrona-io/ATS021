@@ -1,6 +1,6 @@
 # Solution
 
-Solve this lab on `terminal`. Each step ends with `astrona submit`. The `--keep` flag keeps the lab running so you can continue after a failed check. The output below comes from a real run of this lab.
+Solve this lab on `terminal`. The output below comes from a real run of this lab.
 
 Start the lab if it is not running:
 
@@ -8,7 +8,15 @@ Start the lab if it is not running:
 astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/capstone/labs/lab-01
 ```
 
-`astrona submit` right after the start shows that no check passes: the mesh is in `PERMISSIVE` mode and no policy exists.
+Keep this command running in a second host terminal. It grades the lab every few seconds and records nothing:
+
+```sh
+astrona submit --watch --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/capstone/labs/lab-01
+```
+
+Use `--watch` until the end, because a plain `astrona submit` finishes the attempt and deletes the lab. Run the plain command once, in the last step.
+
+The watch terminal right after the start shows that no check passes: the mesh is in `PERMISSIVE` mode and no policy exists.
 
 ## Step 1: Require STRICT mTLS in starfleet
 
@@ -66,13 +74,7 @@ scout-64445474d5-k5xsm     istio-proxy
 shuttle-75fc875874-6wptr   istio-proxy
 ```
 
-Grade it:
-
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/capstone/labs/lab-01 --keep
-```
-
-The check `strict-mtls-required` now passes. Do not use `PERMISSIVE` or `DISABLE`: both let `drifter-plain` through.
+The watch terminal now shows the check `strict-mtls-required` passing. Do not use `PERMISSIVE` or `DISABLE`: both let `drifter-plain` through.
 
 ## Step 2: Allow only GET from shuttle to scout
 
@@ -171,7 +173,7 @@ You should see:
 200
 ```
 
-Grade it with `astrona submit ... --keep`. The checks `scout-allows-only-shuttle-get` and `probe-only-from-starfleet` now pass.
+The watch terminal now shows the checks `scout-allows-only-shuttle-get` and `probe-only-from-starfleet` passing.
 
 ## Step 4: Give beacon a sidecar
 
@@ -203,7 +205,7 @@ deployment "beacon" successfully rolled out
 200
 ```
 
-`beacon` runs as the `shuttle` service account, so with a sidecar it has the `shuttle` identity and the `GET` is allowed. Run the grader one last time without `--keep`:
+`beacon` runs as the `shuttle` service account, so with a sidecar it has the `shuttle` identity and the `GET` is allowed. Press Ctrl-C to stop the watch, then run the grader once:
 
 ```sh
 astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/capstone/labs/lab-01

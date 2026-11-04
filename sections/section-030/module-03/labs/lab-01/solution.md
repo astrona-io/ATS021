@@ -1,12 +1,20 @@
 # Solution
 
-Solve this lab on `terminal`. Each step ends with `astrona submit`. The `--keep` flag keeps the lab running so you can continue after a failed check. The output below comes from a real run of this lab.
+Solve this lab on `terminal`. The output below comes from a real run of this lab.
 
 Start the lab if it is not running:
 
 ```sh
 astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-03/labs/lab-01
 ```
+
+Keep this command running in a second host terminal. It grades the lab every few seconds and records nothing:
+
+```sh
+astrona submit --watch --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-03/labs/lab-01
+```
+
+Use `--watch` until the end, because a plain `astrona submit` finishes the attempt and deletes the lab. Run the plain command once, in the last step.
 
 A `ValidatingAdmissionPolicy` has two parts. The policy holds the CEL (Common Expression Language) rule. A `ValidatingAdmissionPolicyBinding` says where the policy applies and what happens on failure. A policy does nothing until a binding names it.
 
@@ -87,13 +95,9 @@ The deployments "scout" is invalid: : ValidatingAdmissionPolicy 'replica-limit' 
 The deployments "scout" is invalid: : ValidatingAdmissionPolicy 'replica-limit' with binding 'replica-limit-production' denied request: Deployment scout asks for 9 replicas; the limit is 5
 ```
 
-The API server rejects the three requests above the limit and accepts the one at the limit. The message for `kubectl scale` starts with `Scale scout`, which shows that the `deployments/scale` rule ran. Grade it:
+The API server rejects the three requests above the limit and accepts the one at the limit. The message for `kubectl scale` starts with `Scale scout`, which shows that the `deployments/scale` rule ran.
 
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-03/labs/lab-01 --keep
-```
-
-The check `replica-limit-denied-in-production` now passes. The check `over-limit-deployment-can-shrink` still fails, and the next step shows why.
+The watch terminal now shows the check `replica-limit-denied-in-production` passing. The watch terminal still shows `over-limit-deployment-can-shrink` failing, and the next step shows why.
 
 ## Step 2: Allow a request that does not raise the count
 
@@ -160,13 +164,9 @@ deployment.apps/scout labeled (server dry run)
 The deployments "scout" is invalid: : ValidatingAdmissionPolicy 'replica-limit' with binding 'replica-limit-production' denied request: Scale scout asks for 9 replicas; the limit is 5
 ```
 
-Lowering and relabelling now work, and raising above the limit still fails. Grade it:
+Lowering and relabelling now work, and raising above the limit still fails.
 
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-03/labs/lab-01 --keep
-```
-
-The check `over-limit-deployment-can-shrink` now passes.
+The watch terminal now shows the check `over-limit-deployment-can-shrink` passing.
 
 ## Step 3: Warn in sandbox namespaces
 
@@ -209,7 +209,7 @@ Warning: Validation failed for ValidatingAdmissionPolicy 'replica-limit' with bi
 deployment.apps/wide created (server dry run)
 ```
 
-The API server accepts the request and returns the warning. Grade it:
+The API server accepts the request and returns the warning. Press Ctrl-C to stop the watch, then run the grader once:
 
 ```sh
 astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-03/labs/lab-01

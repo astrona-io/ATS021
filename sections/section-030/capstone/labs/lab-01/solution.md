@@ -1,12 +1,20 @@
 # Solution
 
-Solve this lab on `terminal`. Each step ends with `astrona submit`. The `--keep` flag keeps the lab running so you can continue after a failed check. The output below comes from a real run of this lab. Long messages are shortened where the text says so.
+Solve this lab on `terminal`. The output below comes from a real run of this lab. Long messages are shortened where the text says so.
 
 Start the lab if it is not running:
 
 ```sh
 astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/capstone/labs/lab-01
 ```
+
+Keep this command running in a second host terminal. It grades the lab every few seconds and records nothing:
+
+```sh
+astrona submit --watch --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/capstone/labs/lab-01
+```
+
+Use `--watch` until the end, because a plain `astrona submit` finishes the attempt and deletes the lab. Run the plain command once, in the last step.
 
 The start takes several minutes, because it installs Kyverno and Gatekeeper. Right after the start no check passes. The three rules are enforced by three different components: Kyverno (resource limits), Gatekeeper (the `latest` tag) and the API server itself (replicas).
 
@@ -108,13 +116,9 @@ require-limits:
 pod/probe-legacy created (server dry run)
 ```
 
-Kyverno refuses the first pod and accepts the second. Grade it:
+Kyverno refuses the first pod and accepts the second.
 
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/capstone/labs/lab-01 --keep
-```
-
-The checks `limits-enforced` and `probe-exempt-only` pass. Do not exclude the whole namespace and do not use `Audit`: both fail a check.
+The watch terminal now shows the checks `limits-enforced` and `probe-exempt-only` passing. Do not exclude the whole namespace and do not use `Audit`: both fail a check.
 
 ## Step 2: Refuse the latest tag with Gatekeeper
 
@@ -174,13 +178,7 @@ You should see:
 Error from server (Forbidden): error when creating "pod-latest-check.yaml": admission webhook "validation.gatekeeper.sh" denied the request: [no-latest-tag] container <latest-check> uses the disallowed tag <latest>
 ```
 
-Grade it:
-
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/capstone/labs/lab-01 --keep
-```
-
-The check `latest-tag-denied` passes.
+The watch terminal now shows the check `latest-tag-denied` passing.
 
 ## Step 3: Fix beacon and check the audit
 
@@ -217,13 +215,7 @@ NAME            ENFORCEMENT-ACTION   TOTAL-VIOLATIONS
 no-latest-tag   deny                 0
 ```
 
-Grade it:
-
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/capstone/labs/lab-01 --keep
-```
-
-The check `beacon-fixed-audit-clean` passes. It can wait up to four minutes for the audit run.
+The watch terminal now shows the check `beacon-fixed-audit-clean` passing. It can wait up to four minutes for the audit run.
 
 ## Step 4: Limit replicas in production with a ValidatingAdmissionPolicy
 
@@ -311,13 +303,9 @@ The deployments "six" is invalid: : ValidatingAdmissionPolicy 'replica-limit' wi
 The deployments "scout" is invalid: : ValidatingAdmissionPolicy 'replica-limit' with binding 'replica-limit-production' denied request: Production allows at most 5 replicas.
 ```
 
-Change `replicas: 6` to `replicas: 5` in `deployment-six.yaml` and send it again. You should see `deployment.apps/six created (server dry run)`. Grade it:
+Change `replicas: 6` to `replicas: 5` in `deployment-six.yaml` and send it again. You should see `deployment.apps/six created (server dry run)`.
 
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/capstone/labs/lab-01 --keep
-```
-
-The check `replica-limit-in-production` passes.
+The watch terminal now shows the check `replica-limit-in-production` passing.
 
 ## Step 5: Scale scout to 5 replicas
 
@@ -328,7 +316,7 @@ kubectl -n starfleet scale deployment scout --replicas=5
 kubectl -n starfleet get deployment scout
 ```
 
-You should see `deployment.apps/scout scaled`. The `READY` column can show `8/5` for a few seconds while the extra pods stop. Grade it:
+You should see `deployment.apps/scout scaled`. The `READY` column can show `8/5` for a few seconds while the extra pods stop. Press Ctrl-C to stop the watch, then run the grader once:
 
 ```sh
 astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/capstone/labs/lab-01

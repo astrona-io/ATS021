@@ -2,6 +2,14 @@
 
 Three evidence sources hold the answers. Kyverno `PolicyReport` objects answer keys 1 and 2. The Gatekeeper Constraint `status.violations` field answers key 3. The API server audit log answers keys 4 and 5. You read each source, then write the answers to one ConfigMap.
 
+Keep this command running in a second host terminal. It grades the lab every few seconds and records nothing:
+
+```sh
+astrona submit --watch --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-040/module-02/labs/lab-01
+```
+
+Use `--watch` until the end, because a plain `astrona submit` finishes the attempt and deletes the lab. Run the plain command once, in the last step.
+
 ## Step 1: Read the Kyverno policy reports
 
 Kyverno writes one `PolicyReport` for each scanned object. The policies match pods, and Kyverno rule autogeneration also checks Deployments and ReplicaSets, so the reports hold results for all three kinds. Keep only the Deployments:
@@ -49,7 +57,7 @@ kubectl -n starfleet create configmap auditor-answers \
   --from-literal=source-for-who-scaled=audit-log
 ```
 
-Submit:
+The watch terminal shows the checks failing until the ConfigMap exists. Press Ctrl-C to stop the watch, then run the grader once:
 
 ```sh
 astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-040/module-02/labs/lab-01

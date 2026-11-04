@@ -1,12 +1,20 @@
 # Solution
 
-Solve this lab on `terminal`. Each step ends with `astrona submit`. The `--keep` flag keeps the lab running so you can continue after a failed check. The output below comes from a real run of this lab.
+Solve this lab on `terminal`. The output below comes from a real run of this lab.
 
 Start the lab if it is not running:
 
 ```sh
 astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-010/capstone/labs/lab-01
 ```
+
+Keep this command running in a second host terminal. It grades the lab every few seconds and records nothing:
+
+```sh
+astrona submit --watch --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-010/capstone/labs/lab-01
+```
+
+Use `--watch` until the end, because a plain `astrona submit` finishes the attempt and deletes the lab. Run the plain command once, in the last step.
 
 ## Step 1: Remove cluster-admin from ci-deployer
 
@@ -68,13 +76,7 @@ no
 no
 ```
 
-Grade it:
-
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-010/capstone/labs/lab-01 --keep
-```
-
-The checks `ci-deployer-manages-orbit`, `ci-deployer-least-privilege` and `cluster-admin-removed` now pass.
+The watch terminal now shows the checks `ci-deployer-manages-orbit`, `ci-deployer-least-privilege` and `cluster-admin-removed` passing.
 
 ## Step 3: Fix the beacon pods before enforcing
 
@@ -120,7 +122,7 @@ The API server prints `namespace/orbit labeled`. If the old `beacon` pod is stil
 kubectl -n orbit get pods
 ```
 
-Run the grader one last time without `--keep`:
+Press Ctrl-C to stop the watch, then run the grader once:
 
 ```sh
 astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-010/capstone/labs/lab-01

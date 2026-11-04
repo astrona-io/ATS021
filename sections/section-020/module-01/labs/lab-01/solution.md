@@ -1,6 +1,6 @@
 # Solution
 
-Solve this lab on `terminal`. Each step ends with `astrona submit`. The `--keep` flag keeps the lab running so you can continue after a failed check. The output below comes from a real run of this lab.
+Solve this lab on `terminal`. The output below comes from a real run of this lab.
 
 Start the lab if it is not running:
 
@@ -8,7 +8,15 @@ Start the lab if it is not running:
 astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/module-01/labs/lab-01
 ```
 
-`astrona submit` right after the start shows one check that already passes. `scout-allows-shuttle-get` passes because every caller may reach `scout`. It stays your guard: it fails if a policy blocks `shuttle`.
+Keep this command running in a second host terminal. It grades the lab every few seconds and records nothing:
+
+```sh
+astrona submit --watch --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/module-01/labs/lab-01
+```
+
+Use `--watch` until the end, because a plain `astrona submit` finishes the attempt and deletes the lab. Run the plain command once, in the last step.
+
+The watch terminal right after the start shows one check that already passes. `scout-allows-shuttle-get` passes because every caller may reach `scout`. It stays your guard: it fails if a policy blocks `shuttle`.
 
 ## Step 1: Require STRICT mTLS in starfleet
 
@@ -47,13 +55,9 @@ command terminated with exit code 56
 200
 ```
 
-The sidecar of `scout` expected a TLS handshake, got plain HTTP and closed the connection. Grade it:
+The sidecar of `scout` expected a TLS handshake, got plain HTTP and closed the connection.
 
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/module-01/labs/lab-01 --keep
-```
-
-The check `strict-mtls-required` now passes. Do not use `PERMISSIVE` or `DISABLE`: both let `drifter` through.
+The watch terminal now shows the check `strict-mtls-required` passing. Do not use `PERMISSIVE` or `DISABLE`: both let `drifter` through.
 
 ## Step 2: Allow only GET from shuttle
 
@@ -101,7 +105,7 @@ RBAC: access denied
 403
 ```
 
-Envoy in the sidecar of `scout` wrote this answer. The first ALLOW policy turned `scout` into an allow list: a request is allowed only if a rule matches. Grade it with the same `astrona submit ... --keep` command. The check `scout-refuses-other-callers` now passes.
+Envoy in the sidecar of `scout` wrote this answer. The first ALLOW policy turned `scout` into an allow list: a request is allowed only if a rule matches. The watch terminal now shows the check `scout-refuses-other-callers` passing.
 
 ## Step 3: Deny the /env path
 
@@ -166,7 +170,7 @@ ALLOW    _anonymous_match_nothing_       1
 ALLOW    scout-allow-shuttle.starfleet   1
 ```
 
-Run the grader one last time without `--keep`:
+Press Ctrl-C to stop the watch, then run the grader once:
 
 ```sh
 astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/module-01/labs/lab-01

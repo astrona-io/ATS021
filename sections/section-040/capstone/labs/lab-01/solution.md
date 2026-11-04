@@ -1,6 +1,6 @@
 # Solution
 
-Solve this lab on `terminal`. Each step ends with `astrona submit`, so you see which checks turn green. Add the `--keep` flag to a submit if you want the lab to keep running after a failed check. This walkthrough shows no captured output, because the values differ in every cluster: the `auditID` and the lists come from your own evidence.
+Solve this lab on `terminal`. This walkthrough shows no captured output, because the values differ in every cluster: the `auditID` and the lists come from your own evidence.
 
 Start the lab if it is not running:
 
@@ -9,6 +9,14 @@ astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section
 ```
 
 The start takes several minutes, because it installs Kyverno and Gatekeeper. Run every `podman exec` command on your own machine. If you use Docker, replace `podman` with `docker`. Three evidence sources hold the answers: the API server audit log (who deleted `beacon`), the Kyverno `PolicyReport` objects and the status of the Gatekeeper Constraint.
+
+Keep this command running in a second host terminal. It grades the lab every few seconds and records nothing:
+
+```sh
+astrona submit --watch --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-040/capstone/labs/lab-01
+```
+
+Use `--watch` until the end, because a plain `astrona submit` finishes the attempt and deletes the lab. Run the plain command once, in the last step.
 
 ## Step 1: Write the audit policy on the node
 
@@ -102,13 +110,7 @@ The kubelet restarts the API server, and `kubectl` fails for a short time. Leave
 kubectl get --raw=/readyz
 ```
 
-Submit:
-
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-040/capstone/labs/lab-01
-```
-
-The checks for audit logging, Secret metadata, Deployment bodies and dropped noise pass now. The answer checks still fail, because the ConfigMap does not exist yet.
+The watch terminal now shows the checks for audit logging, Secret metadata, Deployment bodies and dropped noise passing. The answer checks still fail, because the ConfigMap does not exist yet.
 
 ## Step 3: Find who deleted beacon
 
@@ -152,7 +154,7 @@ kubectl -n starfleet create configmap auditor-answers \
   --from-literal=owner-label='<LIST FROM STEP 4, GATEKEEPER>'
 ```
 
-Submit again:
+Press Ctrl-C to stop the watch, then run the grader once:
 
 ```sh
 astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-040/capstone/labs/lab-01

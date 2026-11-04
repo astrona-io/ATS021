@@ -10,13 +10,15 @@ Create two Servers, repair the second backend's authorization, then attach a wei
 
 ## The feedback loop
 
-Run grading from the host terminal where you started the lab:
+Keep this command running in a second host terminal. It grades the lab every few seconds and records nothing:
 
 ```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/module-02/labs/lab-02
+astrona submit --watch --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/module-02/labs/lab-02
 ```
 
-The intended start state fails `servers`, `authorization`, `route` and `observed-split`. This is the expected result of the configuration, not a recorded run. Repeat grading after each change; the proxies need time to receive policy updates.
+Use `--watch` until the end, because a plain `astrona submit` finishes the attempt and deletes the lab. Run the plain command once, in the last step.
+
+The intended start state fails `servers`, `authorization`, `route` and `observed-split`. This is the expected result of the configuration, not a recorded run. The watch terminal updates after each change; the proxies need time to receive policy updates.
 
 ## Inspect the missing resources and wrong reference
 
@@ -161,7 +163,7 @@ kubectl -n starfleet exec deploy/shuttle -c shuttle -- sh -c 'for request in $(s
 
 Read the route's status for attachment errors. Look for both backend pod names in the replies' `hostname` fields. The caller still uses the same `scout` address; its outbound proxy chooses a backend for each request. This Service attachment is the Gateway API for Mesh Management and Administration (GAMMA) model. No Gateway resource is needed.
 
-Run the check again:
+Press Ctrl-C to stop the watch, then run the check once:
 
 ```sh
 astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/module-02/labs/lab-02
@@ -174,4 +176,4 @@ astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/sect
 - **`servers`:** Compare both selectors and use the named pod port `http`. A selector for `app: scout` alone covers both versions and can overlap the other Server.
 - **`authorization`:** Check the required authentication, its service account and the Server target. Deleting the broken policy or allowing unauthenticated requests does not meet the task.
 - **`route`:** Use the Gateway API group, a core Service parent and both weights. The similarly named Linkerd policy HTTPRoute is a different resource type.
-- **`observed-split`:** Confirm `shuttle` has a proxy and both versioned Services answer it. A ServiceProfile for `scout` takes precedence over the outbound HTTPRoute; keep that resource absent. If the route has just changed, wait for configuration to reach the proxy and submit again.
+- **`observed-split`:** Confirm `shuttle` has a proxy and both versioned Services answer it. A ServiceProfile for `scout` takes precedence over the outbound HTTPRoute; keep that resource absent. If the route has just changed, wait for configuration to reach the proxy and watch the result again.

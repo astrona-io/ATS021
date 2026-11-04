@@ -13,14 +13,16 @@ Pods in `starfleet` from the terminal.
 
 ## The feedback loop
 
-Run grading from the host terminal where you started the lab:
+Keep this command running in a second host terminal. It grades the lab every few seconds and records nothing:
 
 ```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-01/labs/lab-02
+astrona submit --watch --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-01/labs/lab-02
 ```
 
+Use `--watch` until the end, because a plain `astrona submit` finishes the attempt and deletes the lab. Run the plain command once, in the last step.
+
 Before you write the policy, expect `policy-offline`, `admission-default`
-and `student-pods` to fail. Run the same command after each step.
+and `student-pods` to fail in the watch terminal. It updates after each step.
 These are expected states, not captured command output.
 
 ## Step 1: Test and install the policy
@@ -178,7 +180,7 @@ After the label change and annotation update, look for `team: navigation`
 and `proof: retained` on `scout-default`. Kyverno reads the submitted
 `object`, so it sees the person's value and returns no patch.
 
-Run the check: `student-pods` should now pass, along with the other checks.
+The watch terminal should now show `student-pods` passing, along with the other checks. Press Ctrl-C to stop the watch, then run the grader once:
 
 ```sh
 astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-01/labs/lab-02

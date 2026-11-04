@@ -1,12 +1,20 @@
 # Solution
 
-Solve this lab on `terminal`. Each step ends with `astrona submit`. The `--keep` flag keeps the lab running so you can continue after a failed check. The output below comes from the module that teaches this task; the exact names, times and suffixes differ in your cluster.
+Solve this lab on `terminal`. The output below comes from the module that teaches this task; the exact names, times and suffixes differ in your cluster.
 
 Start the lab if it is not running:
 
 ```sh
 astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/capstone/labs/lab-01
 ```
+
+Keep this command running in a second host terminal. It grades the lab every few seconds and records nothing:
+
+```sh
+astrona submit --watch --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/capstone/labs/lab-01
+```
+
+Use `--watch` until the end, because a plain `astrona submit` finishes the attempt and deletes the lab. Run the plain command once, in the last step.
 
 Before you change anything, read the unfinished Pipeline, ask what `pipeline-runner` may do and try an image in production:
 
@@ -149,13 +157,9 @@ tkn -n pipelines pipelinerun describe --last
 kubectl -n starfleet get deploy
 ```
 
-The `deploy` Pipeline Task has no TaskRun and appears under `Skipped Tasks`. The command `kubectl -n starfleet get deploy` shows that nothing reached the `starfleet` namespace. The run is listed as `Succeeded`, because a skipped Task is not a failure. Grade it:
+The `deploy` Pipeline Task has no TaskRun and appears under `Skipped Tasks`. The command `kubectl -n starfleet get deploy` shows that nothing reached the `starfleet` namespace. The run is listed as `Succeeded`, because a skipped Task is not a failure.
 
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/capstone/labs/lab-01 --keep
-```
-
-The checks `compliant-release-deployed` and `noncompliant-release-blocked` now pass.
+The watch terminal now shows the checks `compliant-release-deployed` and `noncompliant-release-blocked` passing.
 
 ## Step 3: Add the finally Task
 
@@ -214,13 +218,9 @@ Run the compliant release and read the logs:
 tkn -n pipelines pipeline start release-gate --serviceaccount pipeline-runner -w name=release,config=release-compliant -w name=policies,config=platform-policies --showlog
 ```
 
-The log ends with the lines of the `report` Task, which print `pipeline status: Succeeded` and `check status:    Succeeded`. The `deploy` Task created the `scout` Deployment in `starfleet`. Grade it:
+The log ends with the lines of the `report` Task, which print `pipeline status: Succeeded` and `check status:    Succeeded`. The `deploy` Task created the `scout` Deployment in `starfleet`.
 
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/capstone/labs/lab-01 --keep
-```
-
-The check `finally-runs-on-every-path` now passes.
+The watch terminal now shows the check `finally-runs-on-every-path` passing.
 
 ## Step 4: Limit the service account
 
@@ -282,13 +282,9 @@ no
 no
 ```
 
-Do not bind `cluster-admin` to make a failed deploy work: the check for `outpost` fails then. Do not remove all rights either, because the deploy of a compliant release fails. Grade it:
+Do not bind `cluster-admin` to make a failed deploy work: the check for `outpost` fails then. Do not remove all rights either, because the deploy of a compliant release fails.
 
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/capstone/labs/lab-01 --keep
-```
-
-The check `service-account-least-privilege` now passes.
+The watch terminal now shows the check `service-account-least-privilege` passing.
 
 ## Step 5: Restrict images in production
 
@@ -352,7 +348,7 @@ kubectl -n starfleet create deployment image-test --image=ghcr.io/stefanprodan/p
 kubectl -n default create deployment image-test --image=nginx:latest --dry-run=server
 ```
 
-The first and the third request are rejected by Kyverno. The second, the fourth and the fifth print `deployment.apps/image-test created (server dry run)`. Grade it:
+The first and the third request are rejected by Kyverno. The second, the fourth and the fifth print `deployment.apps/image-test created (server dry run)`. Press Ctrl-C to stop the watch, then run the grader once:
 
 ```sh
 astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/capstone/labs/lab-01

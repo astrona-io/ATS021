@@ -1,6 +1,6 @@
 # Solution
 
-Solve this lab on `terminal`. Each step ends with `astrona submit`. The `--keep` flag keeps the lab running so you can continue after a failed check. The output below comes from a real run of this lab.
+Solve this lab on `terminal`. The output below comes from a real run of this lab.
 
 Start the lab if it is not running:
 
@@ -8,7 +8,15 @@ Start the lab if it is not running:
 astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-010/module-01/labs/lab-01
 ```
 
-`astrona submit` right after the start shows one check that already passes. `ci-deployer-least-privilege` passes because `ci-deployer` has no rights yet. It stays your guard while you add the Role.
+Keep this command running in a second host terminal. It grades the lab every few seconds and records nothing:
+
+```sh
+astrona submit --watch --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-010/module-01/labs/lab-01
+```
+
+Use `--watch` until the end, because a plain `astrona submit` finishes the attempt and deletes the lab. Run the plain command once, in the last step.
+
+The watch terminal right after the start shows one check that already passes. `ci-deployer-least-privilege` passes because `ci-deployer` has no rights yet. It stays your guard while you add the Role.
 
 ## Step 1: Give ci-deployer the Deployment rights
 
@@ -40,13 +48,7 @@ yes
 no
 ```
 
-Grade it:
-
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-010/module-01/labs/lab-01 --keep
-```
-
-The checks `ci-deployer-can-manage-deployments` and `ci-deployer-least-privilege` now pass.
+The watch terminal now shows the checks `ci-deployer-can-manage-deployments` and `ci-deployer-least-privilege` passing.
 
 ## Step 2: Remove cluster-admin from legacy-agent
 
@@ -94,7 +96,7 @@ yes
 no
 ```
 
-Grade it with the same `astrona submit ... --keep` command. The checks `legacy-agent-cluster-admin-removed` and `legacy-agent-reads-pods-only` now pass. Do not delete the service account, and do not bind `view` with a ClusterRoleBinding: both fail a check.
+The watch terminal now shows the checks `legacy-agent-cluster-admin-removed` and `legacy-agent-reads-pods-only` passing. Do not delete the service account, and do not bind `view` with a ClusterRoleBinding: both fail a check.
 
 ## Step 3: Extend view with an aggregated ClusterRole
 
@@ -137,7 +139,7 @@ The API server prints `clusterrole.rbac.authorization.k8s.io/view-leases created
 yes
 ```
 
-The aggregation controller copied the rule into `view` within a few seconds. Run the grader one last time without `--keep`:
+The aggregation controller copied the rule into `view` within a few seconds. Press Ctrl-C to stop the watch, then run the grader once:
 
 ```sh
 astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-010/module-01/labs/lab-01

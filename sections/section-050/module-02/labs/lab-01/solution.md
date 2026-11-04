@@ -1,12 +1,20 @@
 # Solution
 
-Solve this lab on `terminal`. Each step ends with `astrona submit`. The `--keep` flag keeps the lab running so you can continue after a failed check. The output below comes from the module that teaches this task. Long Kyverno messages are shortened where the text says so.
+Solve this lab on `terminal`. The output below comes from the module that teaches this task. Long Kyverno messages are shortened where the text says so.
 
 Start the lab if it is not running:
 
 ```sh
 astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-02/labs/lab-01
 ```
+
+Keep this command running in a second host terminal. It grades the lab every few seconds and records nothing:
+
+```sh
+astrona submit --watch --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-02/labs/lab-01
+```
+
+Use `--watch` until the end, because a plain `astrona submit` finishes the attempt and deletes the lab. Run the plain command once, in the last step.
 
 Paste this helper. It asks the API server, without storing anything, whether a Deployment with the given image is accepted in a namespace:
 
@@ -16,7 +24,7 @@ try_image() {
 }
 ```
 
-`astrona submit` right after the start shows that one check passes: the namespaces are unchanged and `default` is not affected. The other three fail.
+The watch terminal right after the start shows that one check passes: the namespaces are unchanged and `default` is not affected. The other three fail.
 
 ## Step 1: Enforce the registry rule
 
@@ -84,13 +92,7 @@ deployment.apps/image-test created (server dry run)
 deployment.apps/image-test created (server dry run)
 ```
 
-Grade it:
-
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-02/labs/lab-01 --keep
-```
-
-The check `registry-enforced` now passes. Do not leave the policy in `Audit` mode, and do not delete it.
+The watch terminal now shows the check `registry-enforced` passing. Do not leave the policy in `Audit` mode, and do not delete it.
 
 ## Step 2: Refuse latest and untagged images
 
@@ -154,13 +156,9 @@ try_image starfleet ghcr.io/stefanprodan/podinfo
 try_image starfleet ghcr.io/stefanprodan/podinfo:6.15.0
 ```
 
-The first two requests fail. The first fails the rule `autogen-disallow-latest` and the second fails the rule `autogen-require-tag`. The third request prints `deployment.apps/image-test created (server dry run)`. Grade it:
+The first two requests fail. The first fails the rule `autogen-disallow-latest` and the second fails the rule `autogen-require-tag`. The third request prints `deployment.apps/image-test created (server dry run)`.
 
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-02/labs/lab-01 --keep
-```
-
-The check `mutable-tags-rejected` now passes.
+The watch terminal now shows the check `mutable-tags-rejected` passing.
 
 ## Step 3: Require a digest in production only
 
@@ -213,7 +211,7 @@ Only the first request is rejected, with the rule `autogen-pin-by-digest`. The o
 kubectl get clusterpolicy
 ```
 
-You should see `READY` as `True` for `allowed-registries`, `image-tags` and `require-digest`. Right after an apply, `READY` can be empty for a few seconds. Grade it:
+You should see `READY` as `True` for `allowed-registries`, `image-tags` and `require-digest`. Right after an apply, `READY` can be empty for a few seconds. Press Ctrl-C to stop the watch, then run the grader once:
 
 ```sh
 astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-02/labs/lab-01

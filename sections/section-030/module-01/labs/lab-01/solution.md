@@ -1,6 +1,6 @@
 # Solution
 
-Solve this lab on `terminal`. Each step ends with `astrona submit`. The `--keep` flag keeps the lab running so you can continue after a failed check. The output below comes from a real run of this lab. Long Kyverno messages are shortened where the text says so.
+Solve this lab on `terminal`. The output below comes from a real run of this lab. Long Kyverno messages are shortened where the text says so.
 
 Start the lab if it is not running:
 
@@ -8,7 +8,15 @@ Start the lab if it is not running:
 astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-01/labs/lab-01
 ```
 
-`astrona submit` right after the start shows one check that already passes. `limits-rule-allows-good-pods` passes because no policy exists yet, so every pod is accepted. It stays your guard: it fails if your policy blocks pods that have both limits, or if it reaches `outpost`.
+Keep this command running in a second host terminal. It grades the lab every few seconds and records nothing:
+
+```sh
+astrona submit --watch --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-01/labs/lab-01
+```
+
+Use `--watch` until the end, because a plain `astrona submit` finishes the attempt and deletes the lab. Run the plain command once, in the last step.
+
+The watch terminal right after the start shows one check that already passes. `limits-rule-allows-good-pods` passes because no policy exists yet, so every pod is accepted. It stays your guard: it fails if your policy blocks pods that have both limits, or if it reaches `outpost`.
 
 ## Step 1: Refuse pods without CPU and memory limits
 
@@ -67,13 +75,9 @@ Error from server: admission webhook "validate.kyverno.svc-fail" denied the requ
 pod/plain created (server dry run)
 ```
 
-A Deployment without limits fails at the same place, but the rule name is `autogen-require-cpu-memory-limits` and the path starts with `/spec/template/spec/containers/0/`. Grade it:
+A Deployment without limits fails at the same place, but the rule name is `autogen-require-cpu-memory-limits` and the path starts with `/spec/template/spec/containers/0/`.
 
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-01/labs/lab-01 --keep
-```
-
-The check `limits-rule-rejects-pods` now passes. Do not set `failureAction: Audit`: it only records the failure and the pod is still created.
+The watch terminal now shows the check `limits-rule-rejects-pods` passing. Do not set `failureAction: Audit`: it only records the failure and the pod is still created.
 
 ## Step 2: Add a default team label
 
@@ -157,13 +161,9 @@ unassigned
 blue
 ```
 
-The first pod got `team: unassigned`. The second kept `team: blue`. Grade it:
+The first pod got `team: unassigned`. The second kept `team: blue`.
 
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-01/labs/lab-01 --keep
-```
-
-The check `team-label-default` now passes.
+The watch terminal now shows the check `team-label-default` passing.
 
 ## Step 3: Generate a default-deny NetworkPolicy in new namespaces
 
@@ -224,7 +224,7 @@ Check that all three policies are ready:
 kubectl get clusterpolicy
 ```
 
-You should see `READY` as `True` and `MESSAGE` as `Ready` for `require-limits`, `add-team-label` and `default-deny-networkpolicy`. Right after an apply, `READY` can be empty for a few seconds. Grade it:
+You should see `READY` as `True` and `MESSAGE` as `Ready` for `require-limits`, `add-team-label` and `default-deny-networkpolicy`. Right after an apply, `READY` can be empty for a few seconds. Press Ctrl-C to stop the watch, then run the grader once:
 
 ```sh
 astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-01/labs/lab-01

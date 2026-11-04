@@ -4,6 +4,14 @@ The cluster has no audit logging. You write an audit policy file on the control 
 
 Run every `podman exec` command on your own machine. If you use Docker, replace `podman` with `docker`.
 
+Keep this command running in a second host terminal. It grades the lab every few seconds and records nothing:
+
+```sh
+astrona submit --watch --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-040/module-01/labs/lab-01
+```
+
+Use `--watch` until the end, because a plain `astrona submit` finishes the attempt and deletes the lab. Run the plain command once, in the last step.
+
 ## Step 1: Write the audit policy on the node
 
 The audit policy tells the API server which requests to record and at which level. Open a shell on the control plane node:
@@ -98,13 +106,7 @@ The kubelet notices the change and restarts the API server. `kubectl` fails for 
 kubectl get --raw=/readyz
 ```
 
-Submit to see the first checks turn green:
-
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-040/module-01/labs/lab-01
-```
-
-The checks for audit logging enabled, Secret metadata, Deployment bodies and dropped noise pass now. The check for the deletion evidence still fails.
+The watch terminal now shows the checks for audit logging enabled, Secret metadata, Deployment bodies and dropped noise passing. The check for the deletion evidence still fails.
 
 ## Step 3: Find the deletion of probe
 
@@ -127,7 +129,7 @@ kubectl -n starfleet create configmap probe-deletion \
   --from-literal=auditID='<AUDIT-ID>'
 ```
 
-Submit again:
+Press Ctrl-C to stop the watch, then run the grader once:
 
 ```sh
 astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-040/module-01/labs/lab-01

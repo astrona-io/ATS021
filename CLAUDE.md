@@ -258,7 +258,8 @@ section is only true for this one.
   waste of the student's time. When a module needs one anyway (cert-manager
   for a mesh, a checker inside a Tekton step), it is hidden plumbing: it is
   installed by the bootstrap or runs as one step image, and the page never
-  teaches its commands or flags. Trivy, Syft and cosign are therefore not
+  teaches its commands or flags. The `kyverno` command-line tool is part of
+  Kyverno and is taught (user decision, 2026-11-04). Trivy, Syft and cosign are therefore not
   part of this course.
   Where the exam lets the candidate pick between two tools, both are taught:
   **Istio is the primary service mesh** with full depth, and **Linkerd gets

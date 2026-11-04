@@ -344,8 +344,35 @@ modules:
           - name: "Kyverno generate rules"
             url: https://kyverno.io/docs/policy-types/cluster-policy/generate/
       - type: reading
+        title: "Default Pod Labels With A NamespacedMutatingPolicy"
+        path: sections/section-030/module-01/course-04-namespaced-mutation-and-offline-tests.md
+      - type: reading
+        title: Question
+        path: sections/section-030/module-01/labs/lab-02/question.md
+      - type: lab
+        title: "Default Pod Labels With A NamespacedMutatingPolicy Lab"
+        path: sections/section-030/module-01/labs/lab-02
+        difficulty: intermediate
+        estimated_duration: 20m
+        topic: policy-engines
+        task_kind: build
+        tags: [kyverno, namespacedmutatingpolicy, cel, json-patch, offline-testing]
+        learning_goals:
+          - Write a policies.kyverno.io/v1 NamespacedMutatingPolicy for Pod CREATE and UPDATE in one namespace
+          - Default an absent label while preserving other labels and a person's later value
+          - Test saved resources with kyverno apply and kyverno test, then prove live admission
+        resources:
+          - name: "Kyverno MutatingPolicy and namespaced scope"
+            url: https://kyverno.io/docs/policy-types/mutating-policy/
+          - name: "Kyverno CLI apply"
+            url: https://kyverno.io/docs/kyverno-cli/reference/kyverno_apply/
+          - name: "Kyverno CLI test"
+            url: https://kyverno.io/docs/kyverno-cli/reference/kyverno_test/
+          - name: "Kyverno 1.19.1 policy schema"
+            url: https://github.com/kyverno/kyverno/blob/v1.19.1/config/crds/policies.kyverno.io/policies.kyverno.io_namespacedmutatingpolicies.yaml
+      - type: reading
         title: Summary
-        path: sections/section-030/module-01/course-04-summary.md
+        path: sections/section-030/module-01/course-05-summary.md
 
       - type: reading
         title: "Enforce Constraints With Gatekeeper And Rego"

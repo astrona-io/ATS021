@@ -31,10 +31,13 @@ Makes the reader able to enforce platform rules at admission time with the three
 
 ### 1. Validate, Mutate And Generate With Kyverno
 *   **Module Reader:** **[Module 1: Validate, Mutate And Generate With Kyverno](./module-01/course.md)**
-*   **Hands-on Playground:** `sections/section-030/module-01/playground` — kind cluster with Kyverno 1.19.1 installed by Helm (admission, background and reports controllers), webhooks ready. Namespaces `starfleet` and `outpost` with the Starfleet workloads; `probe` has no resource limits and `scout` has no `team` label (objects existing policies will flag in background scans). No ClusterPolicy or PolicyException yet.
+*   **Hands-on Playground:** `sections/section-030/module-01/playground` — kind cluster with Kyverno 1.19.1 installed from its release manifest (admission, background, reports and cleanup controllers), plus CLI 1.19.1 on the terminal, webhooks ready. Namespaces `starfleet` and `outpost` with the Starfleet workloads; `probe` has no resource limits and `scout` has no `team` label (objects existing policies will flag in background scans). No ClusterPolicy or PolicyException yet.
     ```bash
     astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-01/playground
     ```
+
+*   **New reading:** Default Pod Labels With A NamespacedMutatingPolicy — `policies.kyverno.io/v1`, Pod CREATE and UPDATE, conditional JSON patches, and offline CLI tests.
+*   **Graded lab 2:** `sections/section-030/module-01/labs/lab-02` — write a namespaced default, test it offline, create Pods and prove that a human label value survives UPDATE (20 minutes).
 
 ### 2. Enforce Constraints With Gatekeeper And Rego
 *   **Module Reader:** **[Module 2: Enforce Constraints With Gatekeeper And Rego](./module-02/course.md)**

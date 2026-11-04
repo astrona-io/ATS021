@@ -12,7 +12,8 @@ This is a **playground**, not a lab. It starts a fresh cluster with Kyverno and 
   | `starfleet` | `scout`, `probe`, `shuttle` | `probe` has no resource limits; `scout` and `shuttle` set only a memory limit; `scout` has no `team` label |
   | `outpost` | `drifter` | None |
 
-- No ClusterPolicy, Policy or PolicyException yet.
+- The Kyverno command-line interface (CLI) 1.19.1 on the terminal for offline policy tests.
+- No ClusterPolicy, Policy, NamespacedMutatingPolicy or PolicyException yet.
 
 ## Helpers
 
@@ -35,4 +36,5 @@ Use them like this: `report_summary starfleet`, `violations starfleet`.
 - Write a validate rule that requires a `team` label on pods in `starfleet`, exclude the `kyverno` namespace, and read the rejection for a pod without the label.
 - Write a mutate rule that adds `allowPrivilegeEscalation: false` to every container only when it is not set.
 - Change the generate rule so it also adds the NetworkPolicy to namespaces that already exist, and check `outpost`.
+- Write a `policies.kyverno.io/v1` NamespacedMutatingPolicy for Pod CREATE and UPDATE. Test it with `kyverno apply` and `kyverno test`, then prove that a person's label value survives another update.
 - Apply a PolicyException and read the warning. Find the flag on the Kyverno controllers that explains it.

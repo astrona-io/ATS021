@@ -12,6 +12,27 @@ set -euo pipefail
 
 KYVERNO_VERSION="v1.19.1"
 
+# Install the same Kyverno CLI version on the learner's terminal.
+BIN_DIR="/usr/local/bin"
+[ -w "$BIN_DIR" ] || BIN_DIR="$HOME/.local/bin"
+mkdir -p "$BIN_DIR"
+export PATH="$BIN_DIR:$PATH"
+WORK="$(mktemp -d)"
+trap 'rm -rf "$WORK"' EXIT
+case "$(uname -s)-$(uname -m)" in
+  Darwin-arm64) ASSET="darwin_arm64" ;;
+  Darwin-x86_64) ASSET="darwin_x86_64" ;;
+  Linux-aarch64|Linux-arm64) ASSET="linux_arm64" ;;
+  Linux-x86_64) ASSET="linux_x86_64" ;;
+  *) echo "Unsupported Kyverno CLI platform" >&2; exit 1 ;;
+esac
+curl -fsSL -o "$WORK/kyverno.tgz" \
+  "https://github.com/kyverno/kyverno/releases/download/v1.19.1/kyverno-cli_v1.19.1_${ASSET}.tar.gz"
+tar -xzf "$WORK/kyverno.tgz" -C "$WORK"
+install -m 0755 "$WORK/kyverno" "$BIN_DIR/kyverno"
+kyverno version
+
+
 echo "[playground] Installing Kyverno ${KYVERNO_VERSION}..."
 kubectl create -f "https://github.com/kyverno/kyverno/releases/download/${KYVERNO_VERSION}/install.yaml"
 for d in kyverno-admission-controller kyverno-background-controller kyverno-reports-controller kyverno-cleanup-controller; do

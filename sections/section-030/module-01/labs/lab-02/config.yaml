@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-lab-030-01-02
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - ghcr.io/stefanprodan/podinfo:6.15.0
+      - reg.kyverno.io/kyverno/kyvernopre:v1.19.1
+      - reg.kyverno.io/kyverno/kyverno:v1.19.1
+      - reg.kyverno.io/kyverno/background-controller:v1.19.1
+      - reg.kyverno.io/kyverno/cleanup-controller:v1.19.1
+      - reg.kyverno.io/kyverno/reports-controller:v1.19.1
+bootstrap:
+  init:
+    - name: seed-cluster
+      description: Install Kyverno and CLI 1.19.1, then create namespaces and service
+        accounts
+      type: file
+      source: bootstrap/01-seed-cluster.sh
+testing:
+  init:
+    - name: apply-solution
+      description: Apply the reference solution
+      type: file
+      source: solution/apply.sh
+validation:
+  scripts:
+    - name: policy-offline
+      description: The saved namespaced policy matches live state and passes offline
+        tests
+      type: file
+      source: validation/validate-policy-offline.sh
+      hint: Use policies.kyverno.io/v1 NamespacedMutatingPolicy default-team in starfleet,
+        save it at /tmp/kyverno-team-test/policy.yaml and match Pod CREATE and UPDATE.
+    - name: admission-default
+      description: CREATE and UPDATE default only missing labels in starfleet
+      type: file
+      source: validation/validate-admission-default.sh
+      hint: Check the incoming object, preserve its other labels and return an empty
+        patch list when team exists.
+    - name: student-pods
+      description: The learner demonstrates a default and a retained human label value
+      type: file
+      source: validation/validate-student-pods.sh
+      hint: Create scout-default and scout-labelled, keep app=scout on scout-labelled,
+        then change scout-default to team=navigation and annotate proof=retained.
+teardown:
+  keepCluster: false

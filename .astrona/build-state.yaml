@@ -89,13 +89,12 @@ items:
   kind: playground
   what: 'playground for module 1: Validate, Mutate And Generate With Kyverno'
   status: done
-  note: astrona CLI developer; Kyverno 1.19.1 from release manifest; booted and verified 2026-10-10
+  note: 'untested: built without booting 2026-11-04; added terminal CLI 1.19.1 installer; existing cluster preparation retained'
 - key: section-030/module-01/course
   kind: course
   what: 'chapter for module 1: Validate, Mutate And Generate With Kyverno'
   status: done
-  note: landing + 3 parts + summary; ClusterPolicy deprecation warning shown; PolicyException off by default,
-    enabling not verified (follow-up)
+  note: 'untested: built without booting 2026-11-04; landing + 4 parts + summary; added namespaced mutation and offline CLI tests; Kyverno 1.19.1 unchanged'
 - key: section-030/module-01/lab
   kind: lab
   what: 'graded lab for module 1: Validate, Mutate And Generate With Kyverno Lab'
@@ -230,3 +229,9 @@ items:
   what: final domain quiz across every section
   status: done
   note: ''
+
+- key: section-030/module-01/labs/lab-02
+  kind: lab
+  what: Default Pod Labels With A NamespacedMutatingPolicy
+  status: done
+  note: 'untested: built without booting 2026-11-04; CLI 1.19.1 offline fixtures verified; astrona validate blocked by sandbox maintenance lock; live admission and reference solution not executed'

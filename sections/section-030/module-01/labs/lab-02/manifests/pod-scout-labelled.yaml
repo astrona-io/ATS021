@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: scout-labelled
+  namespace: starfleet
+  labels:
+    app: scout
+spec:
+  serviceAccountName: scout
+  containers:
+  - name: scout
+    image: ghcr.io/stefanprodan/podinfo:6.15.0
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi

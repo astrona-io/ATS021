@@ -275,6 +275,7 @@ section is only true for this one.
   | Istio (`istioctl`) | 1.31.1 |
   | Linkerd | edge-26.10.1 |
   | Kyverno | 1.19.1 |
+  | Kyverno CLI (`kyverno`) | 1.19.1 |
   | Gatekeeper | 3.23.1 |
   | cert-manager | 1.21.2 |
   | Tekton Pipelines | 1.17.0 |

@@ -235,6 +235,7 @@ sections:
           - Write a validate rule that rejects pods without resource limits in selected namespaces
           - Switch a policy between Enforce and Audit and read the effect in a PolicyReport
           - Write a mutate rule that adds a default label or securityContext field to matching pods
+          - Write a namespaced CEL mutation that keeps a human label value and test it with kyverno apply and kyverno test
           - Write a generate rule that creates a default-deny NetworkPolicy in every new namespace
           - Read a Kyverno admission rejection and name the policy and rule that blocked it
           - Exempt one workload from a rule with a PolicyException instead of weakening the policy
@@ -243,6 +244,7 @@ sections:
           - "Rule anatomy: match, exclude, validate pattern and deny conditions"
           - Enforce versus Audit and reading PolicyReports
           - Mutate and generate rules
+          - NamespacedMutatingPolicy in policies.kyverno.io/v1, conditional JSON patches on Pod CREATE and UPDATE, and offline Kyverno CLI tests
           - PolicyException for a documented exemption
         diagrams:
           - type: sequence

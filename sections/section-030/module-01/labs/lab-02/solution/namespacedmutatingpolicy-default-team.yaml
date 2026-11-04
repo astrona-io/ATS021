@@ -1,0 +1,27 @@
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedMutatingPolicy
+metadata:
+  name: default-team
+  namespace: starfleet
+spec:
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  reinvocationPolicy: IfNeeded
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        resources: ["pods"]
+        operations: ["CREATE", "UPDATE"]
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          !has(object.metadata.labels) ?
+            [JSONPatch{op: "add", path: "/metadata/labels", value: {"team": "unassigned"}}] :
+          !("team" in object.metadata.labels) ?
+            [JSONPatch{op: "add", path: "/metadata/labels/team", value: "unassigned"}] :
+            []

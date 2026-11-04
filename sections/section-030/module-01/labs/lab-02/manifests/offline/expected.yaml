@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: scout-default
+  namespace: starfleet
+  labels:
+    team: unassigned
+spec:
+  serviceAccountName: scout
+  containers:
+  - name: scout
+    image: ghcr.io/stefanprodan/podinfo:6.15.0
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: scout-labelled
+  namespace: starfleet
+  labels:
+    app: scout
+    team: unassigned
+spec:
+  serviceAccountName: scout
+  containers:
+  - name: scout
+    image: ghcr.io/stefanprodan/podinfo:6.15.0
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: scout-owned
+  namespace: starfleet
+  labels:
+    team: navigation
+spec:
+  serviceAccountName: scout
+  containers:
+  - name: scout
+    image: ghcr.io/stefanprodan/podinfo:6.15.0
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: scout-empty
+  namespace: starfleet
+  labels:
+    team: ''
+spec:
+  serviceAccountName: scout
+  containers:
+  - name: scout
+    image: ghcr.io/stefanprodan/podinfo:6.15.0
+    resources:
+      limits:
+        cpu: 100m
+        memory: 64Mi

@@ -79,7 +79,7 @@ NAME             ADMISSION   BACKGROUND   READY   AGE   MESSAGE
 require-limits   true        true         True    0s    Ready
 ```
 
-`READY` `True` means the webhooks enforce the policy now. The warning is new in Kyverno 1.19: the `kyverno.io/v1` ClusterPolicy still works and is what most documentation and exam tasks use, but Kyverno is moving to new CEL-based kinds in the `policies.kyverno.io` group, such as `ValidatingPolicy`. The rest of this module uses ClusterPolicy and leaves the warning out of the output.
+`READY` `True` means the webhooks enforce the policy now. The warning is new in Kyverno 1.19: the `kyverno.io/v1` ClusterPolicy still works and is what most documentation and exam tasks use, but Kyverno is moving to new CEL-based kinds in the `policies.kyverno.io` group, such as `ValidatingPolicy`. The validate, audit and generate examples retain ClusterPolicy and leave the warning out of the output. A namespaced mutation example also teaches the newer policy family.
 
 ## Read a rejection
 

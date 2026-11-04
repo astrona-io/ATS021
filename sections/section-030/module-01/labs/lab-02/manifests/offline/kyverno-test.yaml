@@ -1,0 +1,19 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: default-team
+policies:
+- policy.yaml
+resources:
+- pods.yaml
+results:
+- isMutatingPolicy: true
+  policy: starfleet/default-team
+  kind: Pod
+  resources:
+  - starfleet/scout-default
+  - starfleet/scout-labelled
+  - starfleet/scout-owned
+  - starfleet/scout-empty
+  patchedResources: expected.yaml
+  result: pass

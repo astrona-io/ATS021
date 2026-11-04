@@ -4,7 +4,7 @@ Linkerd is the second service mesh the CNPE exam lists, and the exam may let you
 
 Keep one sentence in mind for this module: **meshed traffic is encrypted automatically, and a Server plus an AuthorizationPolicy decides who may use a port.** You will confirm that traffic between meshed pods is already mutual TLS, read a workload's Linkerd identity, close a namespace to unauthenticated callers with one annotation, and then allow only `shuttle` to call `scout`.
 
-The module has two parts. **Automatic mTLS, Identity And Default Policy** shows Linkerd's identity, proves which connections use TLS, and sets the default inbound policy. **Servers And Authorization Policies** selects `scout`'s port with a Server, names the allowed identity with a MeshTLSAuthentication and connects them with an AuthorizationPolicy.
+The module has three parts. **Automatic mTLS, Identity And Default Policy** shows Linkerd's identity, proves which connections use TLS, and sets the default inbound policy. **Servers And Authorization Policies** selects `scout`'s port with a Server, names the allowed identity with a MeshTLSAuthentication and connects them with an AuthorizationPolicy. **Repair Authorization And Split Service Traffic** protects two backend ports, traces a wrong authentication reference and divides requests between versioned Services with a Gateway API HTTPRoute.
 
 ## Learning objectives
 
@@ -15,6 +15,7 @@ After this module you can:
 - Write a Server and an AuthorizationPolicy with a MeshTLSAuthentication that let only `shuttle` call `scout`.
 - Set a default inbound policy (`all-unauthenticated`, `all-authenticated`, `deny`) and predict who is refused.
 - Map each Linkerd resource to the Istio resource that does the same job.
+- Repair an authorization reference and split requests between two backend Services with a Service-attached HTTPRoute.
 
 ## Before you start
 

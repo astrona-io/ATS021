@@ -20,6 +20,7 @@ Makes the reader able to encrypt and authenticate traffic between workloads and 
 - Write a Server and an AuthorizationPolicy with a MeshTLSAuthentication that let only shuttle call scout
 - Set a default inbound policy (all-unauthenticated, all-authenticated, deny) and predict who is refused
 - Map each Linkerd resource to the Istio resource that does the same job
+- Repair Linkerd authorization on two workload ports and split Service traffic with a Gateway API HTTPRoute
 
 ---
 
@@ -38,6 +39,9 @@ Makes the reader able to encrypt and authenticate traffic between workloads and 
     ```bash
     astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/module-02/playground
     ```
+
+*   **Added reading:** Repair Authorization And Split Service Traffic — two backend Servers, authentication reference repair and weighted routing at a meshed client.
+*   **Graded lab:** `sections/section-020/module-02/labs/lab-02` — create both Servers, repair a policy and prove an 80/20 split from `shuttle` (25 minutes).
 
 ### Section Capstone Challenge
 *   **Comprehensive Challenge:** Secure Service-To-Service Communication Capstone — `sections/section-020/capstone/labs/lab-01` *(created in the build phase)*

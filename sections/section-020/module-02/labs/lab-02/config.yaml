@@ -1,0 +1,61 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-lab-020-02-02
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+    - ghcr.io/stefanprodan/podinfo:6.15.0
+    - curlimages/curl:8.22.0
+    - cr.l5d.io/linkerd/controller:edge-26.10.1
+    - cr.l5d.io/linkerd/proxy:edge-26.10.1
+bootstrap:
+  init:
+  - name: seed-cluster
+    description: Install Linkerd and create the Starfleet workloads
+    type: file
+    source: bootstrap/01-seed-cluster.sh
+testing:
+  init:
+  - name: apply-solution
+    description: Apply Servers, repair the policy and create the weighted route
+    type: file
+    source: solution/apply.sh
+  - name: wait-for-policies
+    description: Wait for both backends to allow shuttle
+    type: file
+    source: testing/wait-for-policies.sh
+validation:
+  scripts:
+  - name: servers
+    description: Both workload ports have correctly scoped Servers
+    type: file
+    source: validation/validate-servers.sh
+    hint: Select app=scout and each version label; use the named pod port http, HTTP/1
+      and accessPolicy deny.
+  - name: authorization
+    description: The repaired policy allows only shuttle on both backends
+    type: file
+    source: validation/validate-authorization.sh
+    hint: Repair scout-v2-allow-shuttle to require the existing shuttle MeshTLSAuthentication;
+      retain the v1 policy.
+  - name: route
+    description: A Gateway API HTTPRoute attaches to scout with 80/20 backend weights
+    type: file
+    source: validation/validate-route.sh
+    hint: Use gateway.networking.k8s.io/v1, a core Service parent on port 80,
+      and scout-v1 and scout-v2 backends.
+  - name: observed-split
+    description: 400 requests from meshed shuttle reach both versions within tolerance
+    type: file
+    source: validation/validate-observed-split.sh
+    hint: Confirm shuttle has a proxy, both backend policies allow it, and no ServiceProfile
+      overrides the route.
+teardown:
+  keepCluster: false

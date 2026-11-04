@@ -63,8 +63,7 @@ items:
   kind: course
   what: 'chapter for module 2: Require Mutual TLS And Authorize Callers With Linkerd'
   status: done
-  note: 'compact: landing + 2 parts + summary; policy API versions verified (Server v1beta3, AP/MeshTLSAuthn
-    v1alpha1)'
+  note: 'untested: built without booting 2026-11-04; landing + 3 parts + summary; added Service-attached gateway.networking.k8s.io/v1 HTTPRoute reading; pinned source and CRD schemas checked offline'
 - key: section-020/module-01/lab
   kind: lab
   what: 'graded lab for module 1: Require Mutual TLS And Authorize Callers With Istio Lab'
@@ -235,3 +234,8 @@ items:
   what: Default Pod Labels With A NamespacedMutatingPolicy
   status: done
   note: 'untested: built without booting 2026-11-04; CLI 1.19.1 offline fixtures verified; astrona validate blocked by sandbox maintenance lock; live admission and reference solution not executed'
+- key: section-020/module-02/lab-02
+  kind: lab
+  what: 'Repair Linkerd Authorization And Split Service Traffic Lab'
+  status: done
+  note: 'untested: built without booting 2026-11-04; two Servers, wrong authentication repair, weighted GAMMA route; live split grader uses 400 requests with 10 percentage point tolerance; CRD and configuration schemas and shell syntax passed; astrona validate blocked by sandbox maintenance lock; live behavior not executed'

@@ -274,6 +274,7 @@ section is only true for this one.
   | kind | v0.33.0 |
   | Istio (`istioctl`) | 1.31.1 |
   | Linkerd | edge-26.10.1 |
+  | Gateway API CRDs (Linkerd plumbing) | v1.4.0 |
   | Kyverno | 1.19.1 |
   | Kyverno CLI (`kyverno`) | 1.19.1 |
   | Gatekeeper | 3.23.1 |
@@ -537,7 +538,7 @@ this order:
   `read-only-root-filesystem`
 - Service mesh: `istio`, `linkerd`, `mtls-strict`, `mtls-permissive`,
   `peerauthentication`, `authorizationpolicy`, `spiffe-identity`,
-  `linkerd-server`, `meshtlsauthentication`, `cert-manager`
+  `linkerd-server`, `meshtlsauthentication`, `cert-manager`, `httproute`, `gamma`
 - Policy engines: `kyverno`, `clusterpolicy`, `validate-rule`,
   `mutate-rule`, `generate-rule`, `policyreport`, `enforce-mode`,
   `audit-mode`, `gatekeeper`, `constrainttemplate`, `constraint`, `rego`,

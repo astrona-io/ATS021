@@ -186,11 +186,13 @@ sections:
           - Write a Server and an AuthorizationPolicy with a MeshTLSAuthentication that let only shuttle call scout
           - Set a default inbound policy (all-unauthenticated, all-authenticated, deny) and predict who is refused
           - Map each Linkerd resource to the Istio resource that does the same job
+          - Repair an authentication reference and measure weighted routing from a meshed client
         outline:
           - Linkerd's automatic mTLS and identity, compared with Istio's
           - "Default inbound policy annotations and what each value allows"
           - "Server, AuthorizationPolicy, MeshTLSAuthentication: selecting a port and naming allowed identities"
           - Proving the result from shuttle and drifter
+          - Repairing authorization on two Servers and splitting traffic with a Service-attached Gateway API HTTPRoute
         diagrams:
           - type: er
             shows: Server - AuthorizationPolicy - MeshTLSAuthentication - ServiceAccount, and what each one selects

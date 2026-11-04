@@ -264,8 +264,35 @@ modules:
           - name: "Linkerd automatic mTLS"
             url: https://linkerd.io/2/features/automatic-mtls/
       - type: reading
+        title: "Repair Authorization And Split Service Traffic"
+        path: sections/section-020/module-02/course-03-repairing-authorization-and-splitting-traffic.md
+      - type: reading
+        title: Question
+        path: sections/section-020/module-02/labs/lab-02/question.md
+      - type: lab
+        title: "Repair Linkerd Authorization And Split Service Traffic Lab"
+        path: sections/section-020/module-02/labs/lab-02
+        difficulty: intermediate
+        estimated_duration: 25m
+        topic: service-mesh
+        task_kind: troubleshooting
+        tags: [linkerd, linkerd-server, authorizationpolicy, meshtlsauthentication, httproute, gamma]
+        learning_goals:
+          - Create Servers for two workloads and repair the authentication reference that blocks the meshed client
+          - Split requests between versioned Services with a Service-attached Gateway API HTTPRoute
+          - Measure the observed split from a meshed client while preserving backend authorization
+        resources:
+          - name: "Linkerd HTTPRoute reference"
+            url: https://linkerd.io/2-edge/reference/httproute/
+          - name: "Linkerd dynamic request routing"
+            url: https://linkerd.io/2-edge/tasks/configuring-dynamic-request-routing/
+          - name: "Linkerd authorization policy"
+            url: https://linkerd.io/2-edge/reference/authorization-policy/
+          - name: "Gateway API v1.4.0 release"
+            url: https://github.com/kubernetes-sigs/gateway-api/releases/tag/v1.4.0
+      - type: reading
         title: Summary
-        path: sections/section-020/module-02/course-03-summary.md
+        path: sections/section-020/module-02/course-04-summary.md
 
       - type: reading
         title: Question

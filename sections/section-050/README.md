@@ -48,6 +48,7 @@ Makes the reader able to stop non-compliant workloads before and at the door of 
     astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-03/playground
     ```
 *   **Graded Lab:** Generate SBOM Audit Evidence — `sections/section-050/module-03/labs/lab-01`, 20 minutes. Save a complete CycloneDX inventory and record package answers from live image data.
+*   **Graded Lab:** Gate A Tekton Release With A Vulnerability Scan — `sections/section-050/module-03/labs/lab-02`, 25 minutes. Generate an image inventory, gate deployment on a scan result, and retain both clean and blocked release evidence across runs.
 *   **Knowledge Check:** 10 questions on inventory formats, scan decisions, evidence retention and signature trust.
 
 ### Section Capstone Challenge

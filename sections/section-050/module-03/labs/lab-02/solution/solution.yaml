@@ -1,0 +1,87 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: scan-release-image
+  namespace: pipelines
+spec:
+  params:
+  - name: image
+    type: string
+  - name: platform
+    type: string
+  - name: evidence-directory
+    type: string
+  workspaces:
+  - name: evidence
+  results:
+  - name: outcome
+    description: pass or fail after a completed HIGH,CRITICAL scan
+  steps:
+  - name: scan
+    image: aquasec/trivy:0.76.2
+    env:
+    - name: IMAGE
+      value: $(params.image)
+    - name: PLATFORM
+      value: $(params.platform)
+    - name: EVIDENCE
+      value: $(workspaces.evidence.path)/$(params.evidence-directory)
+    script: |
+      #!/bin/sh
+      set -eu
+      mkdir -p "$EVIDENCE"
+      printf '%s\n' "$IMAGE" > "$EVIDENCE/image.txt"
+      trivy image --image-src remote --platform "$PLATFORM" \
+        --format cyclonedx --output "$EVIDENCE/sbom.cdx.json" "$IMAGE"
+      trivy image --cache-dir "$EVIDENCE/cache" --download-db-only
+      cp "$EVIDENCE/cache/db/metadata.json" "$EVIDENCE/database.json"
+      if trivy image --image-src remote --platform "$PLATFORM" \
+        --cache-dir "$EVIDENCE/cache" --skip-db-update --scanners vuln \
+        --severity HIGH,CRITICAL --ignorefile '' --exit-code 42 \
+        --format json --output "$EVIDENCE/scan.json" "$IMAGE"; then
+        printf pass > "$(results.outcome.path)"
+      else
+        scan_status=$?
+        printf fail > "$(results.outcome.path)"
+        [ "$scan_status" -eq 42 ] || exit "$scan_status"
+      fi
+      rm -rf "$EVIDENCE/cache"
+---
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: release-scan-gate
+  namespace: pipelines
+spec:
+  params:
+  - name: image
+    type: string
+  - name: platform
+    type: string
+  workspaces:
+  - name: evidence
+  tasks:
+  - name: check
+    taskRef:
+      name: scan-release-image
+    params:
+    - name: image
+      value: $(params.image)
+    - name: platform
+      value: $(params.platform)
+    - name: evidence-directory
+      value: $(context.pipelineRun.name)
+    workspaces:
+    - name: evidence
+      workspace: evidence
+  - name: deploy
+    taskRef:
+      name: deploy-scanned-release
+    params:
+    - name: image
+      value: $(params.image)
+    when:
+    - input: $(tasks.check.results.outcome)
+      operator: in
+      values:
+      - pass

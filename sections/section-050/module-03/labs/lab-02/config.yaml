@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-lab-050-03-02
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+    - docker.io/library/hello-world@sha256:5e22040d441e5fb3aed38368acbe8486b575d7018df38dbdfbc7311fbb2ef3a9
+    - docker.io/library/alpine@sha256:c19173c5ada610a5989151111163d28a67368362762534d8a8121ce95cf2bd5a
+    - docker.io/library/alpine@sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c69fc0d80990c2ad8dd412
+    - aquasec/trivy:0.76.2
+    - registry.k8s.io/kubectl:v1.35.8
+bootstrap:
+  init:
+  - name: install-tools
+    description: Install Trivy 0.76.2 and jq 1.8.2 on the terminal
+    type: file
+    source: bootstrap/01-install-tools.sh
+  - name: seed-pipeline
+    type: file
+    source: bootstrap/02-seed-pipeline.sh
+testing:
+  init:
+  - name: apply-solution
+    type: file
+    source: solution/apply.sh
+validation:
+  scripts:
+  - name: vulnerability-gate
+    description: Own clean and vulnerable runs prove the gate and retained image-specific
+      SBOMs
+    type: file
+    source: validation/validate-vulnerability-gate.sh
+    hint: Write outcome to the Tekton result, gate deploy with when, and retain evidence
+      under each PipelineRun name.
+teardown:
+  keepCluster: false

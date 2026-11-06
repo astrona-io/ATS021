@@ -738,6 +738,28 @@ modules:
         title: "Keep SBOM Evidence In A Tekton Pipeline"
         path: sections/section-050/module-03/course-03-keep-sbom-evidence-in-a-tekton-pipeline.md
       - type: reading
+        title: Question
+        path: sections/section-050/module-03/labs/lab-02/question.md
+      - type: lab
+        title: "Gate A Tekton Release With A Vulnerability Scan Lab"
+        path: sections/section-050/module-03/labs/lab-02
+        difficulty: intermediate
+        estimated_duration: 25m
+        topic: pipeline-security
+        task_kind: build
+        tags: [tekton, tekton-task, task-result, when-expression, trivy, sbom, vulnerability-scan]
+        learning_goals:
+          - Generate a CycloneDX inventory and publish a completed vulnerability scan as a Task result
+          - Deploy the clean image and skip deployment for HIGH or CRITICAL findings with a when expression
+          - Retain image-specific SBOM files across PipelineRuns and Task pod deletion
+        resources:
+          - name: "Trivy 0.76.2 image scan flags"
+            url: https://github.com/aquasecurity/trivy/blob/v0.76.2/docs/guide/references/configuration/cli/trivy_image.md
+          - name: "Tekton 1.17.0 when expressions"
+            url: https://github.com/tektoncd/pipeline/blob/v1.17.0/docs/pipelines.md#guard-task-execution-using-when-expressions
+          - name: "Tekton 1.17.0 persistent workspaces"
+            url: https://github.com/tektoncd/pipeline/blob/v1.17.0/docs/workspaces.md
+      - type: reading
         title: "Verify Signatures Before Admission"
         path: sections/section-050/module-03/course-04-verify-signatures-before-admission.md
       - type: reading

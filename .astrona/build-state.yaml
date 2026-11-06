@@ -245,7 +245,7 @@ items:
   kind: course
   what: SBOMs And Vulnerability Scanning In The Pipeline
   status: done
-  note: 'untested: built without booting 2026-11-06; landing, four parts and summary; official pinned sources checked;
+  note: 'untested: built without booting 2026-11-06; landing, four parts and summary; lab-02 outline and retention summary updated; official pinned sources checked;
     no command output invented'
 - key: section-050/module-03/playground
   kind: playground
@@ -265,3 +265,17 @@ items:
   what: SBOM and scanning knowledge check
   status: done
   note: 'untested: built without booting 2026-11-06; 10 source-linked questions; schema and answer checks offline'
+
+- key: section-050/module-03/lab-02
+  kind: lab
+  what: Gate A Tekton Release With A Vulnerability Scan
+  status: done
+  note: 'untested: built without booting 2026-11-06; own clean and vulnerable PipelineRuns;
+    digest-pinned static C hello-world on scratch and end-of-life Alpine 3.10.3;
+    runtime database download with metadata and skip-db-update scan; per-run PVC
+    SBOMs compared with fresh registry inventories and reread after run deletion;
+    reference solution and live grader not executed; YAML, pinned Tekton CRD schemas,
+    shell syntax, learner/reference parity, manifest paths and unique names passed;
+    astrona validate blocked by sandbox maintenance-lock write; legacy skill helper
+    expects obsolete examQuestion/guide doc keys rather than sibling question/solution;
+    public Astrona lab schema URL returned 404'

@@ -290,6 +290,8 @@ section is only true for this one.
   | Alpine (SBOM inventory workload) | 3.22.2; index `sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c69fc0d80990c2ad8dd412` |
   | Debian (SBOM inventory workload) | 13.1-slim; index `sha256:a347fd7510ee31a84387619a492ad6c8eb0af2f2682b916ff3e643eb076f925a` |
   | Kyverno signature fixtures (dry runs only) | signed `sha256:b31bfb4d0213f254d361e0079deaaebefa4f82ba7aa76ef82e90b4935ad5b105`; unsigned `sha256:74a98f0e4d750c9052f092a7f7a72de7b20f94f176a490088f7a744c76c53ea5` |
+  | hello-world (package-free scan fixture) | `linux` index `sha256:5e22040d441e5fb3aed38368acbe8486b575d7018df38dbdfbc7311fbb2ef3a9`; static C binary on scratch, verified 2026-11-06 |
+  | Alpine (vulnerable scan fixture) | 3.10.3; index `sha256:c19173c5ada610a5989151111163d28a67368362762534d8a8121ce95cf2bd5a`; end-of-life fixture, verified 2026-11-06 |
   | podinfo | 6.15.0 |
   | go-httpbin | 2.25.0 |
 

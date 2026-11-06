@@ -472,7 +472,7 @@ authorization policies all match on the service account. Never use the
 | Module reading: landing page, deep-dive parts, closing page | `sections/section-0N0/module-0M/course.md`, `course-0N-*.md` |
 | Graded lab: task, walkthrough, setup, grader | `.../labs/lab-01/` (`question.md`, `solution.md`, `prerequisites.md`, `bootstrap/`, `manifests/`, `solution/`, `testing/`, `validation/`) |
 | Ungraded sandbox for a module | `.../playground/` (`config.yaml`, `bootstrap/prepare.sh`, `manifests/`, `docs/overview.md`, which is the only learner page) |
-| One graded integration lab per section | `sections/section-0N0/capstone/labs/lab-01/` |
+| Graded integration labs per section (Section 050 also has `lab-02`) | `sections/section-0N0/capstone/labs/lab-01/` |
 
 A lab folder holds:
 
@@ -587,7 +587,8 @@ Names: a playground is `ats-021-playground-<section>-<module>`, a module lab
 is `ats-021-lab-<section>-<module>` and a capstone is
 `ats-021-capstone-<section>`; keep those names. A second lab in a module
 takes `ats-021-lab-<section>-<module>-<lab>`, for example
-`ats-021-lab-030-02-02`, so two labs never share a name. Lab bootstrap
+`ats-021-lab-030-02-02`, so two labs never share a name. A second capstone
+takes `ats-021-capstone-<section>-02`, for example `ats-021-capstone-050-02`. Lab bootstrap
 scripts do not pin a kube context: astrona sets `KUBECONFIG` for the lab, and
 `astrona test` runs on a cluster with a different name. Every lab must pass
 `astrona validate` and `astrona test`.

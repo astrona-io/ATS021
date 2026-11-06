@@ -812,6 +812,30 @@ modules:
             url: https://tekton.dev/docs/pipelines/pipelines/
           - name: "Kyverno validate rules"
             url: https://kyverno.io/docs/policy-types/cluster-policy/validate/
+      - type: reading
+        title: Question
+        path: sections/section-050/capstone/labs/lab-02/question.md
+      - type: lab
+        title: "Integrate Release Evidence And Signature Admission Capstone"
+        path: sections/section-050/capstone/labs/lab-02
+        difficulty: advanced
+        estimated_duration: 35m
+        topic: pipeline-security
+        task_kind: build
+        tags: [tekton, when-expression, finally-task, sbom, trivy, vulnerability-scan, cosign, image-signature]
+        learning_goals:
+          - Gate deployment on an image scan and report execution status in a finally Task
+          - Retain image-specific SBOMs and scan database evidence across release runs
+          - Verify public-key signatures and reject unsigned images in production namespaces
+        resources:
+          - name: "Tekton 1.17.0 Pipeline conditions and finally Tasks"
+            url: https://github.com/tektoncd/pipeline/blob/v1.17.0/docs/pipelines.md
+          - name: "Trivy 0.76.2 image scan flags"
+            url: https://github.com/aquasecurity/trivy/blob/v0.76.2/docs/guide/references/configuration/cli/trivy_image.md
+          - name: "Kyverno ImageValidatingPolicy"
+            url: https://kyverno.io/docs/policy-types/image-validating-policy/
+          - name: "cosign 3.1.4 verification flags"
+            url: https://github.com/sigstore/cosign/blob/v3.1.4/cmd/cosign/cli/options/verify.go
       - type: quiz
         title: "Knowledge Check: Security Checks In The Delivery Pipeline"
         path: sections/section-050/quiz.yaml

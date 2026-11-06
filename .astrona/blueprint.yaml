@@ -537,3 +537,17 @@ sections:
         image policy. The grader runs the pipeline with a compliant and a
         non-compliant release, checks which one is deployed, and checks that an
         unpinned image is rejected.
+
+      additional_labs:
+        - id: lab-02
+          title: Integrate Release Evidence And Signature Admission Capstone
+          estimated_duration: 35m
+          path: sections/section-050/capstone/labs/lab-02
+          objective: >
+            One unguided release task combines the existing Trivy inventory and
+            vulnerability gate with persistent per-run evidence, Tekton finally
+            reporting and production ImageValidatingPolicy enforcement. Reuse
+            module-03 lab-02 scan digests and runtime database cache handling and
+            lab-03 public-key fixtures, transparency exception and admission
+            scope. Scan fixtures update only a zero-replica development
+            Deployment; production signatures are proved by server dry runs.

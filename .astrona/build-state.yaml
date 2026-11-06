@@ -289,3 +289,15 @@ items:
     ImageValidatingPolicy v1 checked against Kyverno 1.19.1 CRD schema;
     controller images preloaded, registry access required for runtime signature lookup;
     live API dry-run matrix and reference solution not executed; YAML, local Astrona config schema, shell and Python syntax, manifest order, unique name and walkthrough parity passed; astrona validate blocked by sandbox maintenance-lock write'
+
+- key: section-050/capstone/lab-02
+  kind: capstone
+  what: Integrate Release Evidence And Signature Admission Capstone
+  status: done
+  note: 'untested: built without booting 2026-11-06; 35-minute unguided task;
+    reuses module-03 lab-02 scan fixtures and database approach and lab-03
+    signature fixtures, public key and admission approach; adds finally reporting
+    on clean, blocked and inventory-error runs; YAML, shell and embedded Python
+    syntax, local Astrona schema, pinned CRD schemas, walkthrough parity, file
+    references and unique names pass; reference solution and live graders not executed;
+    astrona validate blocked by sandbox maintenance-lock write'

@@ -12,7 +12,7 @@ Everything lives under `sections/`. Each section is a set of modules, and each m
 - a **landing page** (`course.md`) plus, where the subject needs it, ordered **deep-dive parts** (`course-0N-*.md`), woven with hands-on "Try it" checkpoints and Mermaid diagrams;
 - an ungraded **playground** — a throwaway environment to explore in;
 
-Each section ends with a **capstone lab** combining its modules and a knowledge-check quiz.
+Each section ends with a **capstone lab** combining its modules and a knowledge-check quiz. Section 050 also has a second, 35-minute capstone integrating scan evidence and signature admission.
 
 [`astrona.yaml`](astrona.yaml) is the manifest: every section, module, reading, playground, lab and capstone in the order they are meant to be taken.
 

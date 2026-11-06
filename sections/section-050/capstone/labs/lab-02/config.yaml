@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-capstone-050-02
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+    - docker.io/library/hello-world@sha256:5e22040d441e5fb3aed38368acbe8486b575d7018df38dbdfbc7311fbb2ef3a9
+    - docker.io/library/alpine@sha256:c19173c5ada610a5989151111163d28a67368362762534d8a8121ce95cf2bd5a
+    - docker.io/library/alpine@sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c69fc0d80990c2ad8dd412
+    - aquasec/trivy:0.76.2
+    - registry.k8s.io/kubectl:v1.35.8
+    - reg.kyverno.io/kyverno/kyverno:v1.19.1
+    - reg.kyverno.io/kyverno/kyvernopre:v1.19.1
+    - reg.kyverno.io/kyverno/background-controller:v1.19.1
+    - reg.kyverno.io/kyverno/reports-controller:v1.19.1
+    - reg.kyverno.io/kyverno/cleanup-controller:v1.19.1
+    - ghcr.io/tektoncd/pipeline/controller-10a3e32792f33651396d02b6855a6e36:v1.17.0@sha256:33255ed915552016fa68d1eb4455d2d48699141e79f6c1a73bab2e983fe3637b
+    - ghcr.io/tektoncd/pipeline/entrypoint-bff0a22da108bc2f16c818c97641a296:v1.17.0@sha256:a4d868728f2a3f0e405f2f4a2f387e226ddf382e49d32f160db690533810dd89
+    - ghcr.io/tektoncd/pipeline/nop-8eac7c133edad5df719dc37b36b62482:v1.17.0@sha256:3eef313fc09139d70c6cad6433a4f0bd455f2d19112f7b01536b4c749cb75dc3
+    - ghcr.io/tektoncd/pipeline/sidecarlogresults-7501c6a20d741631510a448b48ab098f:v1.17.0@sha256:38e5ef3efd146614bc2066177b93e3bd127511c8346111d8d65560209fdc6cfa
+    - ghcr.io/tektoncd/pipeline/workingdirinit-0c558922ec6a1b739e550e349f2d5fc1:v1.17.0@sha256:57397686a0d27e28316b40a5f079580f29dd2b235a30883be101202299eeb034
+    - cgr.dev/chainguard/busybox@sha256:19f02276bf8dbdd62f069b922f10c65262cc34b710eea26ff928129a736be791
+    - ghcr.io/tektoncd/pipeline/events-a9042f7efb0cbade2a868a1ee5ddd52c:v1.17.0@sha256:fe7c89c5a06c83a107527543fa62164c0e037404a52e2c71ea2552803806875a
+    - ghcr.io/tektoncd/pipeline/resolvers-ff86b24f130c42b88983d3c13993056d:v1.17.0@sha256:62e7933fa3697361496215c70b74380389cab9a86701d2e58455b7f9826f11c0
+    - ghcr.io/tektoncd/pipeline/webhook-d4749e605405422fd87700164e31b2d1:v1.17.0@sha256:198176fc8f38d240fb0cf5cce08b978de73f9e74c758feeb558d731bf6cf3e28
+bootstrap:
+  init:
+  - name: install-tools
+    description: Install Trivy 0.76.2 and jq 1.8.2 on the terminal
+    type: file
+    source: bootstrap/01-install-tools.sh
+  - name: install-cosign
+    type: file
+    source: bootstrap/01-install-cosign.sh
+  - name: install-kyverno
+    type: file
+    source: bootstrap/03-install-kyverno.sh
+  - name: seed-pipeline
+    type: file
+    source: bootstrap/02-seed-pipeline.sh
+testing:
+  init:
+  - name: apply-solution
+    type: file
+    source: solution/apply.sh
+  - name: wait-for-admission
+    type: file
+    source: testing/wait-for-admission.sh
+validation:
+  scripts:
+  - name: vulnerability-gate
+    description: Clean, blocked and failed releases prove scan gating, finally reporting and
+      retained evidence
+    type: file
+    source: validation/validate-vulnerability-gate.sh
+  - name: signature-evidence
+    description: Recorded signed and unsigned references agree with live cosign verification
+    type: file
+    source: validation/validate-signature-evidence.sh
+  - name: production-admission
+    description: Production namespaces admit the signed image and reject the unsigned
+      image
+    type: file
+    source: validation/validate-production-admission.sh
+  - name: namespace-scope
+    description: Development and unlabelled namespaces still admit both images
+    type: file
+    source: validation/validate-namespace-scope.sh
+teardown:
+  keepCluster: false

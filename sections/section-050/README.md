@@ -60,6 +60,14 @@ Makes the reader able to stop non-compliant workloads before and at the door of 
     ```
 *   **Hands-on Objective:** The `starfleet` release pipeline must check the release manifests, stop before deploying a non-compliant release, report the outcome in a finally Task, and deploy a compliant one; the cluster must reject any image in `starfleet-prod` that is not from the approved registry or not pinned by digest. The reader completes the Tekton Pipeline and the image policy. The grader runs the pipeline with a compliant and a non-compliant release, checks which one is deployed, and checks that an unpinned image is rejected.
 
+
+*   **Comprehensive Challenge:** Integrate Release Evidence And Signature Admission Capstone — `sections/section-050/capstone/labs/lab-02`, 35 minutes, unguided.
+    ```sh
+    astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/capstone/labs/lab-02
+    astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/capstone/labs/lab-02
+    ```
+*   **Hands-on Objective:** Complete a Tekton release Pipeline with a software bill of materials (SBOM), vulnerability result gate, retained evidence and finally reporting. Enforce trusted signatures in production with Kyverno. The scan fixtures update a zero-replica development Deployment; the existing signature fixtures prove production admission through server-side dry runs. The grader creates fresh release runs and checks that evidence survives run deletion.
+
 ---
 
 ## Ready for Assessment?

@@ -115,3 +115,27 @@ The verification command and admission policy now use the same public key and im
 > - **Selecting only the approved image repository.** Other images may escape the signature check. Match every image in the protected scope.
 > - **Using `Audit` when deployment must stop.** `Deny` enforces the validation; `failurePolicy: Fail` handles evaluation errors.
 > - **Treating an old Pod as an admission test.** Send a new request and inspect the API server's answer.
+
+## Your mission: Verify Image Signatures At Admission
+
+You can now verify an image with a public key and require that key at admission. The mission asks you to record two verification results and protect namespaces labelled for production while preserving admission elsewhere.
+
+Pause the playground, then start the lab:
+
+```sh
+astrona stop ats-021-playground-050-03
+astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-03/labs/lab-03
+```
+
+When your policy is ready, grade it once:
+
+```sh
+astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-03/labs/lab-03
+```
+
+Then remove the lab and resume the playground:
+
+```sh
+astrona destroy ats-021-lab-050-03-03
+astrona start ats-021-playground-050-03
+```

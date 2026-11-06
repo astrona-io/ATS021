@@ -763,6 +763,28 @@ modules:
         title: "Verify Signatures Before Admission"
         path: sections/section-050/module-03/course-04-verify-signatures-before-admission.md
       - type: reading
+        title: Question
+        path: sections/section-050/module-03/labs/lab-03/question.md
+      - type: lab
+        title: "Verify Image Signatures At Admission Lab"
+        path: sections/section-050/module-03/labs/lab-03
+        difficulty: intermediate
+        estimated_duration: 20m
+        topic: image-policy
+        task_kind: build
+        tags: [cosign, image-signature, kyverno, admission-webhook, image-digest]
+        learning_goals:
+          - Verify two immutable image references with cosign and record the signed reference in a ConfigMap
+          - Enforce the trusted public key in production namespaces with an ImageValidatingPolicy
+          - Prove signed acceptance, unsigned rejection and unchanged admission outside production
+        resources:
+          - name: "Kyverno ImageValidatingPolicy"
+            url: https://kyverno.io/docs/policy-types/image-validating-policy/
+          - name: "Kyverno 1.19.1 signature test public key"
+            url: https://github.com/kyverno/kyverno/blob/v1.19.1/test/cli/test/images/verify-signature/policies.yaml
+          - name: "cosign 3.1.4 verification flags"
+            url: https://github.com/sigstore/cosign/blob/v3.1.4/cmd/cosign/cli/options/verify.go
+      - type: reading
         title: "Summary"
         path: sections/section-050/module-03/course-05-summary.md
       - type: quiz

@@ -49,6 +49,7 @@ Makes the reader able to stop non-compliant workloads before and at the door of 
     ```
 *   **Graded Lab:** Generate SBOM Audit Evidence — `sections/section-050/module-03/labs/lab-01`, 20 minutes. Save a complete CycloneDX inventory and record package answers from live image data.
 *   **Graded Lab:** Gate A Tekton Release With A Vulnerability Scan — `sections/section-050/module-03/labs/lab-02`, 25 minutes. Generate an image inventory, gate deployment on a scan result, and retain both clean and blocked release evidence across runs.
+*   **Graded Lab:** Verify Image Signatures At Admission — `sections/section-050/module-03/labs/lab-03`, 20 minutes. Verify two public fixtures with cosign, record the result in a ConfigMap and enforce the public key in production namespaces with an ImageValidatingPolicy. Registry access is needed for signature lookup.
 *   **Knowledge Check:** 10 questions on inventory formats, scan decisions, evidence retention and signature trust.
 
 ### Section Capstone Challenge

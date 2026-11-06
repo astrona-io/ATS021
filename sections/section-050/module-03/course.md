@@ -4,7 +4,7 @@ A release can meet every Kubernetes policy and still contain a vulnerable packag
 
 You will generate inventories with Trivy, a tool that inspects artifacts and checks them for known vulnerabilities. You will then keep an inventory as pipeline evidence, gate deployment on the scan, and verify signatures with cosign, a tool for signing and verifying artifacts. Kyverno will perform the signature check again at admission, when the API server decides whether to accept an object.
 
-The four parts are **Generate An SBOM As Audit Evidence**, **Use Vulnerability Scan Exit Codes**, **Keep SBOM Evidence In A Tekton Pipeline**, and **Verify Signatures Before Admission**. The audit evidence lab follows the inventory exercise. The vulnerability gate lab follows the retained-evidence exercise: add a scan Task, allow only passing releases to deploy, and preserve inventories across runs. The signature exercise then covers verification at admission.
+The four parts are **Generate An SBOM As Audit Evidence**, **Use Vulnerability Scan Exit Codes**, **Keep SBOM Evidence In A Tekton Pipeline**, and **Verify Signatures Before Admission**. The audit evidence lab follows the inventory exercise. The vulnerability gate lab follows the retained-evidence exercise: add a scan Task, allow only passing releases to deploy, and preserve inventories across runs. The signature lab follows the verification exercise: check two image signatures, record the result, and enforce the trusted key only in namespaces labelled `environment: production`.
 
 ## Learning objectives
 

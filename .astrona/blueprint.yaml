@@ -504,7 +504,7 @@ sections:
           - Generate an SBOM as audit evidence, followed by lab-01
           - Severity, exit codes, unfixed vulnerabilities, ignores and database changes
           - Tekton inventory and scan steps, result gating and retained evidence, followed by lab-02
-          - cosign verify with a public key and Kyverno signature admission
+          - cosign verify with a public key and Kyverno production signature admission, followed by lab-03
         diagrams:
           - type: flowchart
             shows: Image inventory to evidence workspace, scan verdict to deploy, skip or Task failure
@@ -520,7 +520,11 @@ sections:
           excluded. Lab-01 is inventory only, with live-derived package grading
           and no vulnerability database. Lab-02 gates release-scan-gate with a Trivy
           Task result, digest-pinned package-free and end-of-life fixtures, runtime
-          database downloads and per-run PVC evidence. Later work adds lab-03.
+          database downloads and per-run PVC evidence. Lab-03 verifies published
+          digest-pinned signatures with cosign and grades ImageValidatingPolicy
+          admission in production, development and unlabelled namespaces.
+          Runtime signature lookup needs registry access; no private key or
+          local registry is installed.
 
     capstone:
       title: Security Checks In The Delivery Pipeline Capstone

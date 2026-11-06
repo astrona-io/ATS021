@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-lab-050-03-03
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - reg.kyverno.io/kyverno/kyverno:v1.19.1
+      - reg.kyverno.io/kyverno/kyvernopre:v1.19.1
+      - reg.kyverno.io/kyverno/background-controller:v1.19.1
+      - reg.kyverno.io/kyverno/reports-controller:v1.19.1
+      - reg.kyverno.io/kyverno/cleanup-controller:v1.19.1
+bootstrap:
+  init:
+    - name: install-cosign
+      description: Install cosign 3.1.4 on the terminal and copy the public key
+      type: file
+      source: bootstrap/01-install-cosign.sh
+    - name: seed-admission
+      description: Install Kyverno 1.19.1 and prepare namespaces without a signature policy
+      type: file
+      source: bootstrap/02-seed-admission.sh
+testing:
+  init:
+    - name: apply-solution
+      type: file
+      source: solution/apply.sh
+    - name: wait-for-admission
+      type: file
+      source: testing/wait-for-admission.sh
+validation:
+  scripts:
+    - name: signature-evidence
+      description: Recorded signed and unsigned references agree with live cosign verification
+      type: file
+      source: validation/validate-signature-evidence.sh
+      hint: Verify both candidates with the supplied key and record full references in signature-audit.
+    - name: production-admission
+      description: Production namespaces admit the signed image and reject the unsigned image
+      type: file
+      source: validation/validate-production-admission.sh
+      hint: Use ImageValidatingPolicy with Deny, the trusted key and an environment production selector.
+    - name: namespace-scope
+      description: Development and unlabelled namespaces still admit both images
+      type: file
+      source: validation/validate-namespace-scope.sh
+      hint: Keep namespace labels unchanged and select production namespaces by label rather than name.
+teardown:
+  keepCluster: false

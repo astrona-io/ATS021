@@ -245,7 +245,7 @@ items:
   kind: course
   what: SBOMs And Vulnerability Scanning In The Pipeline
   status: done
-  note: 'untested: built without booting 2026-11-06; landing, four parts and summary; lab-02 outline and retention summary updated; official pinned sources checked;
+  note: 'untested: built without booting 2026-11-06; landing, four parts and summary; lab-02 and lab-03 outlines, retention and production signature scope summary updated; official pinned sources checked;
     no command output invented'
 - key: section-050/module-03/playground
   kind: playground
@@ -279,3 +279,13 @@ items:
     astrona validate blocked by sandbox maintenance-lock write; legacy skill helper
     expects obsolete examQuestion/guide doc keys rather than sibling question/solution;
     public Astrona lab schema URL returned 404'
+
+- key: section-050/module-03/lab-03
+  kind: lab
+  what: Verify Image Signatures At Admission
+  status: done
+  note: 'untested: built without booting 2026-11-06; public Kyverno fixtures pinned by existing digests;
+    supplied public key and cosign 3.1.4 verified signed acceptance and malformed unsigned signature rejection;
+    ImageValidatingPolicy v1 checked against Kyverno 1.19.1 CRD schema;
+    controller images preloaded, registry access required for runtime signature lookup;
+    live API dry-run matrix and reference solution not executed; YAML, local Astrona config schema, shell and Python syntax, manifest order, unique name and walkthrough parity passed; astrona validate blocked by sandbox maintenance-lock write'

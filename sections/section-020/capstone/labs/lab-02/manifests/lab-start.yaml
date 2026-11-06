@@ -1,0 +1,235 @@
+# Starting state, broken on purpose:
+# - the starfleet namespace has no linkerd.io/inject annotation, so no pod gets a proxy;
+# - there is no Server for the scout port and no HTTPRoute;
+# - the MeshTLSAuthentication scout-callers names the wrong service account (probe).
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: starfleet
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: scout
+  namespace: starfleet
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: shuttle
+  namespace: starfleet
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: probe
+  namespace: starfleet
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scout-v1
+  namespace: starfleet
+  labels:
+    app: scout
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scout
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: scout
+        version: v1
+    spec:
+      serviceAccountName: scout
+      containers:
+      - name: scout
+        image: ghcr.io/stefanprodan/podinfo:6.15.0
+        ports:
+        - name: http
+          containerPort: 9898
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: http
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            memory: 64Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scout-v2
+  namespace: starfleet
+  labels:
+    app: scout
+    version: v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scout
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: scout
+        version: v2
+    spec:
+      serviceAccountName: scout
+      containers:
+      - name: scout
+        image: ghcr.io/stefanprodan/podinfo:6.15.0
+        ports:
+        - name: http
+          containerPort: 9898
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: http
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            memory: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scout-v1
+  namespace: starfleet
+spec:
+  selector:
+    app: scout
+    version: v1
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scout-v2
+  namespace: starfleet
+spec:
+  selector:
+    app: scout
+    version: v2
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: scout
+  namespace: starfleet
+spec:
+  selector:
+    app: scout
+    version: v1
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shuttle
+  namespace: starfleet
+  labels:
+    app: shuttle
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shuttle
+  template:
+    metadata:
+      labels:
+        app: shuttle
+    spec:
+      serviceAccountName: shuttle
+      containers:
+      - name: shuttle
+        image: curlimages/curl:8.22.0
+        command:
+        - sh
+        - -c
+        - while true; do sleep 30; done
+        resources:
+          requests:
+            cpu: 10m
+            memory: 16Mi
+          limits:
+            memory: 32Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: caller
+  namespace: starfleet
+  labels:
+    app: caller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: caller
+  template:
+    metadata:
+      labels:
+        app: caller
+    spec:
+      serviceAccountName: probe
+      containers:
+      - name: caller
+        image: curlimages/curl:8.22.0
+        command:
+        - sh
+        - -c
+        - while true; do sleep 30; done
+        resources:
+          requests:
+            cpu: 10m
+            memory: 16Mi
+          limits:
+            memory: 32Mi
+---
+# Wrong on purpose: the allowed caller is shuttle, not probe.
+apiVersion: policy.linkerd.io/v1alpha1
+kind: MeshTLSAuthentication
+metadata:
+  name: scout-callers
+  namespace: starfleet
+spec:
+  identityRefs:
+  - kind: ServiceAccount
+    name: probe
+---
+# Targets a Server named scout-http that does not exist yet.
+apiVersion: policy.linkerd.io/v1alpha1
+kind: AuthorizationPolicy
+metadata:
+  name: scout-allow-shuttle
+  namespace: starfleet
+spec:
+  targetRef:
+    group: policy.linkerd.io
+    kind: Server
+    name: scout-http
+  requiredAuthenticationRefs:
+  - group: policy.linkerd.io
+    kind: MeshTLSAuthentication
+    name: scout-callers

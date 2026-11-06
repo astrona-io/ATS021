@@ -50,6 +50,12 @@ Makes the reader able to encrypt and authenticate traffic between workloads and 
     astrona submit -c .
     ```
 *   **Hands-on Objective:** On an Istio mesh, the `starfleet` namespace must accept only mTLS traffic, `scout` must answer only GET requests from `shuttle`, and `probe` must be reachable only from inside `starfleet`. One workload starts without a sidecar and must be fixed so it keeps working under STRICT. The grader sends requests from shuttle, drifter and a plain-text client and checks each answer.
+*   **Comprehensive Challenge:** Secure Service-To-Service Communication With Linkerd Capstone — `sections/section-020/capstone/labs/lab-02` (30 minutes, unguided)
+    ```bash
+    astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/capstone/labs/lab-02
+    astrona submit -c .
+    ```
+*   **Hands-on Objective:** On a Linkerd mesh, the `starfleet` namespace starts outside the mesh and must be meshed so all traffic between its workloads uses mTLS. One `Server` must protect the `scout` port on both versions, a `MeshTLSAuthentication` that names the wrong service account must be repaired so only `shuttle` passes the `AuthorizationPolicy` while `caller` stays denied, and a Gateway API `HTTPRoute` attached to the `scout` Service must split requests 75/25 between v1 and v2. The grader sends requests from `shuttle` and `caller` and reads the route status the policy controller writes.
 
 ---
 

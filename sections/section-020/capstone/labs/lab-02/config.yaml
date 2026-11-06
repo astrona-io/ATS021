@@ -1,0 +1,67 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-capstone-020-02
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+    - ghcr.io/stefanprodan/podinfo:6.15.0
+    - curlimages/curl:8.22.0
+    - cr.l5d.io/linkerd/controller:edge-26.10.1
+    - cr.l5d.io/linkerd/proxy:edge-26.10.1
+bootstrap:
+  init:
+  - name: seed-cluster
+    description: Install Linkerd and create the unmeshed Starfleet workloads
+    type: file
+    source: bootstrap/01-seed-cluster.sh
+testing:
+  init:
+  - name: apply-solution
+    description: Mesh the namespace, create the Server, repair the authentication and create the route
+    type: file
+    source: solution/apply.sh
+  - name: wait-for-policies
+    description: Wait until shuttle is allowed and caller is denied on both backends
+    type: file
+    source: testing/wait-for-policies.sh
+validation:
+  scripts:
+  - name: namespace-meshed
+    description: Every starfleet pod runs a Linkerd proxy
+    type: file
+    source: validation/validate-namespace-meshed.sh
+    hint: Annotate the namespace with linkerd.io/inject=enabled and restart all four Deployments;
+      the proxy only joins new pods.
+  - name: server-protects-scout
+    description: A Server selects the scout port on both versions
+    type: file
+    source: validation/validate-server-protects-scout.sh
+    hint: Name it scout-http, select app=scout only, use the named port http with proxyProtocol
+      HTTP/1 and accessPolicy deny.
+  - name: only-shuttle-allowed
+    description: shuttle gets 200 and caller gets 403 from both backends
+    type: file
+    source: validation/validate-only-shuttle-allowed.sh
+    hint: Point scout-callers at the shuttle ServiceAccount; keep scout-allow-shuttle as the only
+      AuthorizationPolicy and leave the policy and the caller alone.
+  - name: route-attached
+    description: An HTTPRoute on the scout Service splits 75/25 and is accepted by Linkerd
+    type: file
+    source: validation/validate-route-attached.sh
+    hint: Use gateway.networking.k8s.io/v1 with a core Service parent on port 80, backends scout-v1
+      weight 75 and scout-v2 weight 25, then read status.parents.
+  - name: observed-split
+    description: 400 requests from shuttle reach both versions near 75/25
+    type: file
+    source: validation/validate-observed-split.sh
+    hint: Confirm shuttle has a proxy, both versions allow it, and the route backends point at the
+      version Services.
+teardown:
+  keepCluster: false

@@ -223,6 +223,24 @@ sections:
         STRICT. The grader sends requests from shuttle, drifter and a
         plain-text client and checks each answer.
 
+      additional_labs:
+        - id: lab-02
+          title: Secure Service-To-Service Communication With Linkerd Capstone
+          estimated_duration: 30m
+          path: sections/section-020/capstone/labs/lab-02
+          objective: >
+            One unguided Linkerd task with three workloads in `starfleet`:
+            mesh the namespace so all traffic between its workloads uses mTLS,
+            protect the `scout` port on both versions with one `Server`, repair
+            a `MeshTLSAuthentication` that names the wrong service account so
+            the `AuthorizationPolicy` allows only `shuttle` and `caller` stays
+            denied, and split requests 75/25 between `scout-v1` and `scout-v2`
+            with a Gateway API `HTTPRoute` whose parent is the `scout` Service.
+            The student reads the served API versions with `kubectl
+            api-resources`. The grader sends requests from `shuttle` and
+            `caller` and reads the route status. Reuses the module-02 lab
+            bootstrap (Linkerd edge-26.10.1, Gateway API CRDs v1.4.0).
+
   # ---------------------------------------------------------------------------
   - id: section-030
     title: Governance With Policy Engines And Admission Control

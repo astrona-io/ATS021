@@ -301,3 +301,16 @@ items:
     syntax, local Astrona schema, pinned CRD schemas, walkthrough parity, file
     references and unique names pass; reference solution and live graders not executed;
     astrona validate blocked by sandbox maintenance-lock write'
+
+- key: section-020/capstone/lab-02
+  kind: capstone
+  what: Secure Service-To-Service Communication With Linkerd Capstone
+  status: done
+  note: 'untested: built without booting 2026-11-06; 30-minute unguided Linkerd task;
+    reuses the module-02 lab bootstrap (Linkerd edge-26.10.1, Gateway API CRDs v1.4.0) and
+    the module-02 lab-02 workloads without outpost; start state is an unmeshed namespace,
+    no Server, no HTTPRoute and a MeshTLSAuthentication naming probe instead of shuttle;
+    five validators send requests from shuttle and caller and read HTTPRoute status.parents
+    for controllerName linkerd.io/policy-controller (name checked in the edge-26.10.1
+    source); YAML, bash -n, astrona validate and manifest order pass; reference solution,
+    live graders, route status write and split statistics not executed'

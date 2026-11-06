@@ -317,6 +317,30 @@ modules:
             url: https://istio.io/latest/docs/reference/config/security/authorization-policy/
           - name: "Istio mutual TLS migration"
             url: https://istio.io/latest/docs/tasks/security/authentication/mtls-migration/
+      - type: reading
+        title: Question
+        path: sections/section-020/capstone/labs/lab-02/question.md
+      - type: lab
+        title: "Secure Service-To-Service Communication With Linkerd Capstone"
+        path: sections/section-020/capstone/labs/lab-02
+        difficulty: advanced
+        estimated_duration: 30m
+        topic: service-mesh
+        task_kind: build
+        tags: [linkerd, linkerd-server, authorizationpolicy, meshtlsauthentication, httproute, gamma, serviceaccount]
+        learning_goals:
+          - Put a namespace in the Linkerd mesh so every pod runs a proxy and traffic between them uses mTLS
+          - Protect the scout port with a Server and allow only the shuttle ServiceAccount by repairing a MeshTLSAuthentication
+          - Split requests between two backend versions with a Service-attached HTTPRoute and read its status
+        resources:
+          - name: "Linkerd authorization policy reference"
+            url: https://linkerd.io/2/reference/authorization-policy/
+          - name: "Linkerd HTTPRoute reference"
+            url: https://linkerd.io/2/reference/httproute/
+          - name: "Linkerd automatic mTLS"
+            url: https://linkerd.io/2/features/automatic-mtls/
+          - name: "Gateway API for mesh (GAMMA)"
+            url: https://gateway-api.sigs.k8s.io/concepts/gamma/
       - type: quiz
         title: "Knowledge Check: Secure Service-To-Service Communication"
         path: sections/section-020/quiz.yaml

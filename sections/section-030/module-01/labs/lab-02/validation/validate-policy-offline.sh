@@ -13,7 +13,9 @@ SAVED="$(kubectl apply --dry-run=server -f /tmp/kyverno-team-test/policy.yaml -o
 for field in '.apiVersion' '.kind' '.metadata.name' '.metadata.namespace' '.spec'; do
   [ "$(printf '%s' "$LIVE" | jq -S "$field")" = "$(printf '%s' "$SAVED" | jq -S "$field")" ] || fail "Saved policy differs from live policy: $field"
 done
-kyverno version | grep -q 'Version: 1.19.1$' || fail "Use the installed CLI 1.19.1"
+# No `grep -q` here: with pipefail it exits on the first line and the CLI gets
+# SIGPIPE while printing the rest of its output, which fails the pipeline.
+kyverno version | grep 'Version: 1.19.1$' >/dev/null || fail "Use the installed CLI 1.19.1"
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
 cp "$DIR/manifests/offline/"* "$WORK/"

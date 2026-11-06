@@ -1,0 +1,6 @@
+apiVersion: v2
+name: probe
+description: The probe HTTP echo backend for starfleet
+type: application
+version: 0.2.0
+appVersion: "2.25.0"

@@ -1,0 +1,79 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+#
+# Satisfy A Gatekeeper Constraint With A Helm Chart (LAB). Graded against the live cluster.
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-lab-030-02-02
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+      - ghcr.io/stefanprodan/podinfo:6.15.0
+      - mccutchen/go-httpbin:2.25.0
+      - curlimages/curl:8.22.0
+
+# Starting state: Helm 4.3.0 on the terminal, Gatekeeper 3.23.1, the
+# Starfleet workloads, and the `probe` chart copied to ~/resources/probe and
+# installed as release `probe` (revision 1) in starfleet. The chart runs one
+# replica and puts the `team` label on the Deployment only, not on the pod
+# template. No ConstraintTemplate and no Constraint exist. The fault in the
+# chart is left in place on purpose.
+bootstrap:
+  init:
+    - name: helm-cli
+      description: Install Helm 4.3.0 in the terminal
+      type: file
+      source: bootstrap/00-install-helm.sh
+    - name: seed-cluster
+      description: Install Gatekeeper 3.23.1, create the workloads and install the probe chart as release probe
+      type: file
+      source: bootstrap/01-seed-cluster.sh
+
+# Applied only by `astrona test`: the reference solution.
+testing:
+  init:
+    - name: apply-solution
+      description: Apply the template and the constraint, then upgrade the release from the repaired chart
+      type: file
+      source: solution/apply.sh
+    - name: wait-for-constraint
+      description: Wait until Gatekeeper enforces the constraint
+      type: file
+      source: testing/wait-for-constraint.sh
+
+validation:
+  scripts:
+    - name: template-created
+      description: The ConstraintTemplate k8sstarfleetworkloadrules compiles and creates the kind K8sStarfleetWorkloadRules
+      type: file
+      source: validation/validate-template-created.sh
+      hint: Name the template k8sstarfleetworkloadrules and its kind K8sStarfleetWorkloadRules. If status.created is false, read status.byPod[0].errors.
+    - name: pod-rule
+      description: A pod without the team label is refused in starfleet, a labelled pod and a pod in outpost are accepted
+      type: file
+      source: validation/validate-pod-rule.sh
+      hint: One violation rule must match Pods (input.review.kind.kind == "Pod") and fail when metadata.labels has no key named by the parameter label. The constraint must use enforcementAction deny, match Pod in the core API group and only the namespace starfleet.
+    - name: deployment-rule
+      description: A one-replica Deployment is refused in starfleet, two replicas and a one-replica Deployment in outpost are accepted
+      type: file
+      source: validation/validate-deployment-rule.sh
+      hint: The second violation rule must match Deployments and fail when spec.replicas is below the parameter minReplicas. Add apps Deployment to match.kinds of the same constraint and set minReplicas to 2.
+    - name: release-repaired
+      description: The chart in ~/resources/probe has version 0.2.0 and the release probe is deployed from it
+      type: file
+      source: validation/validate-release-repaired.sh
+      hint: Change the chart files, set version 0.2.0 in Chart.yaml, then run helm upgrade --install probe ~/resources/probe -n starfleet without --set or extra values files. helm history shows a failed revision if the upgrade was refused.
+    - name: release-pods-ready
+      description: The probe Deployment runs at least two ready pods and every pod carries the team label
+      type: file
+      source: validation/validate-release-pods-ready.sh
+      hint: The label belongs under spec.template.metadata.labels in templates/deployment.yaml, and replicaCount in values.yaml must be at least 2. Read the events of the newest ReplicaSet if pods do not appear.
+
+teardown:
+  keepCluster: false

@@ -262,7 +262,12 @@ section is only true for this one.
   Kyverno and is taught (user decision, 2026-11-04). The course owner also
   approved Trivy and cosign as taught tools on 2026-11-06: teach Trivy for
   SBOM generation and vulnerability scanning, and cosign for image signature
-  verification. Syft is not part of this course.
+  verification. Syft is not part of this course. The course owner also
+  approved Helm on 2026-11-06, for one job only: the Gatekeeper module's
+  second lab repairs a local chart so its release passes a Constraint
+  (`helm upgrade --install`, `helm list`, `helm history`, `helm template`,
+  `helm lint`). Helm itself is taught in the ATS018 course; here a page
+  only uses the commands and never explains chart authoring from scratch.
   Where the exam lets the candidate pick between two tools, both are taught:
   **Istio is the primary service mesh** with full depth, and **Linkerd gets
   one compact module**. Kyverno and Gatekeeper each get a full module because
@@ -294,6 +299,7 @@ section is only true for this one.
   | Alpine (vulnerable scan fixture) | 3.10.3; index `sha256:c19173c5ada610a5989151111163d28a67368362762534d8a8121ce95cf2bd5a`; end-of-life fixture, verified 2026-11-06 |
   | podinfo | 6.15.0 |
   | go-httpbin | 2.25.0 |
+  | Helm (Gatekeeper module lab 2 only; same pin as ATS018) | 4.3.0 |
 
   Do not teach fields, flags or output from other versions without saying
   so. Older tutorials are often wrong for these versions (for example,
@@ -565,6 +571,7 @@ this order:
   `cyclonedx`, `spdx`, `vulnerability-scan`, `cosign`, `image-signature`
 - Pipelines: `tekton`, `tekton-task`, `tekton-pipeline`, `pipelinerun`,
   `task-result`, `when-expression`, `finally-task`, `compliance-gate`
+- Packaging: `helm`
 
 ### Running things
 

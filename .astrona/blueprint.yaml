@@ -292,11 +292,14 @@ sections:
           - Switch a Constraint between deny, dryrun and warn with enforcementAction
           - Read the audit results in a Constraint's status and list existing violations
           - Find the error in a ConstraintTemplate whose Rego does not compile from its status
+          - Find the Gatekeeper refusal of a controller-created pod in the ReplicaSet FailedCreate event and fix the pod template
+          - Write one ConstraintTemplate with a Pod rule and a Deployment rule and repair a Helm chart until its release passes the Constraint (lab 2)
         outline:
           - Gatekeeper and OPA; how a ConstraintTemplate creates a new resource kind
           - "Rego basics needed for a violation rule: input.review.object, parameters, msg"
           - "Constraints: match, parameters, enforcementAction"
           - Audit - reading totalViolations and violations in the constraint status
+          - "Constraints and pods created by controllers: Deployment admitted, ReplicaSet FailedCreate event, ReplicaFailure condition, fix in spec.template"
         diagrams:
           - type: flowchart
             shows: ConstraintTemplate creating a CRD, a Constraint of that kind, and the admission and audit paths that use it

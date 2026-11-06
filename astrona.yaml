@@ -461,8 +461,35 @@ modules:
           - name: "Gatekeeper violations"
             url: https://open-policy-agent.github.io/gatekeeper/website/docs/violations/
       - type: reading
+        title: "Constraints And Pods Created By Controllers"
+        path: sections/section-030/module-02/course-04-constraints-and-controller-created-pods.md
+      - type: reading
+        title: Question
+        path: sections/section-030/module-02/labs/lab-02/question.md
+      - type: lab
+        title: "Satisfy A Gatekeeper Constraint With A Helm Chart Lab"
+        path: sections/section-030/module-02/labs/lab-02
+        difficulty: intermediate
+        estimated_duration: 25m
+        topic: policy-engines
+        task_kind: troubleshooting
+        tags: [gatekeeper, constrainttemplate, constraint, rego, enforce-mode, helm]
+        learning_goals:
+          - Write one ConstraintTemplate with two violation rules, one on Pods and one on Deployments, and a deny Constraint scoped to one namespace
+          - Prove with server-side dry runs that an unlabelled Pod and a one-replica Deployment are refused in starfleet and accepted in outpost
+          - Repair a Helm chart so its pod template carries the label and the Deployment runs two replicas, raise the chart version and upgrade the release until it is deployed
+        resources:
+          - name: "Gatekeeper constraint templates"
+            url: https://open-policy-agent.github.io/gatekeeper/website/docs/constrainttemplates/
+          - name: "Gatekeeper how-to: constraints and match"
+            url: https://open-policy-agent.github.io/gatekeeper/website/docs/howto/
+          - name: "Helm upgrade"
+            url: https://helm.sh/docs/helm/helm_upgrade/
+          - name: "Kubernetes Deployments: failed Deployment"
+            url: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#failed-deployment
+      - type: reading
         title: Summary
-        path: sections/section-030/module-02/course-04-summary.md
+        path: sections/section-030/module-02/course-05-summary.md
 
       - type: reading
         title: "Write ValidatingAdmissionPolicies With CEL"

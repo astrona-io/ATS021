@@ -1,0 +1,5 @@
+replicaCount: 2
+team: starfleet
+image:
+  repository: mccutchen/go-httpbin
+  tag: "2.25.0"

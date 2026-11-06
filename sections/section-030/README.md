@@ -46,6 +46,9 @@ Makes the reader able to enforce platform rules at admission time with the three
     astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-02/playground
     ```
 
+*   **New reading:** Constraints And Pods Created By Controllers — a Constraint on Pods also refuses the pods a Deployment creates; `kubectl apply` succeeds, the `FailedCreate` event of the newest ReplicaSet and the `ReplicaFailure` condition of the Deployment carry the refusal, and the fix belongs in the pod template.
+*   **Graded lab 2:** `sections/section-030/module-02/labs/lab-02` — write one ConstraintTemplate with a Pod rule and a Deployment rule plus a `deny` Constraint for `starfleet`, then repair a local Helm chart (pod template label, two replicas, chart version `0.2.0`) and upgrade the release until it is `deployed` (25 minutes). Helm 4.3.0 is installed on the terminal by the lab.
+
 ### 3. Write ValidatingAdmissionPolicies With CEL
 *   **Module Reader:** **[Module 3: Write ValidatingAdmissionPolicies With CEL](./module-03/course.md)**
 *   **Hands-on Playground:** `sections/section-030/module-03/playground` — kind cluster, no policy engine installed (the API server does the work). Namespaces `starfleet` (labelled `environment: production`) and `outpost` (labelled `environment: sandbox`) with the Starfleet workloads; a `scout` Deployment scaled to 8 replicas so a replica limit has something to reject. A ConfigMap `replica-limits` in `starfleet` to use as params. No ValidatingAdmissionPolicy yet.

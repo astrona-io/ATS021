@@ -108,12 +108,17 @@ items:
   kind: course
   what: 'chapter for module 2: Enforce Constraints With Gatekeeper And Rego'
   status: done
-  note: landing + 3 parts + summary; real output; Rego syntax and broken template status verified
+  note: 'landing + 3 parts + summary; real output; Rego syntax and broken template status verified. untested: built without booting 2026-11-06; part 4 Constraints And Pods Created By Controllers added (ReplicaSet FailedCreate event, ReplicaFailure condition, pod template fix), summary renumbered to course-05, landing updated; no command output shown on the new part'
 - key: section-030/module-02/lab
   kind: lab
   what: 'graded lab for module 2: Enforce Constraints With Gatekeeper And Rego Lab'
   status: done
   note: astrona validate ok; astrona test 4/4 pass; unsolved lab 1/4; reference solution 4/4
+- key: section-030/module-02/labs/lab-02
+  kind: lab
+  what: 'Satisfy A Gatekeeper Constraint With A Helm Chart Lab'
+  status: done
+  note: 'untested: built without booting 2026-11-06; one ConstraintTemplate with a Pod label rule and a Deployment replica rule, one deny Constraint for starfleet, probe Helm chart (0.1.0, one replica, label on Deployment only) installed as revision 1 by bootstrap; Helm 4.3.0 bootstrapped the ATS018 way; static checks only (astrona validate, bash -n, helm lint, helm template); Rego not compiled (no opa on this machine); live admission, helm upgrade failure path and reference solution not executed'
 - key: section-030/module-03/playground
   kind: playground
   what: 'playground for module 3: Write ValidatingAdmissionPolicies With CEL'

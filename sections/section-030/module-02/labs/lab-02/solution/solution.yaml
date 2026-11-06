@@ -1,0 +1,36 @@
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sstarfleetworkloadrules
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sStarfleetWorkloadRules
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            label:
+              type: string
+            minReplicas:
+              type: integer
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sstarfleetworkloadrules
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Pod"
+          required := input.parameters.label
+          not input.review.object.metadata.labels[required]
+          msg := sprintf("pod is missing the required label <%v>", [required])
+        }
+
+        violation[{"msg": msg}] {
+          input.review.kind.kind == "Deployment"
+          minimum := input.parameters.minReplicas
+          replicas := input.review.object.spec.replicas
+          replicas < minimum
+          msg := sprintf("deployment <%v> has %v replicas, the minimum is %v", [input.review.object.metadata.name, replicas, minimum])
+        }

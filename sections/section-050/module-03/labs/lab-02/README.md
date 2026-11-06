@@ -32,8 +32,9 @@ lab's `release-gate` Pipeline and `scout` Deployment.
 The database is downloaded at run time, with metadata saved before scanning
 that cache using `--skip-db-update`. Bootstrap checks database connectivity
 and prepares a terminal cache; it does not populate the Task's cache. No
-database image is required. Kubernetes step, reader and fixture images are
-preloaded; remote Trivy inspections still need registry access. The scanner
+database image is required. The tagged step and reader images are
+preloaded; the digest-pinned fixture images are pulled from Docker Hub when
+their pods start, and remote Trivy inspections still need registry access. The scanner
 removes its large database cache after a completed scan while retaining
 metadata, report and SBOM, so repeated watch checks do not fill the PVC.
 

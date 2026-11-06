@@ -8,8 +8,6 @@ runtime:
   kind:
     image: kindest/node:v1.35.8
     preloadImages:
-    - docker.io/library/alpine@sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c69fc0d80990c2ad8dd412
-    - docker.io/library/debian@sha256:a347fd7510ee31a84387619a492ad6c8eb0af2f2682b916ff3e643eb076f925a
     - aquasec/trivy:0.76.2
     - registry.k8s.io/kubectl:v1.35.8
 bootstrap:

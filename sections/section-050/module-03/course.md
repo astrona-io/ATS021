@@ -21,7 +21,7 @@ You need Deployments, ConfigMaps, service accounts, and the Tekton Task, result,
 
 The playground installs Trivy 0.76.2, cosign 3.1.4, jq 1.8.2, Tekton Pipelines 1.17.0 and Kyverno 1.19.1 on Kubernetes 1.35.8. `trivy`, `cosign` and `jq` run on the terminal. If a command is missing, add `$HOME/.local/bin` to `PATH`. No private signing key is needed.
 
-The `starfleet` namespace contains `scout` using Alpine 3.22.2 and `probe` using Debian 13.1-slim, both pinned by digest. These small inventory workloads run `sleep`; they do not expose an application Service. Each has its own service account. Images are preloaded for Kubernetes. Trivy reads images from their registry, so inventory commands still need internet access. Vulnerability scans also download a database. Signature checks fetch remote signatures and image metadata.
+The `starfleet` namespace contains `scout` using Alpine 3.22.2 and `probe` using Debian 13.1-slim, both pinned by digest. These small inventory workloads run `sleep`; they do not expose an application Service. Each has its own service account. Kubernetes pulls both images from Docker Hub during bootstrap. Trivy reads images from their registry, so inventory commands still need internet access. Vulnerability scans also download a database. Signature checks fetch remote signatures and image metadata.
 
 The `pipelines` namespace has the `deploy-inventory` Task, the `pipeline-runner` service account, and the `sbom-evidence` PersistentVolumeClaim. A **PersistentVolumeClaim (PVC)** requests storage whose lifetime is separate from a Task pod. An `evidence-reader` pod mounts it for inspection. No scanning Task, Pipeline or signature policy exists yet.
 

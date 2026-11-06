@@ -16,8 +16,8 @@ astrona destroy ats-021-lab-050-03
 
 Author validation is offline only: `astrona validate -c sections/section-050/module-03/labs/lab-01`.
 The reference solution is `solution/apply.sh`. Bootstrap installs terminal
-CLIs using release checksums and preloads the two workload images through
-`config.yaml`. Graders fetch the immutable images remotely and select the
+CLIs using release checksums; the two digest-pinned workload images are
+pulled from Docker Hub when the pods start. Graders fetch the immutable images remotely and select the
 node architecture. Report generation needs registry access but no database.
 Built without booting on 2026-11-06; live behavior remains untested.
 

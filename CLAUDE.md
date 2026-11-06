@@ -400,9 +400,16 @@ authorization policies all match on the service account. Never use the
 - **No image registry of its own.** Image reference rules need no registry
   server in the playground. Signature verification uses published remote
   test signatures and a public test key; it needs registry access, not a
-  private signing key. Images that run are preloaded with
+  private signing key. Tagged images that run are preloaded with
   `runtime.kind.preloadImages`. Trivy's remote analysis fetches images
   independently of Kubernetes preloading.
+- **Never preload a digest-pinned image.** A `preloadImages` entry with
+  `@sha256:` (with or without a tag) is imported by kind as
+  `docker.io/library/import-<date>…`, the digest reference in the Pod does
+  not resolve, and the Pod fails with `CreateContainerError` (seen
+  2026-11-06 in ATS017 and ATS018 boot tests). Digest-pinned workloads
+  (`alpine@sha256:…`, the Tekton 1.17.0 controller images) are pulled from
+  their registry when the pod starts; the bootstrap already needs internet.
 - **Many environments start broken on purpose.** A playground or lab often
   starts with an over-broad `ClusterRoleBinding`, a namespace in `PERMISSIVE`
   mTLS, a privileged pod, or an image with known CVEs. The fault is the

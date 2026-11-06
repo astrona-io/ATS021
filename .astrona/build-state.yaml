@@ -251,7 +251,9 @@ items:
   what: SBOMs And Vulnerability Scanning In The Pipeline
   status: done
   note: 'untested: built without booting 2026-11-06; landing, four parts and summary; lab-02 and lab-03 outlines, retention and production signature scope summary updated; official pinned sources checked;
-    no command output invented'
+    no command output invented. Deep-dive review 2026-11-06: part 2 no longer regenerates the part 1 SBOM; diagrams added to parts 1, 2, 4 and a run-state diagram to part 3; Trivy component tree,
+    filter order, --ignore-unfixed statuses and .trivyignore expiry, cosign bundle/.sig lookup and claim check, Kyverno evaluation order and rejection texts verified against Trivy 0.76.2, cosign 3.1.4,
+    Kyverno 1.19.1, Tekton 1.17.0 sources; failurePolicy wording corrected; lab-02 mission added to part 3; landing lists parts with objectives for all; no files renamed'
 - key: section-050/module-03/playground
   kind: playground
   what: SBOM scanning and signature playground

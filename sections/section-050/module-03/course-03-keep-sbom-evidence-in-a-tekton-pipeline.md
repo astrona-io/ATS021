@@ -79,7 +79,7 @@ kubectl apply -f task-scan-inventory.yaml
 
 The first step creates the inventory. Steps share the mounted workspace even though their container filesystems differ. The second step downloads a database, copies its metadata, then scans with that database using `--skip-db-update`. That flag does not make an absent database usable. It keeps the scan and saved database metadata aligned for this run.
 
-A selected vulnerability returns `42`. The script writes `fail` but lets the Task complete, so the Pipeline can evaluate its `when` expression. A scanner error writes `fail` and also fails the Task. An inventory failure stops the Task before the scan. All three paths prevent deployment. A passing scan writes `pass` to the Tekton result path; writing to a similarly named workspace file would not export a result.
+A selected vulnerability returns `42`. The script writes `fail` but lets the Task complete, so the Pipeline can evaluate its `when` expression. A scanner error writes `fail` and also fails the Task. An inventory failure stops the Task before the scan. All three paths prevent deployment. A passing scan writes `pass` to the Tekton result path; writing to a similarly named workspace file would not export a result. Underneath, `$(results.verdict.path)` is a file under `/tekton/results/`, and Tekton copies its content into the step container's termination message when the step exits, which is why a result must stay small and why a step that is killed before it exits leaves no result.
 
 ## Connect the verdict to deployment
 
@@ -179,6 +179,23 @@ kubectl -n pipelines cp evidence-reader:/evidence ./sbom-evidence
 
 Look for `verdict` in TaskRun results and the deploy entry in `skippedTasks` when the verdict is `fail`. For a Task failure, read `status.conditions` and each step's terminated reason and exit code. A result of `fail` is distinct from a Task that failed to produce any result.
 
+The PipelineRun's `Succeeded` condition tells the three outcomes apart by its `reason`:
+
+```mermaid
+stateDiagram-v2
+  [*] --> Running
+  Running --> Succeeded: verdict pass, deploy ran
+  Running --> Completed: verdict fail, deploy skipped
+  Running --> Failed: scan TaskRun failed
+  Running --> InvalidTaskResultReference: scan Task wrote no verdict result
+  Succeeded --> [*]
+  Completed --> [*]
+  Failed --> [*]
+  InvalidTaskResultReference --> [*]
+```
+
+`Succeeded` means status `True` with no skipped Task, `Completed` means status `True` with at least one entry in `skippedTasks`, `Failed` means status `False` because a TaskRun failed, and a missing `verdict` result makes the consuming `when` expression unresolvable so the run fails with `InvalidTaskResultReference`. A gate that only checks for status `True` would therefore treat a skipped deploy as a release.
+
 The PVC keeps one evidence directory per PipelineRun name after its Task pod finishes. The reader pod makes those files accessible with `kubectl cp`. This storage is still part of the playground cluster. Copy the evidence before destroying it; a production pipeline uploads the run directory to artifact storage with access controls and a retention period. Do not store the entire SBOM in a Task result or assume Task logs preserve it.
 
 You now have a scan decision connected to both an image digest and retained evidence. Admission still needs its own check because callers can bypass a pipeline. A trusted image signature gives the admission controller a separate fact to verify.
@@ -190,3 +207,27 @@ You now have a scan decision connected to both an image digest and retained evid
 > - **Using `|| true` without recording the status.** That can turn scanner errors into passing releases.
 > - **Gating on a report string.** Gate on the result derived from the scanner exit code; keep the report as evidence.
 > - **Keeping evidence only in the pod.** Mount retained storage and copy it outside the cluster before cleanup.
+
+## Your mission: Gate A Tekton Release With A Vulnerability Scan
+
+You can now write an inventory to retained storage and let a Task result decide whether a deploy runs. The mission asks you to add that gate to an ungated release Pipeline, keep the SBOM across runs, and allow deployment only for `pass`.
+
+Pause the playground, then start the lab:
+
+```sh
+astrona stop ats-021-playground-050-03
+astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-03/labs/lab-02
+```
+
+When your Pipeline is ready, grade it once:
+
+```sh
+astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-03/labs/lab-02
+```
+
+Then remove the lab and resume the playground:
+
+```sh
+astrona destroy ats-021-lab-050-03-02
+astrona start ats-021-playground-050-03
+```

@@ -105,6 +105,8 @@ Kyverno and Gatekeeper read the objects that are stored in the cluster, and the 
 | Who tried to read the Secret and was refused? | Audit log | It records the `403` and the decision |
 | Was the problem there before the policy existed? | Policy report or Constraint `status` | Both scan stored objects, not only new requests |
 
+A **software bill of materials (SBOM)** is a fourth kind of evidence: it lists the software components detected inside an image. It answers which packages and versions shipped, which the three cluster evidence sources cannot show. Section 050, module 03, SBOMs And Vulnerability Scanning In The Pipeline, teaches how to generate an inventory with Trivy, retain it by image digest and use it in a deployment scan.
+
 Two limits apply to every row. Policy reports and Constraint status describe the present, so an object that was deleted leaves no violation behind. The audit log describes the past only from the time logging was turned on, and it says nothing about whether an object follows a rule. A complete answer to "this Deployment broke the rule, and this user created it" joins two sources: the report names the object, and the log names the caller.
 
 You now can pull the audit events for one question, say what each event proves, and pick the source that answers each kind of question. A real audit also needs a retention plan: the reports change when the objects change, the Gatekeeper list is rewritten on every audit run, and the audit log lives on the node. Evidence that matters must be copied out before it changes or the node is replaced.

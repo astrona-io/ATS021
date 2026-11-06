@@ -22,7 +22,8 @@ course:
     governance with Kyverno, Gatekeeper and ValidatingAdmissionPolicy, audit
     trails and compliance evidence (API server audit logs, Kyverno policy
     reports and Gatekeeper audit results), and compliance gates in a Tekton
-    delivery pipeline plus admission-time image policies. Every change is
+    delivery pipeline plus admission-time image policies, SBOM evidence, Trivy
+    scans and cosign signature verification. Every change is
     proved on a live kind cluster by an admission decision or a real request.
   certification:
     name: Certified Cloud Native Platform Engineer
@@ -41,6 +42,9 @@ course:
     cert-manager: "1.21.2"                  # plumbing only, never a lesson subject
     tekton-pipelines: "1.17.0"
     tkn: "0.46.1"
+    trivy: "0.76.2"
+    cosign: "3.1.4"
+    jq: "1.8.2"
     kyverno-cli-image: "ghcr.io/kyverno/kyverno-cli:v1.19.1"   # step image in the Tekton check Task (plumbing)
     podinfo: "6.15.0"
     go-httpbin: "2.25.0"
@@ -401,8 +405,9 @@ sections:
           bootstrap with a short Metadata-level policy, so audit events exist to
           read. No SBOM or vulnerability scanner.
         notes: >
-          Official-tool rule (user, 2026-10-10): only CNPE-listed tools are
-          taught. Trivy, Syft and cosign are not on the list and do not appear.
+          Trivy and cosign are taught under the course-owner exception approved
+          2026-11-06. SBOM generation and scanning are in section-050/module-03;
+          this module retains its cluster-report environment. Syft is excluded.
 
     capstone:
       title: Audit Trails And Compliance Evidence Capstone
@@ -485,9 +490,35 @@ sections:
           preloading a latest tag). No registry of its own and no signing
           tools.
         notes: >
-          Official-tool rule: image signing with cosign is not on the CNPE
-          list and is dropped; the module teaches admission-time image policy
-          with the listed engines.
+          This module teaches image reference policies. Signature verification
+          with cosign is taught in module-03 under the 2026-11-06 approval.
+
+      - id: module-03
+        title: SBOMs And Vulnerability Scanning In The Pipeline
+        objectives:
+          - Generate CycloneDX and SPDX JSON inventories and query component names and versions
+          - Scan images and saved SBOMs with Trivy and gate on the exit code
+          - Retain SBOM evidence in a Tekton workspace and gate deployment with a Task result
+          - Verify images with cosign public keys and enforce signatures with an ImageValidatingPolicy
+        outline:
+          - Generate an SBOM as audit evidence, followed by lab-01
+          - Severity, exit codes, unfixed vulnerabilities, ignores and database changes
+          - Tekton inventory and scan steps, result gating and retained evidence
+          - cosign verify with a public key and Kyverno signature admission
+        diagrams:
+          - type: flowchart
+            shows: Image inventory to evidence workspace, scan verdict to deploy, skip or Task failure
+        playground: true
+        playground_env: >
+          Trivy 0.76.2, cosign 3.1.4 and jq 1.8.2 on the terminal.
+          Tekton 1.17.0 and Kyverno 1.19.1, no pipeline or signature policy yet.
+          Digest-pinned Alpine 3.22.2 scout and Debian 13.1-slim probe in starfleet.
+          pipelines has deploy-inventory, restricted pipeline-runner, an evidence
+          PVC and a reader pod. Registry and database downloads need internet.
+        notes: >
+          Course-owner approval 2026-11-06 teaches Trivy and cosign; Syft stays
+          excluded. Lab-01 is inventory only, with live-derived package grading
+          and no vulnerability database. Later work adds lab-02 and lab-03.
 
     capstone:
       title: Security Checks In The Delivery Pipeline Capstone

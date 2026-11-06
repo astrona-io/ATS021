@@ -259,8 +259,10 @@ section is only true for this one.
   for a mesh, a checker inside a Tekton step), it is hidden plumbing: it is
   installed by the bootstrap or runs as one step image, and the page never
   teaches its commands or flags. The `kyverno` command-line tool is part of
-  Kyverno and is taught (user decision, 2026-11-04). Trivy, Syft and cosign are therefore not
-  part of this course.
+  Kyverno and is taught (user decision, 2026-11-04). The course owner also
+  approved Trivy and cosign as taught tools on 2026-11-06: teach Trivy for
+  SBOM generation and vulnerability scanning, and cosign for image signature
+  verification. Syft is not part of this course.
   Where the exam lets the candidate pick between two tools, both are taught:
   **Istio is the primary service mesh** with full depth, and **Linkerd gets
   one compact module**. Kyverno and Gatekeeper each get a full module because
@@ -282,6 +284,12 @@ section is only true for this one.
   | Tekton Pipelines | 1.17.0 |
   | Tekton CLI (`tkn`) | 0.46.1 |
   | Kyverno CLI step image (plumbing) | `ghcr.io/kyverno/kyverno-cli:v1.19.1` |
+  | Trivy (CLI and `aquasec/trivy` step image) | 0.76.2 |
+  | cosign | 3.1.4 |
+  | jq (SBOM terminal tooling) | 1.8.2 |
+  | Alpine (SBOM inventory workload) | 3.22.2; index `sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c69fc0d80990c2ad8dd412` |
+  | Debian (SBOM inventory workload) | 13.1-slim; index `sha256:a347fd7510ee31a84387619a492ad6c8eb0af2f2682b916ff3e643eb076f925a` |
+  | Kyverno signature fixtures (dry runs only) | signed `sha256:b31bfb4d0213f254d361e0079deaaebefa4f82ba7aa76ef82e90b4935ad5b105`; unsigned `sha256:74a98f0e4d750c9052f092a7f7a72de7b20f94f176a490088f7a744c76c53ea5` |
   | podinfo | 6.15.0 |
   | go-httpbin | 2.25.0 |
 
@@ -381,9 +389,12 @@ authorization policies all match on the service account. Never use the
 - **Never run Istio and Linkerd in the same playground.** The maintainer's
   Podman machine has 10 GiB and also runs the platform stack. Each
   playground installs only what its module needs.
-- **No image registry of its own.** The image policy module checks image
-  references (registry, tag, digest) at admission, so it needs no registry
-  and no signing. Images are preloaded with `runtime.kind.preloadImages`.
+- **No image registry of its own.** Image reference rules need no registry
+  server in the playground. Signature verification uses published remote
+  test signatures and a public test key; it needs registry access, not a
+  private signing key. Images that run are preloaded with
+  `runtime.kind.preloadImages`. Trivy's remote analysis fetches images
+  independently of Kubernetes preloading.
 - **Many environments start broken on purpose.** A playground or lab often
   starts with an over-broad `ClusterRoleBinding`, a namespace in `PERMISSIVE`
   mTLS, a privileged pod, or an image with known CVEs. The fault is the
@@ -548,7 +559,8 @@ this order:
 - Audit: `audit-policy`, `audit-log`, `kube-apiserver`, `static-pod`
 - Image policy: `image-policy`, `allowed-registries`, `disallow-latest`,
   `image-digest`
-- Compliance: `compliance-report`, `policy-audit`
+- Compliance: `compliance-report`, `policy-audit`, `sbom`, `trivy`,
+  `cyclonedx`, `spdx`, `vulnerability-scan`, `cosign`, `image-signature`
 - Pipelines: `tekton`, `tekton-task`, `tekton-pipeline`, `pipelinerun`,
   `task-result`, `when-expression`, `finally-task`, `compliance-gate`
 

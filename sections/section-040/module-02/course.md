@@ -4,7 +4,7 @@ An auditor asks which workloads in `starfleet` break the platform's policies tod
 
 Keep one sentence in mind for this module: **a policy report says what breaks a rule now, and an audit event says who changed it and when.** You will read both kinds of evidence from a cluster that has already produced them, and you will see why they contain objects that admission never checked.
 
-The module has three parts. **Read Kyverno Policy Reports** lists failing workloads per rule with `kubectl`, custom columns and `jq`. **Read Gatekeeper Audit Results** reads the violations in a Constraint status and explains the audit interval and its limit. **Answer An Auditor With The Right Evidence** pulls audit events for one question and matches each kind of question to its source.
+The module has three parts. **Read Kyverno Policy Reports** lists failing workloads per rule with `kubectl`, custom columns and `jq`. **Read Gatekeeper Audit Results** reads the violations in a Constraint status and explains the audit interval and its limit. **Answer An Auditor With The Right Evidence** pulls audit events for one question and matches each kind of question to its source, including a software bill of materials (SBOM) for image package contents.
 
 ## Learning objectives
 
@@ -24,7 +24,7 @@ Your playground is a single-node kind cluster running Kubernetes 1.35.8 with Kyv
 
 On purpose, `probe` has no resource limits and no `owner` label. `legacy-beacon` uses an image with the `latest` tag and has no `owner` label. These are the violations you will find. API server audit logging is on, with a short policy that records every request at the `Metadata` level. You read the log through the control plane node container, `astro-ats-021-playground-040-02-control-plane`, with Podman; Docker users can replace `podman` with `docker`. You also need `jq`, a command that selects fields from JavaScript Object Notation (JSON) documents, on your machine.
 
-The module teaches no scanner for images or software bills of materials. The platform keeps its own evidence in policy reports, Constraint status and audit events, and that is what you read here.
+The hands-on work reads policy reports, Constraint status and audit events. A software bill of materials records image package contents, a fourth evidence source to choose when the auditor asks what software shipped.
 
 Launch your playground now, and keep it running next to you while you read the parts:
 

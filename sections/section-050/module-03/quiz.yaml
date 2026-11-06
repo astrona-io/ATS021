@@ -1,0 +1,306 @@
+schema_version: 1
+kind: question_bank
+id: ats021-050-03
+course_id: ATS021
+exam_code: CNPE
+status: alpha
+provenance: Original practice material written for this course; not official exam questions.
+scope:
+  type: module
+  id: section-050/module-03
+  title: SBOMs And Vulnerability Scanning In The Pipeline
+questions:
+- id: ats021-050-03-q01
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Generate an SBOM tied to the deployed artifact
+  source_readings:
+  - sections/section-050/module-03/course-01-generate-an-sbom-as-audit-evidence.md
+  prompt: An auditor asks which packages shipped in the image running in scout. Which evidence best answers
+    the question?
+  options:
+  - id: a
+    text: A list of Deployment labels captured after the rollout.
+    explanation: This does not meet the stated requirement. An SBOM records detected components. The digest
+      and platform tie that inventory to the release; the other evidence does not list all detected packages.
+  - id: b
+    text: An SBOM generated for the deployed digest and platform.
+    explanation: An SBOM records detected components. The digest and platform tie that inventory to the
+      release; the other evidence does not list all detected packages.
+  - id: c
+    text: A scan log with only HIGH findings retained.
+    explanation: This does not meet the stated requirement. An SBOM records detected components. The digest
+      and platform tie that inventory to the release; the other evidence does not list all detected packages.
+  - id: d
+    text: A registry allow-list policy with a successful admission event.
+    explanation: This does not meet the stated requirement. An SBOM records detected components. The digest
+      and platform tie that inventory to the release; the other evidence does not list all detected packages.
+  correct_option: b
+  explanation: An SBOM records detected components. The digest and platform tie that inventory to the
+    release; the other evidence does not list all detected packages.
+- id: ats021-050-03-q02
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Read package versions from CycloneDX JSON
+  source_readings:
+  - sections/section-050/module-03/course-01-generate-an-sbom-as-audit-evidence.md
+  prompt: A Trivy CycloneDX JSON file is saved as scout.cdx.json. Which jq filter selects the installed
+    busybox version?
+  options:
+  - id: a
+    text: .packages[] | select(.name == "busybox") | .versionInfo
+    explanation: This does not meet the stated requirement. CycloneDX stores detected package components
+      under components, with version on each component. The root image version and total count do not
+      answer this package question.
+  - id: b
+    text: .components | length
+    explanation: This does not meet the stated requirement. CycloneDX stores detected package components
+      under components, with version on each component. The root image version and total count do not
+      answer this package question.
+  - id: c
+    text: .metadata.component | .version
+    explanation: This does not meet the stated requirement. CycloneDX stores detected package components
+      under components, with version on each component. The root image version and total count do not
+      answer this package question.
+  - id: d
+    text: .components[] | select(.name == "busybox") | .version
+    explanation: CycloneDX stores detected package components under components, with version on each component.
+      The root image version and total count do not answer this package question.
+  correct_option: d
+  explanation: CycloneDX stores detected package components under components, with version on each component.
+    The root image version and total count do not answer this package question.
+- id: ats021-050-03-q03
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Distinguish SPDX JSON from CycloneDX JSON
+  source_readings:
+  - sections/section-050/module-03/course-01-generate-an-sbom-as-audit-evidence.md
+  prompt: A script returns no package list after its input changes from CycloneDX to SPDX JSON. Which
+    change matches the new format?
+  options:
+  - id: a
+    text: Read packages and versionInfo instead of components and version.
+    explanation: SPDX JSON uses packages and versionInfo. Results and Vulnerabilities belong to Trivy
+      scan reports, and scan filtering cannot change an SBOM schema.
+  - id: b
+    text: Read Results and Vulnerabilities instead of components and version.
+    explanation: This does not meet the stated requirement. SPDX JSON uses packages and versionInfo. Results
+      and Vulnerabilities belong to Trivy scan reports, and scan filtering cannot change an SBOM schema.
+  - id: c
+    text: Keep the filter and enable --ignore-unfixed.
+    explanation: This does not meet the stated requirement. SPDX JSON uses packages and versionInfo. Results
+      and Vulnerabilities belong to Trivy scan reports, and scan filtering cannot change an SBOM schema.
+  - id: d
+    text: Read only metadata.component and count it as one package.
+    explanation: This does not meet the stated requirement. SPDX JSON uses packages and versionInfo. Results
+      and Vulnerabilities belong to Trivy scan reports, and scan filtering cannot change an SBOM schema.
+  correct_option: a
+  explanation: SPDX JSON uses packages and versionInfo. Results and Vulnerabilities belong to Trivy scan
+    reports, and scan filtering cannot change an SBOM schema.
+- id: ats021-050-03-q04
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Gate a pipeline on selected vulnerability findings
+  source_readings:
+  - sections/section-050/module-03/course-02-use-vulnerability-scan-exit-codes.md
+  prompt: Trivy prints HIGH findings, but a pipeline continues because the scan command returns zero.
+    Which change makes those findings affect the process status?
+  options:
+  - id: a
+    text: Pipe the report to jq and count all JSON fields.
+    explanation: This does not meet the stated requirement. The configured exit code makes selected findings
+      fail the gate. The pipeline must also stop on scanner errors. Printing findings alone does not change
+      the default successful status.
+  - id: b
+    text: Switch from a digest reference to a tag.
+    explanation: This does not meet the stated requirement. The configured exit code makes selected findings
+      fail the gate. The pipeline must also stop on scanner errors. Printing findings alone does not change
+      the default successful status.
+  - id: c
+    text: Use --severity HIGH,CRITICAL with --exit-code 1 and stop on nonzero status.
+    explanation: The configured exit code makes selected findings fail the gate. The pipeline must also
+      stop on scanner errors. Printing findings alone does not change the default successful status.
+  - id: d
+    text: Add --ignore-unfixed and leave the exit-code default.
+    explanation: This does not meet the stated requirement. The configured exit code makes selected findings
+      fail the gate. The pipeline must also stop on scanner errors. Printing findings alone does not change
+      the default successful status.
+  correct_option: c
+  explanation: The configured exit code makes selected findings fail the gate. The pipeline must also
+    stop on scanner errors. Printing findings alone does not change the default successful status.
+- id: ats021-050-03-q05
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Explain fixed-version filtering
+  source_readings:
+  - sections/section-050/module-03/course-02-use-vulnerability-scan-exit-codes.md
+  prompt: A scan passes only after --ignore-unfixed is added. What can the platform conclude?
+  options:
+  - id: a
+    text: The scanner upgraded every affected package.
+    explanation: This does not meet the stated requirement. The flag filters vulnerabilities without an
+      available fixed version. It neither changes the image nor removes the underlying risk.
+  - id: b
+    text: The image digest changed to a clean rebuild.
+    explanation: This does not meet the stated requirement. The flag filters vulnerabilities without an
+      available fixed version. It neither changes the image nor removes the underlying risk.
+  - id: c
+    text: Findings without a known fix no longer affect this gate; unresolved vulnerabilities may remain.
+    explanation: The flag filters vulnerabilities without an available fixed version. It neither changes
+      the image nor removes the underlying risk.
+  - id: d
+    text: The database proved that every package is free of vulnerabilities.
+    explanation: This does not meet the stated requirement. The flag filters vulnerabilities without an
+      available fixed version. It neither changes the image nor removes the underlying risk.
+  correct_option: c
+  explanation: The flag filters vulnerabilities without an available fixed version. It neither changes
+    the image nor removes the underlying risk.
+- id: ats021-050-03-q06
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Explain changing scan evidence
+  source_readings:
+  - sections/section-050/module-03/course-02-use-vulnerability-scan-exit-codes.md
+  prompt: A retained SBOM has not changed, but a later scan reports a new vulnerability. What is the best
+    explanation?
+  options:
+  - id: a
+    text: The vulnerability database changed after the original assessment.
+    explanation: The inventory records detected components; the scanner compares them against current
+      advisory data. Keep scan time, database metadata and options with the decision.
+  - id: b
+    text: Tekton changed the packages when it read the file.
+    explanation: This does not meet the stated requirement. The inventory records detected components;
+      the scanner compares them against current advisory data. Keep scan time, database metadata and options
+      with the decision.
+  - id: c
+    text: The image digest always changes when a new advisory appears.
+    explanation: This does not meet the stated requirement. The inventory records detected components;
+      the scanner compares them against current advisory data. Keep scan time, database metadata and options
+      with the decision.
+  - id: d
+    text: The inventory is invalid because a valid SBOM cannot be rescanned.
+    explanation: This does not meet the stated requirement. The inventory records detected components;
+      the scanner compares them against current advisory data. Keep scan time, database metadata and options
+      with the decision.
+  correct_option: a
+  explanation: The inventory records detected components; the scanner compares them against current advisory
+    data. Keep scan time, database metadata and options with the decision.
+- id: ats021-050-03-q07
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Require signed images across a protected namespace
+  source_readings:
+  - sections/section-050/module-03/course-04-verify-signatures-before-admission.md
+  prompt: An ImageValidatingPolicy must reject images without a signature from the approved key throughout
+    starfleet. Which configuration meets that requirement?
+  options:
+  - id: a
+    text: Verify every image with the approved key but use only the Audit validation action.
+    explanation: Audit records violations while still admitting the request.
+  - id: b
+    text: Match only the approved repository and let all other image references fall outside the policy.
+    explanation: Images outside that narrow image match can escape this signature requirement.
+  - id: c
+    text: Require a digest and omit the attestor and signature validation.
+    explanation: A digest identifies content; it does not establish a trusted signer.
+  - id: d
+    text: Select starfleet, match every image, verify signatures with the approved attestor and use Deny.
+    explanation: Correct. Resource scope, image scope, trusted signer and enforcing validation all contribute
+      to the admission decision.
+  correct_option: d
+  explanation: The namespace selector defines resource scope, the all-image match prevents a repository
+    bypass, the attestor defines trust, and Deny enforces the signature validation.
+- id: ats021-050-03-q08
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Publish a Tekton scan verdict
+  source_readings:
+  - sections/section-050/module-03/course-03-keep-sbom-evidence-in-a-tekton-pipeline.md
+  prompt: A scan step detects selected vulnerabilities and writes fail to its verdict result while completing
+    the Task successfully. A deploy Task has when input $(tasks.scan.results.verdict), operator in, values
+    [pass]. What happens?
+  options:
+  - id: a
+    text: Deploy runs because the scan Task completed successfully.
+    explanation: This does not meet the stated requirement. The when expression compares the published
+      result, not only Task success. Operational scan errors should fail the Task as well; a successful
+      Task can deliberately publish a failing verdict.
+  - id: b
+    text: Tekton skips deploy because fail does not match pass.
+    explanation: The when expression compares the published result, not only Task success. Operational
+      scan errors should fail the Task as well; a successful Task can deliberately publish a failing verdict.
+  - id: c
+    text: Tekton treats the word fail as a failed Task automatically.
+    explanation: This does not meet the stated requirement. The when expression compares the published
+      result, not only Task success. Operational scan errors should fail the Task as well; a successful
+      Task can deliberately publish a failing verdict.
+  - id: d
+    text: The workspace contents override the when expression.
+    explanation: This does not meet the stated requirement. The when expression compares the published
+      result, not only Task success. Operational scan errors should fail the Task as well; a successful
+      Task can deliberately publish a failing verdict.
+  correct_option: b
+  explanation: The when expression compares the published result, not only Task success. Operational scan
+    errors should fail the Task as well; a successful Task can deliberately publish a failing verdict.
+- id: ats021-050-03-q09
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Retain evidence beyond a Task pod
+  source_readings:
+  - sections/section-050/module-03/course-03-keep-sbom-evidence-in-a-tekton-pipeline.md
+  prompt: Where should a Task keep a full SBOM so an auditor can retrieve it after the Task pod is removed?
+  options:
+  - id: a
+    text: In a run-specific directory on retained workspace storage, then copied to artifact storage before
+      the cluster is removed.
+    explanation: A retained workspace volume survives a Task pod. Separate directories prevent run collisions.
+      The cluster volume still needs external retention before cluster deletion.
+  - id: b
+    text: Only in a verdict result containing the complete JSON document.
+    explanation: This does not meet the stated requirement. A retained workspace volume survives a Task
+      pod. Separate directories prevent run collisions. The cluster volume still needs external retention
+      before cluster deletion.
+  - id: c
+    text: Only in the scan container root filesystem.
+    explanation: This does not meet the stated requirement. A retained workspace volume survives a Task
+      pod. Separate directories prevent run collisions. The cluster volume still needs external retention
+      before cluster deletion.
+  - id: d
+    text: Only in the image tag written in the Pipeline.
+    explanation: This does not meet the stated requirement. A retained workspace volume survives a Task
+      pod. Separate directories prevent run collisions. The cluster volume still needs external retention
+      before cluster deletion.
+  correct_option: a
+  explanation: A retained workspace volume survives a Task pod. Separate directories prevent run collisions.
+    The cluster volume still needs external retention before cluster deletion.
+- id: ats021-050-03-q10
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Separate signature trust from vulnerability risk
+  source_readings:
+  - sections/section-050/module-03/course-04-verify-signatures-before-admission.md
+  prompt: cosign verify --key succeeds for an image, but its scan gate fails. Which statement is correct?
+  options:
+  - id: a
+    text: Signature verification should erase the scan findings.
+    explanation: This does not meet the stated requirement. Signature verification establishes a trusted
+      signing key and image identity. Vulnerability scanning evaluates package risk. Both can give different,
+      valid answers about the same content.
+  - id: b
+    text: A valid signature proves the image contains no known vulnerabilities.
+    explanation: This does not meet the stated requirement. Signature verification establishes a trusted
+      signing key and image identity. Vulnerability scanning evaluates package risk. Both can give different,
+      valid answers about the same content.
+  - id: c
+    text: The trusted key signed the content, while the scan found a separate reason to block deployment.
+    explanation: Signature verification establishes a trusted signing key and image identity. Vulnerability
+      scanning evaluates package risk. Both can give different, valid answers about the same content.
+  - id: d
+    text: The digest must be mutable because the checks disagree.
+    explanation: This does not meet the stated requirement. Signature verification establishes a trusted
+      signing key and image identity. Vulnerability scanning evaluates package risk. Both can give different,
+      valid answers about the same content.
+  correct_option: c
+  explanation: Signature verification establishes a trusted signing key and image identity. Vulnerability
+    scanning evaluates package risk. Both can give different, valid answers about the same content.

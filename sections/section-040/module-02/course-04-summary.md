@@ -18,4 +18,6 @@ Key facts:
 - Gatekeeper: results are in `status.violations` and `status.totalViolations` of each Constraint.
 - Audit log: one JSON event per line, read with `jq`.
 
+A software bill of materials (SBOM) supplies a fourth kind of evidence: the packages and versions detected in an image. Keep it tied to an image digest and platform. Cluster reports describe policy compliance, audit events describe API activity, and an SBOM describes detected software contents.
+
 <!-- astrona:playground:destroy -->

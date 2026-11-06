@@ -32,11 +32,14 @@ The fourth competency is **generating audit trails and enforcing policy complian
 
 - Turn on API server audit logging with an audit policy, and find who did what in the log.
 - Collect compliance evidence from Kyverno policy reports, Gatekeeper audit results and API server audit events.
+- Generate a software bill of materials (SBOM) to record the packages in an image.
 
 The fifth competency is **integrating security scanning and compliance checks into deployment pipelines**. You will learn to:
 
 - Stop a Tekton pipeline when a compliance check fails, and report the result on every run.
 - Make the cluster accept only trusted images: approved registries, no `latest` tag, and images pinned by digest.
+- Scan images and saved inventories with Trivy, retain the evidence and gate deployment on the scan exit code.
+- Verify image signatures with cosign and enforce trusted signatures with Kyverno.
 
 ## The words this course uses
 

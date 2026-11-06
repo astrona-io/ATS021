@@ -162,7 +162,8 @@ items:
   kind: course
   what: 'chapter for module 2: Produce Compliance Reports From Policy Engines'
   status: done
-  note: Landing + three parts + summary; every displayed output taken from real runs on 2026-11-02; no labs or Your mission sections yet (a later step adds them); no SBOM tool taught
+  note: 'untested: built without booting 2026-11-06; added fourth evidence source paragraph and requested pointer; existing teaching retained'
+
 - key: section-040/module-01/lab
   kind: lab
   what: 'graded lab for module 1: Record API Activity With Audit Logging Lab'
@@ -227,7 +228,7 @@ items:
   kind: quiz
   what: final domain quiz across every section
   status: done
-  note: ''
+  note: 'untested: built without booting 2026-11-06; added two SBOM or scanning questions and updated manifest question_count'
 
 - key: section-030/module-01/labs/lab-02
   kind: lab
@@ -239,3 +240,28 @@ items:
   what: 'Repair Linkerd Authorization And Split Service Traffic Lab'
   status: done
   note: 'untested: built without booting 2026-11-04; two Servers, wrong authentication repair, weighted GAMMA route; live split grader uses 400 requests with 10 percentage point tolerance; CRD and configuration schemas and shell syntax passed; astrona validate blocked by sandbox maintenance lock; live behavior not executed'
+
+- key: section-050/module-03/course
+  kind: course
+  what: SBOMs And Vulnerability Scanning In The Pipeline
+  status: done
+  note: 'untested: built without booting 2026-11-06; landing, four parts and summary; official pinned sources checked;
+    no command output invented'
+- key: section-050/module-03/playground
+  kind: playground
+  what: SBOM scanning and signature playground
+  status: done
+  note: 'untested: built without booting 2026-11-06; Trivy 0.76.2, cosign 3.1.4, jq 1.8.2; Tekton 1.17.0, Kyverno
+    1.19.1; digest-pinned workloads; retained evidence storage'
+- key: section-050/module-03/lab
+  kind: lab
+  what: Generate SBOM Audit Evidence
+  status: done
+  note: 'untested: built without booting 2026-11-06; three live-derived checks; complete inventory and package answers;
+    no vulnerability database; YAML, shell syntax, references and unique names checked; reference solution not executed; astrona validate blocked by sandbox maintenance
+    lock'
+- key: section-050/module-03/quiz
+  kind: quiz
+  what: SBOM and scanning knowledge check
+  status: done
+  note: 'untested: built without booting 2026-11-06; 10 source-linked questions; schema and answer checks offline'

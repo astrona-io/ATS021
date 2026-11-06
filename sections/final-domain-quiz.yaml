@@ -706,3 +706,65 @@ questions:
         explanation: "This is not the best answer. Gatekeeper does not generate rules for Deployments from a Pod rule, as Kyverno does. Today the Deployment is stored, and the ReplicaSet records the rejection of its pod as a `FailedCreate` event. Matching Deployments moves the decision to the request."
     correct_option: b
     explanation: "Gatekeeper does not generate rules for Deployments from a Pod rule, as Kyverno does. Today the Deployment is stored, and the ReplicaSet records the rejection of its pod as a `FailedCreate` event. Matching Deployments moves the decision to the request."
+  - id: ats021-final-q30
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: Choose evidence for an image package audit
+    source_readings:
+    - sections/section-050/module-03/course-01-generate-an-sbom-as-audit-evidence.md
+    prompt: An auditor asks which of two running Deployments ships bash. Which approach answers the question
+      without changing the workloads?
+    options:
+    - id: a
+      text: Read the namespace labels and choose the production namespace.
+      explanation: This does not meet the stated requirement. A package inventory lists detected components
+        even when no vulnerability affects them. Inspect each deployed digest and platform rather than inferring
+        package contents from policy or scan results.
+    - id: b
+      text: Find a successful admission event and assume it lists packages.
+      explanation: This does not meet the stated requirement. A package inventory lists detected components
+        even when no vulnerability affects them. Inspect each deployed digest and platform rather than inferring
+        package contents from policy or scan results.
+    - id: c
+      text: Generate an SBOM for each live image digest and node platform, then select components named
+        bash.
+      explanation: A package inventory lists detected components even when no vulnerability affects them.
+        Inspect each deployed digest and platform rather than inferring package contents from policy or
+        scan results.
+    - id: d
+      text: Run a HIGH-only scan and assume packages absent from the findings are absent from the image.
+      explanation: This does not meet the stated requirement. A package inventory lists detected components
+        even when no vulnerability affects them. Inspect each deployed digest and platform rather than inferring
+        package contents from policy or scan results.
+    correct_option: c
+    explanation: A package inventory lists detected components even when no vulnerability affects them.
+      Inspect each deployed digest and platform rather than inferring package contents from policy or scan
+      results.
+  - id: ats021-final-q31
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: Use a vulnerability scan as a release gate
+    source_readings:
+    - sections/section-050/module-03/course-02-use-vulnerability-scan-exit-codes.md
+    prompt: A release must stop on selected HIGH or CRITICAL findings and on scan errors. Which implementation
+      meets the requirement?
+    options:
+    - id: a
+      text: Run Trivy with --severity HIGH,CRITICAL --exit-code 1 and block deployment for any nonzero status.
+      explanation: Selected findings need an explicit failing exit code. Operational failures also block
+        deployment because there is no usable passing assessment.
+    - id: b
+      text: Use the default exit code and search the report for the word pass.
+      explanation: This does not meet the stated requirement. Selected findings need an explicit failing
+        exit code. Operational failures also block deployment because there is no usable passing assessment.
+    - id: c
+      text: Add --ignore-unfixed and ignore every process status.
+      explanation: This does not meet the stated requirement. Selected findings need an explicit failing
+        exit code. Operational failures also block deployment because there is no usable passing assessment.
+    - id: d
+      text: Treat a database download failure as a passing scan because no findings were returned.
+      explanation: This does not meet the stated requirement. Selected findings need an explicit failing
+        exit code. Operational failures also block deployment because there is no usable passing assessment.
+    correct_option: a
+    explanation: Selected findings need an explicit failing exit code. Operational failures also block deployment
+      because there is no usable passing assessment.

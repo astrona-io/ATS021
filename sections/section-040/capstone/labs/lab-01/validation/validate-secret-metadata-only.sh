@@ -4,7 +4,6 @@ set -uo pipefail
 
 fail=0
 READER="audit-grader-reader-$$"
-START_TIME="$(date -u +%Y-%m-%dT%H:%M:%S)"
 
 cleanup() {
   kubectl -n kube-system delete pod "$READER" --ignore-not-found --wait=false >/dev/null 2>&1
@@ -56,6 +55,15 @@ read_audit_log() {
 
 if ! start_reader; then
   echo "FAIL: the grader could not read the control plane node (is the API server ready?)"
+  exit 1
+fi
+
+# The audit log carries the API server's clock. The grader's machine can be
+# minutes or hours off that clock (a laptop that slept, a virtual machine), so
+# take the start time from the reader pod, which the API server stamped.
+START_TIME="$(kubectl -n kube-system get pod "$READER" -o jsonpath='{.metadata.creationTimestamp}' 2>/dev/null | sed 's/Z$//')"
+if [ -z "$START_TIME" ]; then
+  echo "FAIL: the grader could not read the start time from the API server"
   exit 1
 fi
 

@@ -4,7 +4,6 @@ set -uo pipefail
 
 fail=0
 READER="audit-grader-reader-$$"
-START_TIME="$(date -u +%Y-%m-%dT%H:%M:%S)"
 
 cleanup() {
   kubectl -n kube-system delete pod "$READER" --ignore-not-found --wait=false >/dev/null 2>&1

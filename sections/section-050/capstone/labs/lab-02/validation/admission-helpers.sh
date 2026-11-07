@@ -37,10 +37,10 @@ assert policy.get('status', {}).get('conditionStatus', {}).get('ready') is True,
 PYPOLICY
 }
 check_labels() {
-  kubectl get namespaces starfleet starfleet-canary outpost outpost-unlabelled -o json > "$WORK/namespaces.json"
+  kubectl get namespaces starfleet starfleet-prod starfleet-canary outpost outpost-unlabelled -o json > "$WORK/namespaces.json"
   python3 - "$WORK/namespaces.json" <<'PYLABELS'
 import json, sys
-expected = {'starfleet-prod':'production', 'starfleet-canary':'production', 'outpost':'development', 'outpost-unlabelled':None}
+expected = {'starfleet':'development', 'starfleet-prod':'production', 'starfleet-canary':'production', 'outpost':'development', 'outpost-unlabelled':None}
 for namespace in json.load(open(sys.argv[1]))['items']:
     assert namespace['metadata'].get('labels', {}).get('environment') == expected[namespace['metadata']['name']], 'Restore namespace environment labels'
 PYLABELS

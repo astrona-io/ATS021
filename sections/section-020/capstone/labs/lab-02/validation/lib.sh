@@ -21,10 +21,18 @@ expect_code() {
   done
   fail "$client to $url: expected $expected; got ${actual:-no response}"
 }
+# Names of the live pods that match a label selector. A pod that is shutting
+# down keeps phase Running until it is gone, so skip pods with a deletion
+# timestamp; right after a rollout restart the old pods are still there.
+live_pods() {
+  kubectl -n starfleet get pods -l "$1" --field-selector=status.phase=Running \
+    -o 'jsonpath={range .items[*]}{.metadata.name}{" "}{.metadata.deletionTimestamp}{"\n"}{end}' \
+    | awk 'NF == 1 { print $1 }'
+}
 # Every pod of the Deployment labelled app=<name> must carry the Linkerd proxy.
 require_meshed() {
   local app="$1" pod_names pod containers
-  pod_names="$(kubectl -n starfleet get pods -l "app=$app" --field-selector=status.phase=Running -o 'jsonpath={.items[*].metadata.name}')"
+  pod_names="$(live_pods "app=$app")"
   [ -n "$pod_names" ] || fail "No running pod for app=$app"
   for pod in $pod_names; do
     containers="$(kubectl -n starfleet get pod "$pod" -o 'jsonpath={.spec.containers[*].name} {.spec.initContainers[*].name}')"

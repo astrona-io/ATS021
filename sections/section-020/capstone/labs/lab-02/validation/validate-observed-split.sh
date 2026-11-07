@@ -2,8 +2,8 @@
 source "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 require_meshed shuttle
 # A route object alone is insufficient: classify replies using live pod names.
-backend_v1="$(kubectl -n starfleet get pods -l app=scout,version=v1 --field-selector=status.phase=Running -o 'jsonpath={.items[0].metadata.name}')"
-backend_v2="$(kubectl -n starfleet get pods -l app=scout,version=v2 --field-selector=status.phase=Running -o 'jsonpath={.items[0].metadata.name}')"
+backend_v1="$(live_pods app=scout,version=v1 | head -n 1)"
+backend_v2="$(live_pods app=scout,version=v2 | head -n 1)"
 [ -n "$backend_v1" ] && [ -n "$backend_v2" ] || fail 'Both backend pods must exist'
 expect_code starfleet shuttle http://scout-v1.starfleet/api/info 200
 expect_code starfleet shuttle http://scout-v2.starfleet/api/info 200

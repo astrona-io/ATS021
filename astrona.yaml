@@ -894,5 +894,5 @@ modules:
       - type: quiz
         title: "Final Knowledge Check: Security and Policy Enforcement"
         path: sections/final-domain-quiz.yaml
-        question_count: 31
+        question_count: 30
         pass_score: 70

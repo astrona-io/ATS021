@@ -4,7 +4,7 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 source "$SCRIPT_DIR/admission-helpers.sh"
 cmp "$PUBLIC_KEY" "$LAB_DIR/manifests/audit-signing.pub" || fail 'Restore the supplied public key'
 kubectl -n starfleet get configmap signature-candidates -o json > "$WORK/candidates.json"
-kubectl -n starfleet get configmap signature-audit -o json > "$WORK/audit.json"
+kubectl -n starfleet get configmap signature-audit -o json > "$WORK/audit.json" || fail 'Create ConfigMap starfleet/signature-audit with the signature results'
 python3 - "$WORK/candidates.json" "$WORK/audit.json" "$SIGNED_IMAGE" "$UNSIGNED_IMAGE" <<'PYAUDIT'
 import json, sys
 candidates = json.load(open(sys.argv[1]))['data']

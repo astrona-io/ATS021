@@ -23,6 +23,11 @@ bootstrap:
     source: bootstrap/01-seed-cluster.sh
 testing:
   init:
+    - name: verify-unfinished-state
+      description: Require a ready API and an explicit grader rejection before solving
+      type: file
+      source: testing/verify-start.sh
+      timeout: 10m
   - name: apply-solution
     description: Mesh the namespace, create the Server, repair the authentication and create the route
     type: file

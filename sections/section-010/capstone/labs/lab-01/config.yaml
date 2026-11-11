@@ -30,6 +30,11 @@ bootstrap:
 # Applied only by `astrona test`: the reference solution.
 testing:
   init:
+    - name: verify-unfinished-state
+      description: Require a ready API and an explicit grader rejection before solving
+      type: file
+      source: testing/verify-start.sh
+      timeout: 10m
     - name: apply-solution
       description: Apply the reference solution
       type: file

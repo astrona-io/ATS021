@@ -4,7 +4,9 @@ Kyverno lets you write many platform rules as YAML patterns. Gatekeeper takes a 
 
 Keep one sentence in mind for this module: **a ConstraintTemplate defines a new constraint kind, and each Constraint configures where that rule applies.** You will create a template that requires labels, create a constraint from it, change the constraint between `deny`, `dryrun` and `warn`, and read both audit results and template compile errors.
 
-The module has four parts. **ConstraintTemplates And Rego** creates a new constraint kind and explains the small Rego rule inside it. **Constraints And Enforcement Actions** applies that kind to pods in one namespace and proves the difference between `deny`, `dryrun` and `warn`. **Audit Status And Template Errors** reads the audit results for existing pods and finds the compile error in a broken template. **Constraints And Pods Created By Controllers** shows that a Constraint on Pods also refuses the pods a Deployment creates, and that the refusal appears in the events of the ReplicaSet, not in the output of `kubectl apply`.
+The module has five parts. **ConstraintTemplates And Rego** creates a new constraint kind and explains the small Rego rule inside it. **Constraints And Enforcement Actions** applies that kind to pods in one namespace and proves the difference between `deny`, `dryrun` and `warn`. **Audit Status And Template Errors** reads the audit results for existing pods and finds the compile error in a broken template. **Constraints And Pods Created By Controllers** shows that a Constraint on Pods also refuses the pods a Deployment creates, and that the refusal appears in the events of the ReplicaSet, not in the output of `kubectl apply`.
+
+**Repair The Chart That Generates A Rejected Pod** carries a policy correction into chart files and checks the installed release and its Pods.
 
 ## Learning objectives
 

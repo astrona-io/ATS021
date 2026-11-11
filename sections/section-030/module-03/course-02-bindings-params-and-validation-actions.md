@@ -235,27 +235,3 @@ You can now keep a rule in one policy, feed it a value per namespace through a C
 > - **Expecting `Audit` to print something.** `Audit` only adds an annotation to the audit event; without audit logging nothing is visible.
 > - **Combining `Deny` and `Warn`.** The API server rejects that binding; use `["Deny", "Audit"]` or `["Warn", "Audit"]`.
 > - **Trusting a stale answer after a params change.** Test with a server-side dry run after you edit the ConfigMap. In one test run on Kubernetes 1.35.8 the API server kept the old limit after a ConfigMap edit until the API server restarted; after that restart, every later edit took effect at once.
-
-## Your mission: Write ValidatingAdmissionPolicies With CEL Lab
-
-You can now write a `ValidatingAdmissionPolicy` with a parameter, bind it with `Deny` or `Warn`, and cover `kubectl scale`. The mission starts a cluster with no admission policy, and asks you to limit the replicas of Deployments in production namespaces to the number in a ConfigMap, still allow `scout` to shrink, and only warn in sandbox namespaces.
-
-Pause the playground first, so the lab has the memory it needs:
-
-```sh
-astrona stop ats-021-playground-030-03
-```
-
-Start the lab, then grade it when you are done:
-
-```sh
-astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-03/labs/lab-01
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-03/labs/lab-01
-```
-
-When you are done, remove the lab and start the playground again:
-
-```sh
-astrona destroy ats-021-lab-030-03
-astrona start ats-021-playground-030-03
-```

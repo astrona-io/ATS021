@@ -269,27 +269,3 @@ You can now protect two backend ports, find the authentication reference that bl
 > - **Testing with an unmeshed client.** It follows normal Service selection and never receives the outbound route configuration.
 > - **Confusing pod and Service ports.** The Servers select `http` on port `9898`; route references use Service port `80`.
 > - **Expecting exact percentages in a small sample.** Count many successful requests, allow a tolerance and investigate failed replies separately.
-
-## Your mission: Repair Linkerd Authorization And Split Service Traffic
-
-You can now authorize two backend ports and route requests by weight. The mission starts with no Servers and a wrong authentication reference, then asks you to restore access and split `scout` traffic 80/20.
-
-Pause the playground and start the lab:
-
-```sh
-astrona stop ats-021-playground-020-02
-astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/module-02/labs/lab-02
-```
-
-Grade your work when both versions answer:
-
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/module-02/labs/lab-02
-```
-
-Remove the lab and resume the playground:
-
-```sh
-astrona destroy ats-021-lab-020-02-02
-astrona start ats-021-playground-020-02
-```

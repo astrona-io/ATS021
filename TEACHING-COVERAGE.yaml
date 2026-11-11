@@ -1,0 +1,147 @@
+version: 1
+labs:
+  sections/section-010/module-01/labs/lab-01:
+    preparation:
+    - sections/section-010/module-01/course-01-request-path-and-role-rules.md
+    - sections/section-010/module-01/course-02-bindings-subjects-and-scope.md
+    - sections/section-010/module-01/course-03-proving-and-debugging-access.md
+    - sections/section-010/module-01/course-04-over-broad-grants-and-aggregation.md
+  sections/section-010/module-02/labs/lab-01:
+    preparation:
+    - sections/section-010/module-02/course-01-levels-modes-and-rejections.md
+    - sections/section-010/module-02/course-02-changing-a-namespace-level.md
+    - sections/section-010/module-02/course-03-securitycontext-for-restricted.md
+  sections/section-010/capstone/labs/lab-01:
+    preparation:
+    - sections/section-010/module-01/course-01-request-path-and-role-rules.md
+    - sections/section-010/module-01/course-02-bindings-subjects-and-scope.md
+    - sections/section-010/module-01/course-03-proving-and-debugging-access.md
+    - sections/section-010/module-01/course-04-over-broad-grants-and-aggregation.md
+    - sections/section-010/module-02/course-01-levels-modes-and-rejections.md
+    - sections/section-010/module-02/course-02-changing-a-namespace-level.md
+    - sections/section-010/module-02/course-03-securitycontext-for-restricted.md
+  sections/section-020/module-01/labs/lab-01:
+    preparation:
+    - sections/section-020/module-01/course-01-mesh-identity-and-mtls-modes.md
+    - sections/section-020/module-01/course-02-requiring-strict-mtls.md
+    - sections/section-020/module-01/course-03-authorizing-callers.md
+  sections/section-020/module-02/labs/lab-01:
+    preparation:
+    - sections/section-020/module-02/course-01-automatic-mtls-identity-and-default-policy.md
+    - sections/section-020/module-02/course-02-servers-and-authorization-policies.md
+  sections/section-020/module-02/labs/lab-02:
+    preparation:
+    - sections/section-020/module-02/course-01-automatic-mtls-identity-and-default-policy.md
+    - sections/section-020/module-02/course-02-servers-and-authorization-policies.md
+    - sections/section-020/module-02/course-03-repairing-authorization-and-splitting-traffic.md
+  sections/section-020/capstone/labs/lab-01:
+    preparation:
+    - sections/section-020/module-01/course-01-mesh-identity-and-mtls-modes.md
+    - sections/section-020/module-01/course-02-requiring-strict-mtls.md
+    - sections/section-020/module-01/course-03-authorizing-callers.md
+  sections/section-020/capstone/labs/lab-02:
+    preparation:
+    - sections/section-020/module-02/course-01-automatic-mtls-identity-and-default-policy.md
+    - sections/section-020/module-02/course-02-servers-and-authorization-policies.md
+    - sections/section-020/module-02/course-03-repairing-authorization-and-splitting-traffic.md
+  sections/section-030/module-01/labs/lab-01:
+    preparation:
+    - sections/section-030/module-01/course-01-validate-rules-and-admission.md
+    - sections/section-030/module-01/course-02-enforce-audit-and-policy-reports.md
+    - sections/section-030/module-01/course-03-mutate-and-generate-rules.md
+  sections/section-030/module-01/labs/lab-02:
+    preparation:
+    - sections/section-030/module-01/course-04-namespaced-mutation-and-offline-tests.md
+  sections/section-030/module-02/labs/lab-01:
+    preparation:
+    - sections/section-030/module-02/course-01-constrainttemplates-and-rego.md
+    - sections/section-030/module-02/course-02-constraints-and-enforcement-actions.md
+    - sections/section-030/module-02/course-03-audit-status-and-template-errors.md
+  sections/section-030/module-02/labs/lab-02:
+    preparation:
+    - sections/section-030/module-02/course-01-constrainttemplates-and-rego.md
+    - sections/section-030/module-02/course-02-constraints-and-enforcement-actions.md
+    - sections/section-030/module-02/course-04-constraints-and-controller-created-pods.md
+    - sections/section-030/module-02/course-05-repair-the-chart-that-generates-a-rejected-pod.md
+  sections/section-030/module-03/labs/lab-01:
+    preparation:
+    - sections/section-030/module-03/course-01-policies-and-cel-expressions.md
+    - sections/section-030/module-03/course-02-bindings-params-and-validation-actions.md
+  sections/section-030/capstone/labs/lab-01:
+    preparation:
+    - sections/section-030/module-01/course-01-validate-rules-and-admission.md
+    - sections/section-030/module-01/course-02-enforce-audit-and-policy-reports.md
+    - sections/section-030/module-02/course-01-constrainttemplates-and-rego.md
+    - sections/section-030/module-02/course-02-constraints-and-enforcement-actions.md
+    - sections/section-030/module-02/course-03-audit-status-and-template-errors.md
+    - sections/section-030/module-03/course-01-policies-and-cel-expressions.md
+    - sections/section-030/module-03/course-02-bindings-params-and-validation-actions.md
+  sections/section-040/module-01/labs/lab-01:
+    preparation:
+    - sections/section-040/module-01/course-01-audit-policy-rules-levels-and-stages.md
+    - sections/section-040/module-01/course-02-enable-audit-logging-on-the-api-server.md
+    - sections/section-040/module-01/course-03-find-the-caller-and-the-change.md
+    - sections/section-040/module-01/course-04-recover-a-failed-api-server-restart.md
+  sections/section-040/module-02/labs/lab-01:
+    preparation:
+    - sections/section-040/module-02/course-01-read-kyverno-policy-reports.md
+    - sections/section-040/module-02/course-02-read-gatekeeper-audit-results.md
+    - sections/section-040/module-02/course-03-answer-an-auditor-with-the-right-evidence.md
+  sections/section-040/capstone/labs/lab-01:
+    preparation:
+    - sections/section-040/module-01/course-01-audit-policy-rules-levels-and-stages.md
+    - sections/section-040/module-01/course-02-enable-audit-logging-on-the-api-server.md
+    - sections/section-040/module-01/course-03-find-the-caller-and-the-change.md
+    - sections/section-040/module-01/course-04-recover-a-failed-api-server-restart.md
+    - sections/section-040/module-02/course-01-read-kyverno-policy-reports.md
+    - sections/section-040/module-02/course-02-read-gatekeeper-audit-results.md
+    - sections/section-040/module-02/course-03-answer-an-auditor-with-the-right-evidence.md
+  sections/section-050/module-01/labs/lab-01:
+    preparation:
+    - sections/section-050/module-01/course-01-run-a-compliance-check-as-a-tekton-task.md
+    - sections/section-050/module-01/course-02-gate-the-deploy-with-a-when-expression.md
+    - sections/section-050/module-01/course-03-run-finally-on-every-path.md
+    - sections/section-050/module-01/course-04-read-a-failed-task-and-limit-the-service-account.md
+  sections/section-050/module-02/labs/lab-01:
+    preparation:
+    - sections/section-050/module-02/course-01-read-an-image-reference.md
+    - sections/section-050/module-02/course-02-allow-only-one-registry-with-kyverno.md
+    - sections/section-050/module-02/course-03-reject-latest-untagged-and-unpinned-images.md
+  sections/section-050/module-03/labs/lab-01:
+    preparation:
+    - sections/section-050/module-03/course-01-generate-an-sbom-as-audit-evidence.md
+  sections/section-050/module-03/labs/lab-02:
+    preparation:
+    - sections/section-050/module-03/course-01-generate-an-sbom-as-audit-evidence.md
+    - sections/section-050/module-03/course-02-use-vulnerability-scan-exit-codes.md
+    - sections/section-050/module-03/course-03-keep-sbom-evidence-in-a-tekton-pipeline.md
+  sections/section-050/module-03/labs/lab-03:
+    preparation:
+    - sections/section-050/module-03/course-04-verify-signatures-before-admission.md
+  sections/section-050/capstone/labs/lab-01:
+    preparation:
+    - sections/section-050/module-01/course-01-run-a-compliance-check-as-a-tekton-task.md
+    - sections/section-050/module-01/course-02-gate-the-deploy-with-a-when-expression.md
+    - sections/section-050/module-01/course-03-run-finally-on-every-path.md
+    - sections/section-050/module-01/course-04-read-a-failed-task-and-limit-the-service-account.md
+    - sections/section-050/module-02/course-01-read-an-image-reference.md
+    - sections/section-050/module-02/course-02-allow-only-one-registry-with-kyverno.md
+    - sections/section-050/module-02/course-03-reject-latest-untagged-and-unpinned-images.md
+  sections/section-050/capstone/labs/lab-02:
+    preparation:
+    - sections/section-050/module-01/course-01-run-a-compliance-check-as-a-tekton-task.md
+    - sections/section-050/module-01/course-02-gate-the-deploy-with-a-when-expression.md
+    - sections/section-050/module-01/course-03-run-finally-on-every-path.md
+    - sections/section-050/module-01/course-04-read-a-failed-task-and-limit-the-service-account.md
+    - sections/section-050/module-03/course-01-generate-an-sbom-as-audit-evidence.md
+    - sections/section-050/module-03/course-02-use-vulnerability-scan-exit-codes.md
+    - sections/section-050/module-03/course-03-keep-sbom-evidence-in-a-tekton-pipeline.md
+    - sections/section-050/module-03/course-04-verify-signatures-before-admission.md
+  sections/section-030/module-02/labs/lab-03:
+    preparation:
+    - sections/section-030/module-02/course-03-audit-status-and-template-errors.md
+  sections/section-050/module-02/labs/lab-02:
+    preparation:
+    - sections/section-050/module-02/course-04-allow-only-one-registry-with-gatekeeper.md
+additional_readings:
+- sections/section-030/module-03/course-03-choosing-the-right-tool.md

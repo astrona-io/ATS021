@@ -66,27 +66,3 @@ You now know the full Gatekeeper loop: a template defines the kind and Rego code
 > - **Forgetting that audit reports live objects.** If you delete a violating pod, the next audit run removes it from the status.
 > - **Stopping at `kubectl apply` for a template.** A broken template can be stored but still have `status.created: false`.
 > - **Reading only the first line of a Rego error.** The pointer line often shows the exact missing brace, unsafe variable or parse location.
-
-## Your mission: Enforce Constraints With Gatekeeper And Rego Lab
-
-You can now read the status of a `ConstraintTemplate`, fix a Rego error, and use a Constraint with `deny` and `dryrun` enforcement actions. The mission starts a cluster with Gatekeeper and a broken template, and asks you to fix the template, refuse the `latest` tag in `starfleet` and list the `drifter` pod in the audit results of a second constraint for `outpost`.
-
-Pause the playground first, so the lab has the memory it needs:
-
-```sh
-astrona stop ats-021-playground-030-02
-```
-
-Start the lab, then grade it when you are done:
-
-```sh
-astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-02/labs/lab-01
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-02/labs/lab-01
-```
-
-When you are done, remove the lab and start the playground again:
-
-```sh
-astrona destroy ats-021-lab-030-02
-astrona start ats-021-playground-030-02
-```

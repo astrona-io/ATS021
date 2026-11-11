@@ -168,27 +168,3 @@ The `podinfo` digest was copied from the registry. The platform team gets the di
 > - `!*:latest` does not catch an image with no tag, which the runtime reads as `latest`. That is why the policy has the separate `require-tag` rule.
 > - A digest proves that the content does not change. It does not prove that the content is safe. Admission cannot see inside the image.
 > - A policy applies to a namespace through its label. If someone removes the label `environment: production` from the namespace, the digest rule stops applying. Limit who may edit namespace labels with RBAC.
-
-## Your mission: Admit Only Trusted Images Lab
-
-You can now write Kyverno policies that allow one registry, refuse `latest` and untagged images, and require a digest in namespaces labelled `environment: production`. The mission starts a cluster with Kyverno and a registry policy in `Audit` mode. It asks you to enforce the registry rule, refuse mutable tags and require digests in `starfleet-prod` only.
-
-Pause the playground first, so the lab has the memory it needs:
-
-```sh
-astrona stop ats-021-playground-050-02
-```
-
-Start the lab, then grade it when you are done:
-
-```sh
-astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-02/labs/lab-01
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-02/labs/lab-01
-```
-
-When you are done, remove the lab and start the playground again:
-
-```sh
-astrona destroy ats-021-lab-050-02
-astrona start ats-021-playground-050-02
-```

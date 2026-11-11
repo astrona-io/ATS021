@@ -66,7 +66,9 @@ for i in $(seq 1 30); do
 done
 
 echo "[lab] Turning on API server audit logging on the control plane node..."
-if command -v podman >/dev/null 2>&1 && podman ps >/dev/null 2>&1; then
+if [ -n "${ASTRONA_CONTAINER_ENGINE:-}" ]; then
+  RUNTIME="$ASTRONA_CONTAINER_ENGINE"
+elif command -v podman >/dev/null 2>&1 && podman ps >/dev/null 2>&1; then
   RUNTIME=podman
 else
   RUNTIME=docker

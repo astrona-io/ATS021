@@ -4,7 +4,9 @@
 # for the deck-cleaner CronJob to delete `probe` and records the evidence.
 set -euo pipefail
 
-if command -v podman >/dev/null 2>&1 && podman ps >/dev/null 2>&1; then
+if [ -n "${ASTRONA_CONTAINER_ENGINE:-}" ]; then
+  RUNTIME="$ASTRONA_CONTAINER_ENGINE"
+elif command -v podman >/dev/null 2>&1 && podman ps >/dev/null 2>&1; then
   RUNTIME=podman
 else
   RUNTIME=docker

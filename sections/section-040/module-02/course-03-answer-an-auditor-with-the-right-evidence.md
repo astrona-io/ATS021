@@ -119,27 +119,3 @@ You now can pull the audit events for one question, say what each event proves, 
 > - **Reading the user and missing the impersonation.** With `--as`, the `user` is the caller and `impersonatedUser` is the identity it acted as. Read both.
 > - **Expecting request bodies at `Metadata` level.** The `requestObject` and `responseObject` fields are empty at this level. A different audit level records them, and Secrets must stay at `Metadata`.
 > - **Treating a missing event as proof of no action.** The log only holds events from after audit logging started, and a rotated file may hold older ones.
-
-## Your mission: Produce Compliance Reports From Policy Engines Lab
-
-You can now pick the right evidence source for each audit question: policy reports for Kyverno results, the Constraint status for Gatekeeper results and the audit log for the caller of a change. The mission starts a cluster with both policy engines in audit mode and asks you to answer an auditor in a ConfigMap, without repairing any workload.
-
-Pause the playground first, so the lab has the memory it needs:
-
-```sh
-astrona stop ats-021-playground-040-02
-```
-
-Start the lab, then grade it when you are done:
-
-```sh
-astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-040/module-02/labs/lab-01
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-040/module-02/labs/lab-01
-```
-
-When you are done, remove the lab and start the playground again:
-
-```sh
-astrona destroy ats-021-lab-040-02
-astrona start ats-021-playground-040-02
-```

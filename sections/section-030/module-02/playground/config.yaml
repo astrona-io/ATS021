@@ -25,6 +25,10 @@ runtime:
 # ConstraintTemplate and no Constraint.
 bootstrap:
   init:
+    - name: install-helm
+      description: Install Helm 4.3.0 for the chart repair exercise
+      type: file
+      source: bootstrap/install-helm.sh
     - name: prepare
       description: "Install Gatekeeper 3.23.1 from its release manifest, then apply the Starfleet workloads and the broken ConstraintTemplate"
       type: file

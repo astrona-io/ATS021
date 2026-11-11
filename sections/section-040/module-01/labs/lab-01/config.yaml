@@ -32,6 +32,11 @@ bootstrap:
 # logging on the control plane node and records the deletion.
 testing:
   init:
+    - name: verify-unfinished-state
+      description: Require a ready API and an explicit grader rejection before solving
+      type: file
+      source: testing/verify-start.sh
+      timeout: 10m
     - name: apply-solution
       description: Turn on audit logging on the node and record who deleted probe
       type: file

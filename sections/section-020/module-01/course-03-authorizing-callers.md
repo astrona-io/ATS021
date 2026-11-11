@@ -209,27 +209,3 @@ You can now allow one identity and one method on one workload, read an Envoy `40
 > - **Writing `spiffe://` in `principals`.** The field takes `cluster.local/ns/<namespace>/sa/<name>`, without the prefix.
 > - **Expecting an ALLOW policy to beat a DENY policy.** DENY is checked first and always wins.
 > - **Adding the first ALLOW policy to a busy workload.** From that moment, every request it does not match is denied.
-
-## Your mission: Require Mutual TLS And Authorize Callers With Istio Lab
-
-You can now require STRICT mTLS with a `PeerAuthentication`, allow one identity and one method with an `AuthorizationPolicy`, and close a path with a DENY policy. The mission starts a cluster in `PERMISSIVE` mode with no policy, and asks you to refuse plain text in `starfleet`, let only `shuttle` send `GET` requests to `scout` and deny the `/env` path.
-
-Pause the playground first, so the lab has the memory it needs:
-
-```sh
-astrona stop ats-021-playground-020-01
-```
-
-Start the lab, then grade it when you are done:
-
-```sh
-astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/module-01/labs/lab-01
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-020/module-01/labs/lab-01
-```
-
-When you are done, remove the lab and start the playground again:
-
-```sh
-astrona destroy ats-021-lab-020-01
-astrona start ats-021-playground-020-01
-```

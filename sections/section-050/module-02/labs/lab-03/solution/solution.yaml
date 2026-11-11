@@ -1,0 +1,65 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: image-tags
+spec:
+  background: true
+  rules:
+  - name: require-tag
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+          namespaceSelector:
+            matchExpressions:
+            - key: environment
+              operator: Exists
+    validate:
+      failureAction: Enforce
+      message: An image tag is required.
+      pattern:
+        spec:
+          containers:
+          - image: '*:*'
+  - name: disallow-latest
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+          namespaceSelector:
+            matchExpressions:
+            - key: environment
+              operator: Exists
+    validate:
+      failureAction: Enforce
+      message: Using a mutable image tag such as 'latest' is not allowed.
+      pattern:
+        spec:
+          containers:
+          - image: '!*:latest'
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-digest
+spec:
+  background: true
+  rules:
+  - name: pin-by-digest
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+          namespaceSelector:
+            matchLabels:
+              environment: production
+    validate:
+      failureAction: Enforce
+      message: Images in production must be pinned by digest (image@sha256:...).
+      pattern:
+        spec:
+          containers:
+          - image: '*@sha256:*'

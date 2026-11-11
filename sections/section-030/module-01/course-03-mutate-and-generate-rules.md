@@ -89,7 +89,7 @@ spec:
       exclude:
         any:
           - resources:
-              namespaces: ["kube-system", "kube-public", "kube-node-lease", "kyverno", "local-path-storage"]
+              names: ["kube-system", "kube-public", "kube-node-lease", "kyverno", "local-path-storage"]
       generate:
         apiVersion: networking.k8s.io/v1
         kind: NetworkPolicy
@@ -123,7 +123,7 @@ default-deny   <none>         4s
 No resources found in outpost namespace.
 ```
 
-The new namespace `orbit` got its NetworkPolicy within a few seconds. `outpost` existed before the policy, and a generate rule does not touch existing objects unless the rule sets `generateExisting: true`. Now delete the generated NetworkPolicy and look again a few seconds later:
+The exclude rule uses `names` because Namespace is a cluster-scoped object. The new namespace `orbit` got its NetworkPolicy within a few seconds. `outpost` existed before the policy, and a generate rule does not touch existing objects unless the rule sets `generateExisting: true`. Now delete the generated NetworkPolicy and look again a few seconds later:
 
 ```sh
 kubectl -n orbit delete networkpolicy default-deny
@@ -151,6 +151,8 @@ Warning: PolicyException resources would not be processed until it is enabled.
 The object is stored, and it has no effect. To use exceptions, an administrator sets `--enablePolicyException=true` on the Kyverno controllers, usually through the installation's settings, and should also limit the namespaces that may hold exceptions with `--exceptionNamespace`, so not every team can exempt itself. Kyverno 1.19.1 also marks the `kyverno.io/v2` PolicyException as deprecated in favour of the PolicyException in `policies.kyverno.io`. Whatever version you meet, check that exceptions are enabled before you rely on one, and prove an exception the same way as a policy: apply the object it should exempt and read the answer.
 
 You can now fill in defaults with a mutate rule and its add-if-missing anchors, create and keep a default-deny NetworkPolicy in every new namespace with a generate rule, and say why a PolicyException does nothing on a default installation. Together with validate rules and reports, that covers the jobs the exam asks of Kyverno.
+
+The generated object proves that Kyverno provisioned the policy. Traffic isolation also requires a network plugin that enforces NetworkPolicy; this kind playground does not test that enforcement.
 
 ## Common pitfalls
 

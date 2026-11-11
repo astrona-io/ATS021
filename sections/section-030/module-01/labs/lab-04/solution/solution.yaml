@@ -1,0 +1,33 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: default-deny-networkpolicy
+spec:
+  rules:
+  - name: generate-default-deny
+    match:
+      any:
+      - resources:
+          kinds:
+          - Namespace
+    exclude:
+      any:
+      - resources:
+          names:
+          - kube-system
+          - kube-public
+          - kube-node-lease
+          - kyverno
+          - local-path-storage
+    generate:
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      name: default-deny
+      namespace: '{{request.object.metadata.name}}'
+      synchronize: true
+      data:
+        spec:
+          podSelector: {}
+          policyTypes:
+          - Ingress
+          - Egress

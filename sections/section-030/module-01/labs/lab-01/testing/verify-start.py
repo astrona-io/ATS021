@@ -44,7 +44,7 @@ def verify(lab, graders):
     raise RuntimeError('all graders passed before the reference solution')
 
 
-GRADERS = ['validation/validate-limits-rule-rejects-pods.sh', 'validation/validate-limits-rule-allows-good-pods.sh', 'validation/validate-team-label-default.sh', 'validation/validate-default-deny-generated.sh']
+GRADERS = ['validation/validate-limits-rule-rejects-pods.sh', 'validation/validate-limits-rule-allows-good-pods.sh']
 
 if __name__ == '__main__':
     try:

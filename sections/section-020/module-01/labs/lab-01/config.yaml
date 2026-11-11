@@ -1,6 +1,4 @@
 # yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
-#
-# Require Mutual TLS And Authorize Callers With Istio (LAB). Graded against the live cluster.
 apiVersion: astrona.io/v1
 metadata:
   name: ats-021-lab-020-01
@@ -8,68 +6,40 @@ metadata:
     prerequisites: prerequisites.md
     question: question.md
     solution: solution.md
-
 runtime:
   type: kind
   kind:
     image: kindest/node:v1.35.8
     preloadImages:
-      - ghcr.io/stefanprodan/podinfo:6.15.0
-      - mccutchen/go-httpbin:2.25.0
-      - curlimages/curl:8.22.0
-      - docker.io/istio/pilot:1.31.1
-      - docker.io/istio/proxyv2:1.31.1
-
-# Starting state: Istio 1.31.1 (minimal profile), the Starfleet workloads in
-# starfleet (sidecar injection on) and drifter in outpost (no sidecar). There
-# is no PeerAuthentication and no AuthorizationPolicy: the mesh is PERMISSIVE
-# and every caller may reach scout. This is the fault the learner fixes.
+    - ghcr.io/stefanprodan/podinfo:6.15.0
+    - mccutchen/go-httpbin:2.25.0
+    - curlimages/curl:8.22.0
+    - docker.io/istio/pilot:1.31.1
+    - docker.io/istio/proxyv2:1.31.1
 bootstrap:
   init:
-    - name: seed-cluster
-      description: Install Istio and create the Starfleet workloads
-      type: file
-      source: bootstrap/01-seed-cluster.sh
-
-# Applied only by `astrona test`: the reference solution.
+  - name: seed-cluster
+    description: Install Istio and create the Starfleet workloads
+    type: file
+    source: bootstrap/01-seed-cluster.sh
 testing:
   init:
-    - name: verify-unfinished-state
-      description: Require a ready API and an explicit grader rejection before solving
-      type: file
-      source: testing/verify-start.sh
-      timeout: 10m
-    - name: apply-solution
-      description: Apply the reference solution
-      type: file
-      source: solution/apply.sh
-    - name: wait-for-policies
-      description: Wait until the sidecar of scout enforces the policies
-      type: file
-      source: testing/wait-for-policies.sh
-
+  - name: verify-unfinished-state
+    description: Require a ready API and an explicit grader rejection before solving
+    type: file
+    source: testing/verify-start.sh
+    timeout: 10m
+  - name: apply-solution
+    description: Apply the reference solution for this task
+    type: file
+    source: solution/apply.sh
 validation:
   scripts:
-    - name: strict-mtls-required
-      description: starfleet refuses plain-text requests and still serves mesh clients
-      type: file
-      source: validation/validate-strict-mtls-required.sh
-      hint: Create a PeerAuthentication named default in starfleet, without a selector, with mtls mode STRICT. Do not use PERMISSIVE.
-    - name: scout-allows-shuttle-get
-      description: shuttle can send GET requests to scout
-      type: file
-      source: validation/validate-scout-allows-shuttle-get.sh
-      hint: The ALLOW policy must name the principal cluster.local/ns/starfleet/sa/shuttle and the method GET.
-    - name: scout-refuses-other-callers
-      description: scout refuses other identities and other methods with 403
-      type: file
-      source: validation/validate-scout-refuses-other-callers.sh
-      hint: Write an AuthorizationPolicy with action ALLOW and selector app scout. After the first ALLOW policy exists, everything it does not match is denied.
-    - name: env-path-denied
-      description: The /env path of scout is denied for every caller
-      type: file
-      source: validation/validate-env-path-denied.sh
-      hint: Add a second AuthorizationPolicy with action DENY and the path /env. DENY is checked before ALLOW.
-
+  - name: strict-mtls-required
+    description: starfleet refuses plain-text requests and still serves mesh clients
+    type: file
+    source: validation/validate-strict-mtls-required.sh
+    hint: Create a PeerAuthentication named default in starfleet, without a selector, with mtls mode STRICT.
+      Do not use PERMISSIVE.
 teardown:
   keepCluster: false

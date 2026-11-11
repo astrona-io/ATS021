@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-lab-010-01-03
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+    - ghcr.io/stefanprodan/podinfo:6.15.0
+    - mccutchen/go-httpbin:2.25.0
+    - curlimages/curl:8.22.0
+bootstrap:
+  init:
+  - name: seed-cluster
+    description: Create the workloads and the faulty access setup
+    type: file
+    source: bootstrap/01-seed-cluster.sh
+testing:
+  init:
+  - name: verify-unfinished-state
+    description: Require a ready API and an explicit grader rejection before solving
+    type: file
+    source: testing/verify-start.sh
+    timeout: 10m
+  - name: apply-solution
+    description: Apply the reference solution for this task
+    type: file
+    source: solution/apply.sh
+  - name: wait-for-solution
+    type: file
+    source: testing/wait-for-solution.sh
+validation:
+  scripts:
+  - name: developers-can-list-leases
+    description: The developers group can list Leases in starfleet
+    type: file
+    source: validation/validate-developers-can-list-leases.sh
+    hint: Leases are in the coordination.k8s.io API group. The group already has the view role in starfleet.
+  - name: view-extended-by-aggregation
+    description: The lease right comes from an aggregated ClusterRole
+    type: file
+    source: validation/validate-view-extended-by-aggregation.sh
+    hint: Create a small ClusterRole with the label rbac.authorization.k8s.io/aggregate-to-view set to
+      true. Do not edit view.
+teardown:
+  keepCluster: false

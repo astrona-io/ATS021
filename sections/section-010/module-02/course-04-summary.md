@@ -17,4 +17,6 @@ A `securityContext` exists at pod level and container level, and the container v
 - A rejected controller pod shows up as `FailedCreate` on the ReplicaSet, not on your command.
 - Fix the pod template, never the namespace level, when a workload is rejected.
 
+A warning label alone does not scan existing Pods. Previewing an enforce level change with a server-side dry run reports existing violations without saving enforcement. Inspect each affected Pod and use a custom namespace label to record the finding; the custom label does not repair or restrict the workload.
+
 <!-- astrona:playground:destroy -->

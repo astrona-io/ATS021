@@ -6,6 +6,8 @@ Keep one sentence in mind for this module: **a Task writes the decision to a res
 
 The module has four parts. **Run A Compliance Check As A Tekton Task** builds the check and its `pass` or `fail` result. **Gate The Deploy With A when Expression** builds the Pipeline and shows a blocked release. **Run finally On Every Path** runs a compliant release and reads what the `finally` Task reports. **Read A Failed Task And Limit The Service Account** tells a failed Task from a skipped one and checks the rights of the pipeline's service account.
 
+The independent labs practise the compliance gate, reporting every pipeline outcome, and limiting the pipeline service account. Each starts with its supporting resources prepared.
+
 ## Learning objectives
 
 After this module you can:

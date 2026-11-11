@@ -8,6 +8,8 @@ The module has four parts. **Validate Rules And Admission** writes the first Clu
 
 **Default Pod Labels With A NamespacedMutatingPolicy** writes a namespaced CEL mutation on CREATE and UPDATE, preserves a person's label change, and tests saved resources with the Kyverno command-line interface (CLI).
 
+Separate labs practise validation, label mutation and resource generation. Another lab uses a namespaced CEL mutation policy and checks CREATE and UPDATE behavior.
+
 ## Learning objectives
 
 After this module you can:

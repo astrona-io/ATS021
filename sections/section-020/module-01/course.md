@@ -6,6 +6,8 @@ Keep one sentence in mind for this module: **PeerAuthentication decides whether 
 
 The module has three parts. **Mesh Identity And mTLS Modes** shows the sidecar, the workload certificate and the SPIFFE identity inside it, and why the mesh accepts plain text at the start. **Requiring STRICT Mutual TLS** turns on STRICT with a PeerAuthentication, proves that plain text is refused, and finds the workload without a sidecar that breaks. **Authorizing Callers** writes AuthorizationPolicies, reads the `RBAC: access denied` answer, and works out which policy wins when several match.
 
+Independent labs separate mutual TLS authentication from caller, method and path authorization.
+
 ## Learning objectives
 
 After this module you can:

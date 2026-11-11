@@ -44,7 +44,7 @@ def verify(lab, graders):
     raise RuntimeError('all graders passed before the reference solution')
 
 
-GRADERS = ['validation/validate-registry-enforced.sh', 'validation/validate-mutable-tags-rejected.sh', 'validation/validate-digest-required-in-production.sh', 'validation/validate-scope-and-labels-unchanged.sh']
+GRADERS = ['validation/validate-registry-enforced.sh', 'validation/validate-scope-and-labels-unchanged.sh']
 
 if __name__ == '__main__':
     try:

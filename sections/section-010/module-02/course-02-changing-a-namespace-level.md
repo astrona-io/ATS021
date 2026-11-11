@@ -4,7 +4,7 @@ Turning on `enforce: restricted` in a busy namespace looks harmless: the running
 
 ## Test the change before you make it
 
-A namespace label change goes through the API server like any other request. With `--dry-run=server`, Pod Security Admission checks every existing pod in the namespace against the new level and prints a warning for each one that would break it. Nothing is changed.
+A namespace label change goes through the API server like any other request. When an enforce level or version changes with `--dry-run=server`, Pod Security Admission checks existing pods in the namespace against the new level and prints a warning for each one that would break it. Nothing is changed.
 
 <!-- astrona:playground:renew -->
 
@@ -37,14 +37,40 @@ namespace/starfleet labeled (server dry run)
 
 Only `privileged-debug` breaks `baseline`. The ordinary workloads pass it unchanged, which is typical. That gives a plan: enforce `baseline` now, and report `restricted` until the workloads are fixed.
 
+## Find existing violations across namespaces
+
+Setting `warn=baseline` reports violations on later admission requests. Adding that warning label alone does not scan Pods that are already running. To review existing workloads, preview an **enforce** label change with `--dry-run=server` in each target namespace. Neither this dry run nor adding a warning label evicts a running Pod.
+
+The playground has two application namespaces. Check each one and print its name before the result:
+
+```sh
+for namespace in starfleet outpost; do
+  echo "Checking $namespace"
+  kubectl label --dry-run=server --overwrite namespace "$namespace" \
+    pod-security.kubernetes.io/enforce=baseline \
+    pod-security.kubernetes.io/enforce-version=v1.35
+done
+```
+
+Inspect the Pod named by a warning with `kubectl get pod -n NAMESPACE POD -o yaml`, replacing the uppercase values. Check the fields named in the warning. Baseline permits some settings that restricted forbids, so a restricted warning does not prove a baseline violation.
+
+A custom namespace label can record a confirmed finding for a later review. In this playground, `starfleet` contains `privileged-debug`, whose privileged container and hostPath volume violate baseline:
+
+```sh
+kubectl label namespace starfleet security-review=required --overwrite
+kubectl get namespace starfleet outpost -L security-review
+```
+
+`security-review` is an inventory label, not a Pod Security setting. It does not block requests or repair the Pod. When reviewing more namespaces, apply the same inspection to each one and label only those with confirmed violations.
+
 ## Report first, then enforce
 
-The `warn` and `audit` modes report without blocking. Each mode can also take a version label. `pod-security.kubernetes.io/warn-version: v1.35` pins the checks to the ones in Kubernetes 1.35, so a cluster upgrade cannot add a new check and start rejecting pods without anyone changing the namespace. Without a version label, the level uses `latest`.
+The `warn` and `audit` modes report without blocking. Each mode can also take a version label. `pod-security.kubernetes.io/warn-version: v1.35` pins warning checks to the rules in Kubernetes 1.35. Pin `enforce-version` separately to keep enforcement on those rules, and pin `audit-version` for audit annotations. Without its own version label, each mode uses `latest`.
 
 Label `starfleet` to warn and audit at `restricted`:
 
 ```sh
-kubectl label --overwrite namespace starfleet pod-security.kubernetes.io/warn=restricted pod-security.kubernetes.io/warn-version=v1.35 pod-security.kubernetes.io/audit=restricted
+kubectl label --overwrite namespace starfleet pod-security.kubernetes.io/warn=restricted pod-security.kubernetes.io/warn-version=v1.35 pod-security.kubernetes.io/audit=restricted pod-security.kubernetes.io/audit-version=v1.35
 ```
 
 `warn` also checks workload objects such as Deployments, not only pods. Restart the `scout` Deployment, which changes its pod template:

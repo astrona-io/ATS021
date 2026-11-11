@@ -1,30 +1,41 @@
 # Coverage review
 
-The review separates template repair from audit investigation and adds a Gatekeeper registry lab. Registry controls cover allowed images, denied images, lookalike hosts, a disallowed second container and an outside namespace. The registry playground runs those controls, and the Helm-policy lesson has a linked question.
+The course has 32 module labs and seven integration capstones. The new focused exercises separate independent jobs that previously shared one lab: granting access, removing excessive access, aggregating roles, authenticating mesh traffic, authorizing requests, validating objects, mutating labels, generating resources, gating a pipeline, reporting its outcome and limiting its identity.
 
-The Gatekeeper chart lab now follows an example that carries a fix into the chart template and values, increments chart version, upgrades the release and checks the resulting Pods. Its playground installs the same Helm version used by the lab. Audit scripts now respect the selected container engine when both Docker and Podman are installed.
+Additional practical gaps now have independent tasks:
 
-Practical limits remain:
+| Outcome | Teaching and graded evidence |
+| --- | --- |
+| Restrict one named scale subresource | RBAC request rules and debugging; a real dry-run scale succeeds for scout while unrelated scaling and template changes fail |
+| Stage stronger Pod Security checks | Namespace modes and versions; baseline enforcement with restricted warnings, a warning-free compliant control and an outside namespace control |
+| Find a baseline violation across three namespaces | Namespace-level inspection; all three warning labels, live dry-run discovery, exactly one finding label, and the original Pods preserved |
+| Repair CEL type and missing-key errors | CEL debugging; valid CREATE and UPDATE requests pass, invalid requests return the intended policy messages, and the outside namespace stays unaffected |
+| Scan saved inventories before building a pipeline | Vulnerability exit codes; reports, statuses and counts match independent scans of the same inventories and database |
+
+The baseline-review lab chooses the affected namespace at startup. Its solution discovers the finding from API warnings. Live failure-case checks reject a wrong namespace, blanket findings, a missing warning label and persisted enforcement. A playground procedure test checks the lesson's warn-label and dry-run inspection commands against its own fixtures.
+
+The generated NetworkPolicy exercise also checks empty allow-rule lists and recreation after deletion. It proves Kyverno resource generation, not packet filtering: the default kind network plugin does not enforce NetworkPolicy.
+
+## Remaining limits
+
+Preparation links do not mean every sentence in a reading is independently assessed. The existing Linkerd authorization lab still combines caller policy with the default inbound policy. The audit-logging lab combines API server configuration with investigation of a deletion, and the compliance-evidence lab compares several sources. These are explicit exercises with related evidence, not a claim that every troubleshooting variation has its own lab.
 
 - Signature exercises verify published fixture images with a teaching public key. They do not operate an organization's signing service or manage private signing keys.
-- SBOM and vulnerability tasks use live tooling and image-specific evidence, but a passing scan is not proof that an image has no vulnerabilities.
+- A completed vulnerability scan reports findings for its image, database and filter settings. It is not proof that the image has no vulnerabilities. The standalone scan fixes the database within a lab run; it does not freeze advisory data across future starts.
 - Audit exercises configure the API server in a kind control-plane container. They test API audit policy and evidence, not host auditd or isolation between tenant kernels.
+- The Pod Security staging lab checks audit labels; it does not claim to inspect stored audit events. Dedicated audit exercises cover that evidence.
 - Policy exceptions remain limited to the working mechanisms described in the course; the previously unsuccessful Kyverno PolicyException configuration is not claimed as validated practice.
 
-## Runtime choice
+## Runtime and verification
 
-All current tasks use kind because their assessed behavior belongs to the Kubernetes API, controllers or cluster workloads. Separate environments keep different service meshes and policy configurations independent. Use QEMU for a future task that needs a separate kernel, VM boot behavior or a host service; none of these changes needs it.
-
-## What verification establishes
+All current tasks use kind because their assessed behavior belongs to the Kubernetes API, controllers or cluster workloads. Separate environments keep service meshes and policy configurations independent. Use QEMU for a task that needs a separate kernel, VM boot behavior or a host service.
 
 The workflow checks registration and preparation order, then runs each selected environment on its own runner. A lab first requires API readiness and an explicit grader FAIL, applies its reference solution, runs all configured graders and tears down. The starting-state check stops at the first intentional rejection; it does not prove that every individual criterion fails initially. Shell errors, missing scripts, timeouts and inconsistent verdicts fail the test.
 
-Playgrounds run bootstrap and readiness checks. A playground with testing/smoke.sh also runs that script. A successful playground start alone does not prove all learner commands. Network downloads, public registries and chart repositories remain external dependencies. Consult the PR's latest workflow for actual runtime results; this review and the generated map are not passing test reports.
+Playgrounds run bootstrap and readiness checks. A playground with testing/smoke.sh also runs that script. A successful playground start alone does not prove all learner commands. Network downloads, public registries and chart repositories remain external dependencies. Actual lifecycle results must be reported with the change; this review and the generated map are not passing test reports.
 
-## Assessment and procedure checks
-
-CI checks quiz registration, answer references, unique question IDs, declared counts and links to earlier readings. Playground procedure tests cover the named examples above; other playgrounds still prove only startup and declared readiness unless they contain their own smoke script. These checks do not establish every command in every lesson.
+CI also checks quiz registration, answer references, unique question IDs, declared counts and links to earlier readings. Grader regression tests in testing/test-*.py run before each lab lifecycle. The standalone scan tests cover omitted findings, changed package versions, incorrect source identities, wrong counts and forged statuses.
 
 ## Readings without a module-lab link
 
-The generated reverse map in [LAB-COVERAGE.md](LAB-COVERAGE.md) lists the current supporting and capstone-only readings. A listed concept is not claimed as independently assessed without a lab link.
+The generated reverse map in [LAB-COVERAGE.md](LAB-COVERAGE.md) lists supporting and capstone-only readings. A listed concept is not claimed as independently assessed without a lab link.

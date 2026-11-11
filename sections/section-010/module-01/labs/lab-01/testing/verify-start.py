@@ -44,7 +44,7 @@ def verify(lab, graders):
     raise RuntimeError('all graders passed before the reference solution')
 
 
-GRADERS = ['validation/validate-ci-deployer-can-manage-deployments.sh', 'validation/validate-ci-deployer-least-privilege.sh', 'validation/validate-legacy-agent-cluster-admin-removed.sh', 'validation/validate-legacy-agent-reads-pods-only.sh', 'validation/validate-developers-can-list-leases.sh', 'validation/validate-view-extended-by-aggregation.sh']
+GRADERS = ['validation/validate-ci-deployer-can-manage-deployments.sh', 'validation/validate-ci-deployer-least-privilege.sh']
 
 if __name__ == '__main__':
     try:

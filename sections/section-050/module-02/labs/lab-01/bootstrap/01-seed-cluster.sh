@@ -14,15 +14,17 @@ for d in kyverno-admission-controller kyverno-background-controller kyverno-repo
 done
 kubectl wait --for=condition=Established crd/clusterpolicies.kyverno.io --timeout=120s
 
-# The admission controller registers its webhook configurations after it starts.
-for name in kyverno-policy-validating-webhook-cfg kyverno-resource-validating-webhook-cfg kyverno-resource-mutating-webhook-cfg; do
-  for i in $(seq 1 60); do
-    if kubectl get validatingwebhookconfiguration,mutatingwebhookconfiguration 2>/dev/null | grep -q "$name"; then
-      break
-    fi
-    sleep 2
-  done
+# Policy admission must be ready before the learner can create a ClusterPolicy.
+# Resource webhooks are registered when matching policies exist.
+ready=0
+for attempt in $(seq 1 60); do
+  if kubectl get validatingwebhookconfiguration kyverno-policy-validating-webhook-cfg >/dev/null 2>&1; then
+    ready=1
+    break
+  fi
+  sleep 2
 done
+[ "$ready" -eq 1 ] || { echo "ERROR: Kyverno policy webhook was not registered" >&2; exit 1; }
 
 kubectl apply -f "$DIR/manifests/lab-start.yaml"
 # The policy webhook may need a moment after it is registered; retry the apply.

@@ -116,7 +116,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Write a generate rule that creates a default-deny NetworkPolicy in every new namespace"
     source_readings:
-      - sections/section-030/module-01/course-03-mutate-and-generate-rules.md
+      - sections/section-030/module-01/course-03-generate-namespace-policy.md
     prompt: |-
       A ClusterPolicy has a generate rule that matches `Namespace` and creates a `default-deny` NetworkPolicy with `synchronize: true`. The existing namespace `outpost` has no NetworkPolicy. A new namespace `orbit` is created, and a team deletes the generated NetworkPolicy in it. What is the result?
     options:
@@ -140,7 +140,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Exempt one workload from a rule with a PolicyException instead of weakening the policy"
     source_readings:
-      - sections/section-030/module-01/course-03-mutate-and-generate-rules.md
+      - sections/section-030/module-01/course-03-generate-namespace-policy.md
     prompt: |-
       A team asks for one workload to be allowed to break the `require-limits` rule. On a default Kyverno 1.19.1 installation, the administrator applies a `PolicyException` for it. The command succeeds with a warning, and the workload is still rejected. What explains this?
     options:
@@ -164,7 +164,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Find the error in a ConstraintTemplate whose Rego does not compile from its status"
     source_readings:
-      - sections/section-030/module-02/course-03-audit-status-and-template-errors.md
+      - sections/section-030/module-02/course-03-diagnose-template-errors.md
     prompt: |-
       A `ConstraintTemplate` is applied without an error, but `kubectl get crd` does not list its constraint kind. Which check finds the cause fastest?
     options:

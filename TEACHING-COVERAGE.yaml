@@ -15,10 +15,14 @@ labs:
     - sections/section-010/module-01/course-01-request-path-and-role-rules.md
     - sections/section-010/module-01/course-02-bindings-subjects-and-scope.md
     - sections/section-010/module-01/course-03-proving-and-debugging-access.md
+    - sections/section-010/module-01/course-03-limit-subresources-and-named-objects.md
     - sections/section-010/module-01/course-04-over-broad-grants-and-aggregation.md
+    - sections/section-010/module-01/course-04-extend-built-in-roles-with-aggregation.md
     - sections/section-010/module-02/course-01-levels-modes-and-rejections.md
     - sections/section-010/module-02/course-02-changing-a-namespace-level.md
+    - sections/section-010/module-02/course-02-stage-namespace-enforcement.md
     - sections/section-010/module-02/course-03-securitycontext-for-restricted.md
+    - sections/section-010/capstone/course-01-review-api-permissions-and-pod-admission-separately.md
   sections/section-020/module-01/labs/lab-01:
     preparation:
     - sections/section-020/module-01/course-01-mesh-identity-and-mtls-modes.md
@@ -37,11 +41,13 @@ labs:
     - sections/section-020/module-01/course-01-mesh-identity-and-mtls-modes.md
     - sections/section-020/module-01/course-02-requiring-strict-mtls.md
     - sections/section-020/module-01/course-03-authorizing-callers.md
+    - sections/section-020/capstone/course-01-separate-istio-transport-identity-from-authorization.md
   sections/section-020/capstone/labs/lab-02:
     preparation:
     - sections/section-020/module-02/course-01-automatic-mtls-identity-and-default-policy.md
     - sections/section-020/module-02/course-02-servers-and-authorization-policies.md
     - sections/section-020/module-02/course-03-repairing-authorization-and-splitting-traffic.md
+    - sections/section-020/capstone/course-02-trace-linkerd-identity-and-server-authorization.md
   sections/section-030/module-01/labs/lab-01:
     preparation:
     - sections/section-030/module-01/course-01-validate-rules-and-admission.md
@@ -52,7 +58,7 @@ labs:
     preparation:
     - sections/section-030/module-02/course-01-constrainttemplates-and-rego.md
     - sections/section-030/module-02/course-02-constraints-and-enforcement-actions.md
-    - sections/section-030/module-02/course-03-audit-status-and-template-errors.md
+    - sections/section-030/module-02/course-03-diagnose-template-errors.md
   sections/section-030/module-02/labs/lab-02:
     preparation:
     - sections/section-030/module-02/course-01-constrainttemplates-and-rego.md
@@ -70,8 +76,10 @@ labs:
     - sections/section-030/module-02/course-01-constrainttemplates-and-rego.md
     - sections/section-030/module-02/course-02-constraints-and-enforcement-actions.md
     - sections/section-030/module-02/course-03-audit-status-and-template-errors.md
+    - sections/section-030/module-02/course-03-diagnose-template-errors.md
     - sections/section-030/module-03/course-01-policies-and-cel-expressions.md
     - sections/section-030/module-03/course-02-bindings-params-and-validation-actions.md
+    - sections/section-030/capstone/course-01-compare-policy-selection-evaluation-and-admission-results.md
   sections/section-040/module-01/labs/lab-01:
     preparation:
     - sections/section-040/module-01/course-01-audit-policy-rules-levels-and-stages.md
@@ -92,6 +100,7 @@ labs:
     - sections/section-040/module-02/course-01-read-kyverno-policy-reports.md
     - sections/section-040/module-02/course-02-read-gatekeeper-audit-results.md
     - sections/section-040/module-02/course-03-answer-an-auditor-with-the-right-evidence.md
+    - sections/section-040/capstone/course-01-choose-evidence-for-a-request-and-for-current-compliance.md
   sections/section-050/module-01/labs/lab-01:
     preparation:
     - sections/section-050/module-01/course-01-run-a-compliance-check-as-a-tekton-task.md
@@ -120,6 +129,7 @@ labs:
     - sections/section-050/module-02/course-01-read-an-image-reference.md
     - sections/section-050/module-02/course-02-allow-only-one-registry-with-kyverno.md
     - sections/section-050/module-02/course-03-reject-latest-untagged-and-unpinned-images.md
+    - sections/section-050/capstone/course-01-trace-a-compliance-decision-through-a-delivery-pipeline.md
   sections/section-050/capstone/labs/lab-02:
     preparation:
     - sections/section-050/module-01/course-01-run-a-compliance-check-as-a-tekton-task.md
@@ -130,6 +140,7 @@ labs:
     - sections/section-050/module-03/course-02-use-vulnerability-scan-exit-codes.md
     - sections/section-050/module-03/course-03-keep-sbom-evidence-in-a-tekton-pipeline.md
     - sections/section-050/module-03/course-04-verify-signatures-before-admission.md
+    - sections/section-050/capstone/course-02-connect-image-identity-to-supply-chain-evidence.md
   sections/section-030/module-02/labs/lab-03:
     preparation:
     - sections/section-030/module-02/course-03-audit-status-and-template-errors.md
@@ -143,7 +154,7 @@ labs:
   sections/section-010/module-01/labs/lab-03:
     preparation:
     - sections/section-010/module-01/course-02-bindings-subjects-and-scope.md
-    - sections/section-010/module-01/course-04-over-broad-grants-and-aggregation.md
+    - sections/section-010/module-01/course-04-extend-built-in-roles-with-aggregation.md
   sections/section-020/module-01/labs/lab-02:
     preparation:
     - sections/section-020/module-01/course-02-requiring-strict-mtls.md
@@ -153,7 +164,7 @@ labs:
     - sections/section-030/module-01/course-03-mutate-and-generate-rules.md
   sections/section-030/module-01/labs/lab-04:
     preparation:
-    - sections/section-030/module-01/course-03-mutate-and-generate-rules.md
+    - sections/section-030/module-01/course-03-generate-namespace-policy.md
   sections/section-050/module-01/labs/lab-02:
     preparation:
     - sections/section-050/module-01/course-01-run-a-compliance-check-as-a-tekton-task.md
@@ -173,11 +184,12 @@ labs:
     preparation:
     - sections/section-010/module-01/course-01-request-path-and-role-rules.md
     - sections/section-010/module-01/course-02-bindings-subjects-and-scope.md
-    - sections/section-010/module-01/course-03-proving-and-debugging-access.md
+    - sections/section-010/module-01/course-03-limit-subresources-and-named-objects.md
   sections/section-010/module-02/labs/lab-02:
     preparation:
-    - sections/section-010/module-02/course-01-levels-modes-and-rejections.md
     - sections/section-010/module-02/course-02-changing-a-namespace-level.md
+    - sections/section-010/module-02/course-01-levels-modes-and-rejections.md
+    - sections/section-010/module-02/course-02-stage-namespace-enforcement.md
   sections/section-030/module-03/labs/lab-02:
     preparation:
     - sections/section-030/module-03/course-01-policies-and-cel-expressions.md

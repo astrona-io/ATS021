@@ -4,9 +4,11 @@ RBAC decides who may create a pod. It does not look at what the pod asks for. A 
 
 Keep one sentence in mind for this module: **a namespace label picks a level and a mode, and the API server checks every new pod against it.** You will read the label that already protects one namespace, test a stricter level against running workloads before you turn it on, fix a workload so it passes the strictest level, and find out where the rejection hides when a Deployment, not a person, creates the pod.
 
-The module has three parts. **Levels, Modes And Rejections** explains the three levels and the three modes and reads a real rejection. **Changing A Namespace Level Safely** tests a level with a server-side dry run, uses `warn` and `audit` before `enforce`, and follows a rejection into a ReplicaSet's events. **A securityContext That Passes Restricted** writes the pod and container fields the `restricted` level needs and fixes the error the kubelet adds on top.
+The four readings cover security levels and admission rejections, inspection of existing violations, staged namespace enforcement, and the securityContext fields required by restricted admission.
 
 The independent labs cover staged warning and enforcement labels, reviewing baseline violations across three namespaces, and repairing workloads for restricted admission.
+
+The readings separate existing-workload inspection from staged namespace enforcement. Practise the inventory before changing enforce, warn and audit labels, then repair workload security contexts.
 
 ## Learning objectives
 

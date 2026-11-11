@@ -4,7 +4,7 @@ Every request to a Kubernetes cluster goes to the API server, and the API server
 
 Keep one sentence in mind for this module: **a role says what may be done, a binding says who may do it, and the binding's kind and namespace say where.** You will give a pipeline's service account exactly the rights it needs, prove every answer with `kubectl auth can-i`, read the `Forbidden` errors that tell you what is missing, and find a grant that gives far too much.
 
-The module has four parts. **The Request Path And Role Rules** follows one request through authentication, authorization and admission, and writes the first `Role` and `RoleBinding`. **Bindings, Subjects And Scope** compares users, groups and service accounts as subjects, and `Role` with `ClusterRole`. **Proving And Debugging Access** checks permissions for any identity and reads a `Forbidden` error field by field. **Finding Over-Broad Grants And Extending Roles** searches the cluster for `cluster-admin` bindings, removes one, and adds rights to a built-in role the safe way.
+The six readings cover request rules, binding scope, access checks, named subresources, excessive grants and role aggregation. Each practical reading is followed by the lab that tests it.
 
 The independent labs practise namespace grants, replacing excessive access, extending an aggregated role, and limiting access to a named scale subresource.
 

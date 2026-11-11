@@ -136,7 +136,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Explain why a Deployment is accepted while its pods are rejected, and find the error in the ReplicaSet events"
     source_readings:
-      - sections/section-010/module-02/course-02-changing-a-namespace-level.md
+      - sections/section-010/module-02/course-02-stage-namespace-enforcement.md
     prompt: |-
       A user applies the Deployment `bad-pod` in a namespace that enforces `restricted`. `kubectl apply` prints `deployment.apps/bad-pod created`, but `kubectl get deploy bad-pod` shows `0/1` and no pods appear. Where is the Pod Security Admission error?
     options:
@@ -352,7 +352,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Exempt one workload from a rule with a PolicyException instead of weakening the policy"
     source_readings:
-      - sections/section-030/module-01/course-03-mutate-and-generate-rules.md
+      - sections/section-030/module-01/course-03-generate-namespace-policy.md
     prompt: |-
       On a default Kyverno 1.19.1 installation, an administrator applies a `PolicyException` for one workload. The command succeeds, but the workload is still rejected. What is the cause, and what is the right response?
     options:

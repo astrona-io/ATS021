@@ -77,7 +77,6 @@ modules:
       - type: reading
         title: Section Overview
         path: sections/section-010/README.md
-
       - type: reading
         title: "Grant Least-Privilege Access With RBAC"
         path: sections/section-010/module-01/course.md
@@ -90,28 +89,6 @@ modules:
       - type: reading
         title: "Proving And Debugging Access"
         path: sections/section-010/module-01/course-03-proving-and-debugging-access.md
-      - type: reading
-        title: Question
-        path: sections/section-010/module-01/labs/lab-04/question.md
-      - type: lab
-        title: Grant Access To One Scale Subresource Lab
-        path: sections/section-010/module-01/labs/lab-04
-        difficulty: intermediate
-        estimated_duration: 15m
-        topic: access-control
-        task_kind: build
-        tags:
-        - rbac
-        - subresources
-        - resourceNames
-        learning_goals:
-        - Grant access to one named scale subresource.
-        - Prove scaling succeeds while template changes and unrelated access fail.
-        resources:
-        - name: Kubernetes RBAC reference
-          url: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
-        - name: Kubernetes service accounts
-          url: https://kubernetes.io/docs/concepts/security/service-accounts/
       - type: reading
         title: Question
         path: sections/section-010/module-01/labs/lab-01/question.md
@@ -136,7 +113,32 @@ modules:
         - name: Kubernetes service accounts
           url: https://kubernetes.io/docs/concepts/security/service-accounts/
       - type: reading
-        title: "Finding Over-Broad Grants And Extending Roles"
+        title: Limit Subresources And Named Objects
+        path: sections/section-010/module-01/course-03-limit-subresources-and-named-objects.md
+      - type: reading
+        title: Question
+        path: sections/section-010/module-01/labs/lab-04/question.md
+      - type: lab
+        title: Grant Access To One Scale Subresource Lab
+        path: sections/section-010/module-01/labs/lab-04
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: access-control
+        task_kind: build
+        tags:
+        - rbac
+        - subresources
+        - resourceNames
+        learning_goals:
+        - Grant access to one named scale subresource.
+        - Prove scaling succeeds while template changes and unrelated access fail.
+        resources:
+        - name: Kubernetes RBAC reference
+          url: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+        - name: Kubernetes service accounts
+          url: https://kubernetes.io/docs/concepts/security/service-accounts/
+      - type: reading
+        title: Find And Remove Over-Broad Grants
         path: sections/section-010/module-01/course-04-over-broad-grants-and-aggregation.md
       - type: reading
         title: Question
@@ -160,6 +162,9 @@ modules:
           url: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
         - name: Kubernetes service accounts
           url: https://kubernetes.io/docs/concepts/security/service-accounts/
+      - type: reading
+        title: Extend Built-In Roles With Aggregation
+        path: sections/section-010/module-01/course-04-extend-built-in-roles-with-aggregation.md
       - type: reading
         title: Question
         path: sections/section-010/module-01/labs/lab-03/question.md
@@ -185,7 +190,6 @@ modules:
       - type: reading
         title: Summary
         path: sections/section-010/module-01/course-05-summary.md
-
       - type: reading
         title: "Restrict Pods With Pod Security Admission"
         path: sections/section-010/module-02/course.md
@@ -193,7 +197,7 @@ modules:
         title: "Levels, Modes And Rejections"
         path: sections/section-010/module-02/course-01-levels-modes-and-rejections.md
       - type: reading
-        title: "Changing A Namespace Level Safely"
+        title: Inspect Existing Pod Security Violations
         path: sections/section-010/module-02/course-02-changing-a-namespace-level.md
       - type: reading
         title: Question
@@ -222,6 +226,9 @@ modules:
           url: https://kubernetes.io/docs/concepts/security/pod-security-standards/
         - name: Configure a security context
           url: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+      - type: reading
+        title: Stage Namespace Enforcement
+        path: sections/section-010/module-02/course-02-stage-namespace-enforcement.md
       - type: reading
         title: Question
         path: sections/section-010/module-02/labs/lab-02/question.md
@@ -275,7 +282,9 @@ modules:
       - type: reading
         title: Summary
         path: sections/section-010/module-02/course-04-summary.md
-
+      - type: reading
+        title: Review API Permissions And Pod Admission Separately
+        path: sections/section-010/capstone/course-01-review-api-permissions-and-pod-admission-separately.md
       - type: reading
         title: Question
         path: sections/section-010/capstone/labs/lab-01/question.md
@@ -317,7 +326,6 @@ modules:
       - type: reading
         title: Section Overview
         path: sections/section-020/README.md
-
       - type: reading
         title: "Require Mutual TLS And Authorize Callers With Istio"
         path: sections/section-020/module-01/course.md
@@ -382,7 +390,6 @@ modules:
       - type: reading
         title: Summary
         path: sections/section-020/module-01/course-04-summary.md
-
       - type: reading
         title: "Require Mutual TLS And Authorize Callers With Linkerd"
         path: sections/section-020/module-02/course.md
@@ -442,7 +449,9 @@ modules:
       - type: reading
         title: Summary
         path: sections/section-020/module-02/course-04-summary.md
-
+      - type: reading
+        title: Separate Istio Transport Identity From Authorization
+        path: sections/section-020/capstone/course-01-separate-istio-transport-identity-from-authorization.md
       - type: reading
         title: Question
         path: sections/section-020/capstone/labs/lab-01/question.md
@@ -465,6 +474,9 @@ modules:
             url: https://istio.io/latest/docs/reference/config/security/authorization-policy/
           - name: "Istio mutual TLS migration"
             url: https://istio.io/latest/docs/tasks/security/authentication/mtls-migration/
+      - type: reading
+        title: Trace Linkerd Identity And Server Authorization
+        path: sections/section-020/capstone/course-02-trace-linkerd-identity-and-server-authorization.md
       - type: reading
         title: Question
         path: sections/section-020/capstone/labs/lab-02/question.md
@@ -508,7 +520,6 @@ modules:
       - type: reading
         title: Section Overview
         path: sections/section-030/README.md
-
       - type: reading
         title: "Validate, Mutate And Generate With Kyverno"
         path: sections/section-030/module-01/course.md
@@ -543,7 +554,7 @@ modules:
         title: "Enforce, Audit And Policy Reports"
         path: sections/section-030/module-01/course-02-enforce-audit-and-policy-reports.md
       - type: reading
-        title: "Mutate And Generate Rules"
+        title: Add Defaults With Mutation
         path: sections/section-030/module-01/course-03-mutate-and-generate-rules.md
       - type: reading
         title: Question
@@ -569,6 +580,9 @@ modules:
           url: https://kyverno.io/docs/policy-types/cluster-policy/mutate/
         - name: Kyverno generate rules
           url: https://kyverno.io/docs/policy-types/cluster-policy/generate/
+      - type: reading
+        title: Generate And Maintain Namespace Policy
+        path: sections/section-030/module-01/course-03-generate-namespace-policy.md
       - type: reading
         title: Question
         path: sections/section-030/module-01/labs/lab-04/question.md
@@ -623,7 +637,6 @@ modules:
       - type: reading
         title: Summary
         path: sections/section-030/module-01/course-05-summary.md
-
       - type: reading
         title: "Enforce Constraints With Gatekeeper And Rego"
         path: sections/section-030/module-02/course.md
@@ -634,8 +647,26 @@ modules:
         title: "Constraints And Enforcement Actions"
         path: sections/section-030/module-02/course-02-constraints-and-enforcement-actions.md
       - type: reading
-        title: "Audit Status And Template Errors"
+        title: Read Gatekeeper Audit Results
         path: sections/section-030/module-02/course-03-audit-status-and-template-errors.md
+      - type: reading
+        title: Question
+        path: sections/section-030/module-02/labs/lab-03/question.md
+      - type: lab
+        title: Investigate Existing Gatekeeper Violations Lab
+        path: sections/section-030/module-02/labs/lab-03
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: policy-engines
+        task_kind: troubleshooting
+        tags:
+        - policy-engines
+        learning_goals:
+        - Read a live audit violation without denying admission
+        - Preserve the original workload while testing policy scope
+      - type: reading
+        title: Diagnose Gatekeeper Template Errors
+        path: sections/section-030/module-02/course-03-diagnose-template-errors.md
       - type: reading
         title: Question
         path: sections/section-030/module-02/labs/lab-01/question.md
@@ -657,21 +688,6 @@ modules:
             url: https://open-policy-agent.github.io/gatekeeper/website/docs/audit/
           - name: "Gatekeeper violations"
             url: https://open-policy-agent.github.io/gatekeeper/website/docs/violations/
-      - type: reading
-        title: Question
-        path: sections/section-030/module-02/labs/lab-03/question.md
-      - type: lab
-        title: Investigate Existing Gatekeeper Violations Lab
-        path: sections/section-030/module-02/labs/lab-03
-        difficulty: intermediate
-        estimated_duration: 15m
-        topic: policy-engines
-        task_kind: troubleshooting
-        tags:
-        - policy-engines
-        learning_goals:
-        - Read a live audit violation without denying admission
-        - Preserve the original workload while testing policy scope
       - type: reading
         title: "Constraints And Pods Created By Controllers"
         path: sections/section-030/module-02/course-04-constraints-and-controller-created-pods.md
@@ -705,7 +721,6 @@ modules:
       - type: reading
         title: Summary
         path: sections/section-030/module-02/course-06-summary.md
-
       - type: reading
         title: "Write ValidatingAdmissionPolicies With CEL"
         path: sections/section-030/module-03/course.md
@@ -763,7 +778,9 @@ modules:
       - type: reading
         title: Summary
         path: sections/section-030/module-03/course-04-summary.md
-
+      - type: reading
+        title: Compare Policy Selection, Evaluation And Admission Results
+        path: sections/section-030/capstone/course-01-compare-policy-selection-evaluation-and-admission-results.md
       - type: reading
         title: Question
         path: sections/section-030/capstone/labs/lab-01/question.md
@@ -876,7 +893,9 @@ modules:
       - type: reading
         title: "Summary"
         path: sections/section-040/module-02/course-04-summary.md
-
+      - type: reading
+        title: Choose Evidence For A Request And For Current Compliance
+        path: sections/section-040/capstone/course-01-choose-evidence-for-a-request-and-for-current-compliance.md
       - type: reading
         title: Question
         path: sections/section-040/capstone/labs/lab-01/question.md
@@ -1191,6 +1210,9 @@ modules:
         question_count: 10
         pass_score: 70
       - type: reading
+        title: Trace A Compliance Decision Through A Delivery Pipeline
+        path: sections/section-050/capstone/course-01-trace-a-compliance-decision-through-a-delivery-pipeline.md
+      - type: reading
         title: Question
         path: sections/section-050/capstone/labs/lab-01/question.md
       - type: lab
@@ -1210,6 +1232,9 @@ modules:
             url: https://tekton.dev/docs/pipelines/pipelines/
           - name: "Kyverno validate rules"
             url: https://kyverno.io/docs/policy-types/cluster-policy/validate/
+      - type: reading
+        title: Connect Image Identity To Supply-Chain Evidence
+        path: sections/section-050/capstone/course-02-connect-image-identity-to-supply-chain-evidence.md
       - type: reading
         title: Question
         path: sections/section-050/capstone/labs/lab-02/question.md

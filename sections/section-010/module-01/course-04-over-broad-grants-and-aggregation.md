@@ -1,6 +1,6 @@
-# Finding Over-Broad Grants And Extending Roles
+# Find And Remove Over-Broad Grants
 
-Least privilege is not only about the grants you write. Clusters collect grants over time: an agent installed years ago, a quick fix during an outage, a Helm chart that asked for `cluster-admin`. Each one is a service account token that can do anything if it leaks. This part searches the playground for the most dangerous kind of grant, removes it, and then adds rights to a built-in role in the one way that survives upgrades.
+A service account can receive rights from several bindings. Removing one broad grant does not prove the account now has only the intended permissions. Inspect all bindings, replace excessive access with a precise Role, and check the resulting scope.
 
 ## Who has cluster-admin
 
@@ -75,88 +75,11 @@ no
 
 The warning is `kubectl` telling you that it ignores the namespace for a cluster-wide resource; it is harmless. The answer changed from `yes` to `no`. On a real cluster, the next step is to find out what the agent actually needs and give it a Role with exactly that, the same way as for `ci-deployer`. Removing the binding first and watching which `Forbidden` errors the agent logs is a common way to find out.
 
-## Extending a built-in role with aggregation
-
-The developers can read pods, Services and most other namespaced objects with the `view` ClusterRole, but `view` does not include Leases. A Lease is a small object in the `coordination.k8s.io` group that controllers use to elect a leader and that nodes use to report that they are alive. You could edit `view`, but the API server owns it: it carries the annotation `rbac.authorization.kubernetes.io/autoupdate: "true"`, and the API server resets built-in roles to their defaults when it starts.
-
-`view` is built in a different way, too. Look at the top of it:
-
-```sh
-kubectl get clusterrole view -o yaml | head -20
-```
-
-You should see something like (shortened):
-
-```text
-aggregationRule:
-  clusterRoleSelectors:
-  - matchLabels:
-      rbac.authorization.k8s.io/aggregate-to-view: "true"
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  annotations:
-    rbac.authorization.kubernetes.io/autoupdate: "true"
-  ...
-  labels:
-    kubernetes.io/bootstrapping: rbac-defaults
-    rbac.authorization.k8s.io/aggregate-to-edit: "true"
-  name: view
-```
-
-`aggregationRule` makes `view` an **aggregated ClusterRole**. A controller in the control plane fills its `rules` with the rules of every ClusterRole that carries the label `rbac.authorization.k8s.io/aggregate-to-view: "true"`, and keeps them in sync. So the safe way to extend `view` is to create a small ClusterRole with that label. `view` itself also carries `aggregate-to-edit`, so whatever `view` gains, `edit` gains too.
-
-Check the starting point:
-
-```sh
-kubectl auth can-i list leases.coordination.k8s.io -n starfleet --as=dev-anna --as-group=developers
-```
-
-You should see:
-
-```text
-no
-```
-
-Save this as `clusterrole-view-leases.yaml`:
-
-```yaml
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: view-leases
-  labels:
-    rbac.authorization.k8s.io/aggregate-to-view: "true"
-rules:
-  - apiGroups: ["coordination.k8s.io"]
-    resources: ["leases"]
-    verbs: ["get", "list", "watch"]
-```
-
-Apply it and check again:
-
-```sh
-kubectl apply -f clusterrole-view-leases.yaml
-kubectl auth can-i list leases.coordination.k8s.io -n starfleet --as=dev-anna --as-group=developers
-kubectl -n starfleet get leases --as=dev-anna --as-group=developers
-```
-
-You should see:
-
-```text
-clusterrole.rbac.authorization.k8s.io/view-leases created
-yes
-No resources found in starfleet namespace.
-```
-
-The answer changed to `yes`, and the list request is now allowed; `starfleet` simply has no Leases yet. Run `kubectl get clusterrole view -o yaml` again: it now holds a `leases` rule that you never wrote into `view`. Nobody had to create a new binding, because the `developers-view` RoleBinding already points at `view`.
-
-You can now find every grant of `cluster-admin`, list every binding of one identity across the cluster, remove an over-broad grant and prove the result. You have also extended a built-in role through its aggregation label, which keeps working after the API server resets its defaults. Together with exact Roles and the right binding scope, that is least-privilege RBAC.
+After replacing a grant, prove that required reads still work and that unrelated writes, Secrets and other namespaces stay outside the account’s permissions.
 
 ## Common pitfalls
 
 > [!WARNING]
-> - **Searching only ClusterRoleBindings.** A RoleBinding to `cluster-admin` gives full rights inside its namespace, including every Secret there. Search both kinds.
-> - **Editing a built-in ClusterRole such as `view` or `edit`.** The API server resets it. Add a labelled ClusterRole instead.
-> - **Labelling a broad role `aggregate-to-view`.** Every subject bound to `view` in every namespace gets its rules at once. Keep aggregated roles small and read-only for `view`.
-> - **Removing a grant without checking what still needs it.** Watch for `Forbidden` errors from the workload afterwards and give it a precise Role.
+> - Search RoleBindings and ClusterRoleBindings for the identity.
+> - Check the service account namespace as well as its name.
+> - Keep the workload’s required access when removing its broad binding.

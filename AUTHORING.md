@@ -2,7 +2,7 @@
 
 Read CLAUDE.md for course structure, version pins and renderer conventions. Keep each module independent. Place a lab's question immediately before its lab entry and after all required preparation. Teach a procedure before asking the learner to produce its evidence. Do not duplicate lab launch commands in reading pages.
 
-Maintain TEACHING-COVERAGE.yaml when adding, moving or changing labs. Map only relevant preparation; list technical readings without a module-lab link in additional_readings. Review the graded behavior as well as the links. For an inventory task, seed the evidence independently of the learner's answer and grade the finding against current resources. Distinguish warning labels from a retrospective scan of running Pods. Update COVERAGE-REVIEW.md when a practical gap closes or a fixture limit changes. Regenerate LAB-COVERAGE.md with python3 scripts/ci/lab-coverage.py --write.
+Maintain TEACHING-COVERAGE.yaml when adding, moving or changing labs. Map only relevant preparation; list module readings without a module-lab link and capstone readings without a capstone-lab link in additional_readings. Review the graded behavior as well as the links. For an inventory task, seed the evidence independently of the learner's answer and grade the finding against current resources. Distinguish warning labels from a retrospective scan of running Pods. Update COVERAGE-REVIEW.md when a practical gap closes or a fixture limit changes. Regenerate LAB-COVERAGE.md with python3 scripts/ci/lab-coverage.py --write.
 
 Prefer one fault or observable outcome per module lab, usually three to five tasks. Split unrelated outcomes and add their preparation in the same change. Keep capstones for integration. Estimate duration from the work and required waits, not a target label. Preserve published paths and identifiers unless an actual collision requires a documented correction.
 
@@ -19,3 +19,9 @@ Reuse the active review branch and PR while they remain open. Start a new featur
 Keep each question linked to the registered reading that teaches its answer. Update `question_count` when adding questions, and preserve published IDs. Run `scripts/ci/check-assessments.py` and its failure-case tests. A structural pass does not replace technical review of the answer and distractors.
 
 For a new practical outcome, add a playground procedure test where the lesson has runnable commands. Record exactly which example it covers. Keep task-work estimates separate from cluster startup, reconciliation and telemetry waits; do not shorten a duration without narrowing or measuring the work.
+
+## Reading and practice order
+
+Every lab needs a mapped technical reading after the previous lab and before its question. A question, quiz, summary or unrelated reading does not satisfy this rule. Split a combined lesson when its labs assess separate outcomes, retaining the published path for the first part and updating quiz sources for the extracted part. Preserve the playground state and commands each part needs.
+
+Give each capstone a short integration reading immediately before its question. Teach how the relevant controllers and evidence connect; keep the independent task in the question. Register the reading in `astrona.yaml` and `TEACHING-COVERAGE.yaml`. The coverage validator and its regression tests enforce this sequence.

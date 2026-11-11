@@ -1,6 +1,3 @@
-# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
-#
-# Enforce Constraints With Gatekeeper And Rego (LAB). Graded against the live cluster.
 apiVersion: astrona.io/v1
 metadata:
   name: ats-021-lab-030-02
@@ -8,65 +5,53 @@ metadata:
     prerequisites: prerequisites.md
     question: question.md
     solution: solution.md
-
 runtime:
   type: kind
   kind:
     image: kindest/node:v1.35.8
     preloadImages:
-      - ghcr.io/stefanprodan/podinfo:6.15.0
-      - mccutchen/go-httpbin:2.25.0
-      - curlimages/curl:8.22.0
-
-# Starting state: Gatekeeper 3.23.1, the Starfleet workloads (`drifter` in
-# outpost uses the latest tag) and a ConstraintTemplate whose Rego does not
-# compile. No Constraint exists. The fault is left in place on purpose.
+    - ghcr.io/stefanprodan/podinfo:6.15.0
+    - mccutchen/go-httpbin:2.25.0
+    - curlimages/curl:8.22.0
 bootstrap:
   init:
-    - name: seed-cluster
-      description: Install Gatekeeper 3.23.1, create the workloads and the broken ConstraintTemplate
-      type: file
-      source: bootstrap/01-seed-cluster.sh
-
-# Applied only by `astrona test`: the reference solution.
+  - name: seed-cluster
+    description: Install Gatekeeper 3.23.1, create the workloads and the broken ConstraintTemplate
+    type: file
+    source: bootstrap/01-seed-cluster.sh
 testing:
   init:
-    - name: verify-unfinished-state
-      description: Require a ready API and an explicit grader rejection before solving
-      type: file
-      source: testing/verify-start.sh
-      timeout: 10m
-    - name: apply-solution
-      description: Apply the fixed template and the two constraints
-      type: file
-      source: solution/apply.sh
-    - name: wait-for-constraint
-      description: Wait until Gatekeeper enforces the constraint
-      type: file
-      source: testing/wait-for-constraint.sh
-
+  - name: verify-unfinished-state
+    description: Require a ready API and an explicit grader rejection before solving
+    type: file
+    source: testing/verify-start.sh
+    timeout: 10m
+  - name: apply-solution
+    description: Apply the fixed template and deny constraint
+    type: file
+    source: solution/apply.sh
+  - name: wait-for-constraint
+    description: Wait until Gatekeeper enforces the constraint
+    type: file
+    source: testing/wait-for-constraint.sh
 validation:
   scripts:
-    - name: template-created
-      description: The ConstraintTemplate k8sdisallowedtags compiles and creates its constraint kind
-      type: file
-      source: validation/validate-template-created.sh
-      hint: Read status.byPod[0].errors of the template. Fix the Rego, then apply the template again with the same name. There are two errors.
-    - name: latest-denied-in-starfleet
-      description: A pod with the latest tag is refused in starfleet
-      type: file
-      source: validation/validate-latest-denied-in-starfleet.sh
-      hint: Create a K8sDisallowedTags constraint with enforcementAction deny, match Pod in the namespace starfleet and the parameter tags ["latest"].
-    - name: pinned-tags-and-scope
-      description: A pinned tag is accepted in starfleet and the latest tag is still accepted in outpost
-      type: file
-      source: validation/validate-pinned-tags-and-scope.sh
-      hint: The deny constraint must match only starfleet. The second constraint for outpost must use dryrun.
-    - name: audit-lists-drifter
-      description: A dryrun constraint lists the drifter pod in its audit results
-      type: file
-      source: validation/validate-audit-lists-drifter.sh
-      hint: Create a second K8sDisallowedTags constraint for outpost with enforcementAction dryrun. The audit controller runs about once a minute, then read status.violations.
-
+  - name: template-created
+    description: The ConstraintTemplate k8sdisallowedtags compiles and creates its constraint kind
+    type: file
+    source: validation/validate-template-created.sh
+    hint: Read status.byPod[0].errors of the template. Fix the Rego, then apply the template again with the same
+      name. There are two errors.
+  - name: latest-denied-in-starfleet
+    description: A pod with the latest tag is refused in starfleet
+    type: file
+    source: validation/validate-latest-denied-in-starfleet.sh
+    hint: Create a K8sDisallowedTags constraint with enforcementAction deny, match Pod in the namespace starfleet
+      and the parameter tags ["latest"].
+  - name: pinned-tags-and-scope
+    description: A pinned tag is accepted in starfleet and the latest tag is still accepted in outpost
+    type: file
+    source: validation/validate-pinned-tags-and-scope.sh
+    hint: Scope the deny constraint to starfleet.
 teardown:
   keepCluster: false

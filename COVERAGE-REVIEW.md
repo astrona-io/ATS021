@@ -1,10 +1,11 @@
 # Coverage review
 
+The review separates template repair from audit investigation and adds a Gatekeeper registry lab. Registry controls cover allowed images, denied images, lookalike hosts, a disallowed second container and an outside namespace. The registry playground runs those controls, and the Helm-policy lesson has a linked question.
+
 The Gatekeeper chart lab now follows an example that carries a fix into the chart template and values, increments chart version, upgrades the release and checks the resulting Pods. Its playground installs the same Helm version used by the lab. Audit scripts now respect the selected container engine when both Docker and Podman are installed.
 
 Practical limits remain:
 
-- Tool-selection discussion and the alternative Gatekeeper registry restriction have no dedicated module lab.
 - Signature exercises verify published fixture images with a teaching public key. They do not operate an organization's signing service or manage private signing keys.
 - SBOM and vulnerability tasks use live tooling and image-specific evidence, but a passing scan is not proof that an image has no vulnerabilities.
 - Audit exercises configure the API server in a kind control-plane container. They test API audit policy and evidence, not host auditd or isolation between tenant kernels.
@@ -20,9 +21,10 @@ The workflow checks registration and preparation order, then runs each selected 
 
 Playgrounds run bootstrap and readiness checks. A playground with testing/smoke.sh also runs that script. A successful playground start alone does not prove all learner commands. Network downloads, public registries and chart repositories remain external dependencies. Consult the PR's latest workflow for actual runtime results; this review and the generated map are not passing test reports.
 
+## Assessment and procedure checks
+
+CI checks quiz registration, answer references, unique question IDs, declared counts and links to earlier readings. Playground procedure tests cover the named examples above; other playgrounds still prove only startup and declared readiness unless they contain their own smoke script. These checks do not establish every command in every lesson.
+
 ## Readings without a module-lab link
 
-These remain visible in the reverse map. Some are supporting concepts or integrated in a section capstone; none is claimed as an independently graded skill merely because it appears in a reading.
-
-- [course-03-choosing-the-right-tool](sections/section-030/module-03/course-03-choosing-the-right-tool.md)
-- [course-04-allow-only-one-registry-with-gatekeeper](sections/section-050/module-02/course-04-allow-only-one-registry-with-gatekeeper.md)
+The generated reverse map in [LAB-COVERAGE.md](LAB-COVERAGE.md) lists the current supporting and capstone-only readings. A listed concept is not claimed as independently assessed without a lab link.

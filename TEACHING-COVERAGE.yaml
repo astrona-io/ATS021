@@ -137,6 +137,11 @@ labs:
     - sections/section-050/module-03/course-02-use-vulnerability-scan-exit-codes.md
     - sections/section-050/module-03/course-03-keep-sbom-evidence-in-a-tekton-pipeline.md
     - sections/section-050/module-03/course-04-verify-signatures-before-admission.md
+  sections/section-030/module-02/labs/lab-03:
+    preparation:
+    - sections/section-030/module-02/course-03-audit-status-and-template-errors.md
+  sections/section-050/module-02/labs/lab-02:
+    preparation:
+    - sections/section-050/module-02/course-04-allow-only-one-registry-with-gatekeeper.md
 additional_readings:
 - sections/section-030/module-03/course-03-choosing-the-right-tool.md
-- sections/section-050/module-02/course-04-allow-only-one-registry-with-gatekeeper.md

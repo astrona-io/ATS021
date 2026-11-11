@@ -445,14 +445,13 @@ modules:
         title: "Enforce Constraints With Gatekeeper And Rego Lab"
         path: sections/section-030/module-02/labs/lab-01
         difficulty: intermediate
-        estimated_duration: 30m
+        estimated_duration: 15m
         topic: policy-engines
         task_kind: build
-        tags: [gatekeeper, constrainttemplate, constraint, rego, gatekeeper-audit]
+        tags: [gatekeeper, constrainttemplate, constraint, rego]
         learning_goals:
           - Find a Rego error in the status of a ConstraintTemplate and fix it
           - Create a deny Constraint that refuses the latest tag in one namespace and accepts pinned tags
-          - Create a dryrun Constraint and read the existing violation in its audit results
         resources:
           - name: "Gatekeeper constraint templates"
             url: https://open-policy-agent.github.io/gatekeeper/website/docs/constrainttemplates/
@@ -460,6 +459,21 @@ modules:
             url: https://open-policy-agent.github.io/gatekeeper/website/docs/audit/
           - name: "Gatekeeper violations"
             url: https://open-policy-agent.github.io/gatekeeper/website/docs/violations/
+      - type: reading
+        title: Question
+        path: sections/section-030/module-02/labs/lab-03/question.md
+      - type: lab
+        title: Investigate Existing Gatekeeper Violations Lab
+        path: sections/section-030/module-02/labs/lab-03
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: policy-engines
+        task_kind: troubleshooting
+        tags:
+        - policy-engines
+        learning_goals:
+        - Read a live audit violation without denying admission
+        - Preserve the original workload while testing policy scope
       - type: reading
         title: "Constraints And Pods Created By Controllers"
         path: sections/section-030/module-02/course-04-constraints-and-controller-created-pods.md
@@ -757,6 +771,21 @@ modules:
         title: "Allow Only One Registry With Gatekeeper"
         path: sections/section-050/module-02/course-04-allow-only-one-registry-with-gatekeeper.md
       - type: reading
+        title: Question
+        path: sections/section-050/module-02/labs/lab-02/question.md
+      - type: lab
+        title: Enforce A Registry Boundary With Gatekeeper Lab
+        path: sections/section-050/module-02/labs/lab-02
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: supply-chain
+        task_kind: troubleshooting
+        tags:
+        - supply-chain
+        learning_goals:
+        - Write a parameterized registry template and scoped constraint
+        - Verify allowed, denied, lookalike-host and multi-container cases
+      - type: reading
         title: Summary
         path: sections/section-050/module-02/course-05-summary.md
       - type: reading
@@ -897,5 +926,5 @@ modules:
       - type: quiz
         title: "Final Knowledge Check: Security and Policy Enforcement"
         path: sections/final-domain-quiz.yaml
-        question_count: 30
+        question_count: 31
         pass_score: 70

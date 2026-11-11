@@ -278,3 +278,27 @@ questions:
         explanation: "This is not the best answer. The built-in policy runs in the API server with no extra software. It validates only and cannot create objects. Kyverno fits when the team also needs mutate, generate or reports. Gatekeeper fits a team that writes Rego. With `failurePolicy: Fail`, a missing key is a runtime error that rejects the request."
     correct_option: c
     explanation: "The built-in policy runs in the API server with no extra software. It validates only and cannot create objects. Kyverno fits when the team also needs mutate, generate or reports. Gatekeeper fits a team that writes Rego. With `failurePolicy: Fail`, a missing key is a runtime error that rejects the request."
+  - id: ats021-030-q12
+    type: single_choice
+    difficulty: intermediate
+    learning_objective: Repair a Helm-generated workload rejected by admission policy.
+    source_readings:
+    - sections/section-030/module-02/course-05-repair-the-chart-that-generates-a-rejected-pod.md
+    prompt: Gatekeeper rejects a Pod because its required team label is missing. The Helm chart puts the label only
+      on Deployment metadata. What makes the release reproducibly compliant?
+    options:
+    - id: a
+      text: Disable the constraint until the rollout finishes
+      explanation: This bypasses admission and leaves the generated Pod invalid.
+    - id: b
+      text: Label the running Pod manually
+      explanation: Admission has already rejected it, and future Pods would still lack the label.
+    - id: c
+      text: Add the label to spec.template.metadata.labels in the chart, supply the value and upgrade the release
+      explanation: The chart now generates compliant Pods on every rollout.
+    - id: d
+      text: Change only the chart appVersion
+      explanation: appVersion does not change the rendered Pod labels.
+    correct_option: c
+    explanation: Repair the generating template and values, render the chart to inspect the Pod template, then upgrade
+      with policy enforcement still enabled.

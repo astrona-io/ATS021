@@ -44,7 +44,7 @@ def verify(lab, graders):
     raise RuntimeError('all graders passed before the reference solution')
 
 
-GRADERS = ['validation/validate-template-created.sh', 'validation/validate-latest-denied-in-starfleet.sh', 'validation/validate-pinned-tags-and-scope.sh', 'validation/validate-audit-lists-drifter.sh']
+GRADERS = ['validation/validate-template-created.sh', 'validation/validate-latest-denied-in-starfleet.sh', 'validation/validate-pinned-tags-and-scope.sh']
 
 if __name__ == '__main__':
     try:

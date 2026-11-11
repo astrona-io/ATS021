@@ -1,6 +1,6 @@
 # Allow Only One Registry With Gatekeeper
 
-The exam gives the same task to candidates who use different policy engines, so you must be able to write the registry rule in Gatekeeper as well. Gatekeeper works differently from Kyverno. You write the rule once as Rego code in a template, and then you create objects of the new kind to switch the rule on with parameters. This part writes the registry rule in that form and shows a difference in what each engine matches.
+The same registry restriction can be expressed in different policy engines. This example implements it with a Gatekeeper template and constraint. Gatekeeper works differently from Kyverno. You write the rule once as Rego code in a template, and then you create objects of the new kind to switch the rule on with parameters. This part writes the registry rule in that form and shows a difference in what each engine matches.
 
 A **`ConstraintTemplate`** holds the Rego rule and creates a new resource kind. A **Constraint** is an object of that kind. It says where the rule applies (`match`) and gives the parameters. Rego is the policy language of Open Policy Agent (OPA). A Rego rule named `violation` produces a message for every violation.
 
@@ -162,7 +162,7 @@ The Deployment exists, but it has no pods. The ReplicaSet controller tried to cr
 kubectl -n starfleet delete deploy bad-nginx
 ```
 
-To reject the Deployment at the time of the request, a Gatekeeper template must also match Deployments and read `spec.template.spec.containers`. The exam hint is to read the events when a Deployment shows `0/1` and no error.
+To reject the Deployment at the time of the request, a Gatekeeper template must also match Deployments and read `spec.template.spec.containers`. Read the events when a Deployment shows `0/1` and its creation command reported no error.
 
 ## Common pitfalls
 
@@ -171,3 +171,9 @@ To reject the Deployment at the time of the request, a Gatekeeper template must 
 > - The Constraint kind exists only after the template is applied and Gatekeeper has created the CRD. If `kubectl apply` of the Constraint says the kind is not found, wait a few seconds and apply again.
 > - Without `namespaces` in `match`, the Constraint applies to every namespace Gatekeeper checks. A registry rule can then block system pods that come from other registries when they restart.
 > - The prefix `ghcr.io/` ends with a slash. Without the slash, `ghcr.io.example.com/app` would also match.
+
+## Test the registry boundary
+
+A passing allowed-image test and a failing Docker Hub test are necessary but incomplete. Try `ghcr.io.example.com/team/app:v1` to catch a prefix without the trailing slash. Then use a two-container Pod with an allowed first image and a disallowed second image to prove the loop checks every regular container. Repeat in both protected namespaces and verify that an outside namespace remains unaffected.
+
+This example checks `spec.containers`. Before using a registry policy in production, extend and test the treatment of init and ephemeral containers and decide whether trusted registries alone are sufficient or image digests and signatures are also required. The independent lab assesses the regular-container rule taught here.

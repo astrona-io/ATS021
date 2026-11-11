@@ -6,22 +6,12 @@ spec:
   enforcementAction: deny
   match:
     kinds:
-      - apiGroups: [""]
-        kinds: ["Pod"]
-    namespaces: ["starfleet"]
+    - apiGroups:
+      - ''
+      kinds:
+      - Pod
+    namespaces:
+    - starfleet
   parameters:
-    tags: ["latest"]
----
-apiVersion: constraints.gatekeeper.sh/v1beta1
-kind: K8sDisallowedTags
-metadata:
-  name: audit-latest-outpost
-spec:
-  enforcementAction: dryrun
-  match:
-    kinds:
-      - apiGroups: [""]
-        kinds: ["Pod"]
-    namespaces: ["outpost"]
-  parameters:
-    tags: ["latest"]
+    tags:
+    - latest

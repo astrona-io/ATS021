@@ -265,21 +265,3 @@ has the intended effect.
 > - **Adding the label without checking the key.** An `add` patch can overwrite an existing value. Check `object` and preserve empty values too.
 > - **Patching a missing parent map.** Create `/metadata/labels` when absent; otherwise add only `/metadata/labels/team`.
 > - **Treating offline success as admission proof.** Also create and update live Pods, and check that other namespaces remain unchanged.
-
-## Your mission: Default Pod Labels With A NamespacedMutatingPolicy
-
-You can now test a namespaced mutation without overwriting a team value.
-Write the policy, test it offline and prove it with new Pods and a later update.
-
-```sh
-astrona stop ats-021-playground-030-01
-astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-01/labs/lab-02
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-01/labs/lab-02
-```
-
-When you finish, remove the lab and resume the playground:
-
-```sh
-astrona destroy ats-021-lab-030-01-02
-astrona start ats-021-playground-030-01
-```

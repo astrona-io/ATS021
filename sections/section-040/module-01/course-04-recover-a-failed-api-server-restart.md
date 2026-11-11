@@ -87,27 +87,3 @@ You can now diagnose an API server startup failure without API access, identify 
 > - **Keeping no working backup.** Save it outside the watched directory before changing startup configuration.
 > - **Restoring the wrong backup.** The pre-audit copy disables audit logging; the working audit copy preserves it.
 > - **Making this change on another cluster.** The commands are for the disposable playground's node only.
-
-## Your mission: Record API Activity With Audit Logging Lab
-
-You can now write an audit policy, turn on audit logging on the API server, find the caller of a change in the log and recover from a failed restart. The mission starts a cluster with no audit logging and a CronJob that deletes the Deployment `probe`. It asks you to enable logging with the right levels for Secrets and Deployments, drop the health checks, and record who deleted `probe`.
-
-Pause the playground first, so the lab has the memory it needs:
-
-```sh
-astrona stop ats-021-playground-040-01
-```
-
-Start the lab, then grade it when you are done:
-
-```sh
-astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-040/module-01/labs/lab-01
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-040/module-01/labs/lab-01
-```
-
-When you are done, remove the lab and start the playground again:
-
-```sh
-astrona destroy ats-021-lab-040-01
-astrona start ats-021-playground-040-01
-```

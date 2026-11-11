@@ -114,27 +114,3 @@ The service account may create Deployments in `starfleet`. It may not create the
 > - `kubectl apply` needs `get` and `create` (and `patch` for later updates). A Role with only `create` fails on the first `get`, as the error message shows.
 > - A skipped deploy is a successful run. Alert on a failed run and report on a skipped one; do not treat them as the same event.
 > - A ConfigMap workspace needs no rights from the service account. The kubelet mounts it, so a Role for ConfigMaps does not help and is not needed.
-
-## Your mission: Gate A Tekton Pipeline On A Compliance Check Lab
-
-You can now write a check Task that records `pass` or `fail`, gate a deploy with a `when` expression, report with a `finally` Task and limit a service account to the verbs it needs. The mission starts a cluster with Tekton and an unfinished Pipeline `release-gate`. It asks you to add the check Task, skip the deploy for a release that breaks the rules, add a `finally` Task and replace the broad grant of `pipeline-runner` with a Role in `starfleet`.
-
-Pause the playground first, so the lab has the memory it needs:
-
-```sh
-astrona stop ats-021-playground-050-01
-```
-
-Start the lab, then grade it when you are done:
-
-```sh
-astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-01/labs/lab-01
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-01/labs/lab-01
-```
-
-When you are done, remove the lab and start the playground again:
-
-```sh
-astrona destroy ats-021-lab-050-01
-astrona start ats-021-playground-050-01
-```

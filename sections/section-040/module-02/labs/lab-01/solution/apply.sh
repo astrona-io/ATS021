@@ -4,7 +4,9 @@
 # answers to the ConfigMap `auditor-answers`.
 set -euo pipefail
 
-if command -v podman >/dev/null 2>&1 && podman ps >/dev/null 2>&1; then
+if [ -n "${ASTRONA_CONTAINER_ENGINE:-}" ]; then
+  RUNTIME="$ASTRONA_CONTAINER_ENGINE"
+elif command -v podman >/dev/null 2>&1 && podman ps >/dev/null 2>&1; then
   RUNTIME=podman
 else
   RUNTIME=docker

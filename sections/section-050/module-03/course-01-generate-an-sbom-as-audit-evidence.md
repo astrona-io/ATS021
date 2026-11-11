@@ -96,27 +96,3 @@ You can now turn an image into an inventory in two formats and answer a package 
 > - **Scanning a tag after it moved.** Read the Deployment reference and retain the digest and platform with the evidence.
 > - **Using `components` on SPDX JSON.** SPDX JSON uses `packages` and `versionInfo`.
 > - **Calling an SBOM a clean security report.** An inventory says what was found inside the image. It is not a vulnerability verdict.
-
-## Your mission: Generate SBOM Audit Evidence
-
-You can now identify packages in a pinned image. The mission asks you to save an inventory and record package answers for running Deployments.
-
-Pause the playground, then start the lab:
-
-```sh
-astrona stop ats-021-playground-050-03
-astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-03/labs/lab-01
-```
-
-When your evidence is ready, grade it once:
-
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-03/labs/lab-01
-```
-
-Then remove the lab and resume the playground:
-
-```sh
-astrona destroy ats-021-lab-050-03
-astrona start ats-021-playground-050-03
-```

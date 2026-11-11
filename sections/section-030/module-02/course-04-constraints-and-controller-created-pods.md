@@ -92,27 +92,3 @@ You now know that a Constraint on Pods also governs the pods a Deployment create
 > - **Describing the Deployment for the message.** The Deployment shows `ReplicaFailure`; the Gatekeeper text is in the ReplicaSet events.
 > - **Labelling the Deployment instead of the pod template.** Only `spec.template.metadata.labels` reaches the pods.
 > - **Changing the selector to add the label.** `spec.selector` of a Deployment is immutable; add the label to the template only.
-
-## Your mission: Satisfy A Gatekeeper Constraint With A Helm Chart Lab
-
-You can now write a Constraint with rules on Pods and Deployments and find the refusal a controller-created pod leaves behind. The mission starts a cluster with Gatekeeper, Helm on the terminal and a `probe` chart that runs one replica and labels the Deployment only; you write a template with two violation rules and a `deny` constraint for `starfleet`, then repair the chart, raise its version to `0.2.0` and upgrade the release until its pods run.
-
-Pause the playground first, so the lab has the memory it needs:
-
-```sh
-astrona stop ats-021-playground-030-02
-```
-
-Start the lab, then grade it when you are done:
-
-```sh
-astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-02/labs/lab-02
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-02/labs/lab-02
-```
-
-When you are done, remove the lab and start the playground again:
-
-```sh
-astrona destroy ats-021-lab-030-02-02
-astrona start ats-021-playground-030-02
-```

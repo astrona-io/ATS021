@@ -10,4 +10,6 @@ Template status is part of the troubleshooting path. If a template has invalid R
 
 A Constraint on Pods also governs the pods a Deployment creates. The API server admits the Deployment, the ReplicaSet controller sends the pod create requests, and the Gatekeeper webhook refuses them there. The person who applied the Deployment sees no error; the refusal is in the `FailedCreate` event of the newest ReplicaSet and in the `ReplicaFailure` condition of the Deployment. The fix belongs in the pod template, and when the workload comes from a Helm chart, in the chart's template file, followed by a new chart version and an upgrade of the release.
 
+A packaged workload needs its repair in the chart template and values. The chart version records that change; the stored release and available Pods show whether the upgrade applied it.
+
 <!-- astrona:playground:destroy -->

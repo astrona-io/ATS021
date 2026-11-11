@@ -207,27 +207,3 @@ You now have a scan decision connected to both an image digest and retained evid
 > - **Using `|| true` without recording the status.** That can turn scanner errors into passing releases.
 > - **Gating on a report string.** Gate on the result derived from the scanner exit code; keep the report as evidence.
 > - **Keeping evidence only in the pod.** Mount retained storage and copy it outside the cluster before cleanup.
-
-## Your mission: Gate A Tekton Release With A Vulnerability Scan
-
-You can now write an inventory to retained storage and let a Task result decide whether a deploy runs. The mission asks you to add that gate to an ungated release Pipeline, keep the SBOM across runs, and allow deployment only for `pass`.
-
-Pause the playground, then start the lab:
-
-```sh
-astrona stop ats-021-playground-050-03
-astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-03/labs/lab-02
-```
-
-When your Pipeline is ready, grade it once:
-
-```sh
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-050/module-03/labs/lab-02
-```
-
-Then remove the lab and resume the playground:
-
-```sh
-astrona destroy ats-021-lab-050-03-02
-astrona start ats-021-playground-050-03
-```

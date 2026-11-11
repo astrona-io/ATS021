@@ -464,6 +464,9 @@ modules:
         title: "Constraints And Pods Created By Controllers"
         path: sections/section-030/module-02/course-04-constraints-and-controller-created-pods.md
       - type: reading
+        title: "Repair The Chart That Generates A Rejected Pod"
+        path: sections/section-030/module-02/course-05-repair-the-chart-that-generates-a-rejected-pod.md
+      - type: reading
         title: Question
         path: sections/section-030/module-02/labs/lab-02/question.md
       - type: lab
@@ -489,7 +492,7 @@ modules:
             url: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#failed-deployment
       - type: reading
         title: Summary
-        path: sections/section-030/module-02/course-05-summary.md
+        path: sections/section-030/module-02/course-06-summary.md
 
       - type: reading
         title: "Write ValidatingAdmissionPolicies With CEL"

@@ -160,27 +160,3 @@ You can now write a `securityContext` that passes `restricted`, say what each fi
 > - **Stopping after admission accepts the pod.** `runAsNonRoot` is checked again by the kubelet; a non-numeric image user gives `CreateContainerConfigError`.
 > - **Using `runAsUser: 0` to make an image work.** `restricted` rejects it, and so does the kubelet with `runAsNonRoot: true`. Fix the image or pick its non-root user ID.
 > - **Fixing only the containers you know about.** The warning names every container, including sidecars and init containers; read the whole message.
-
-## Your mission: Restrict Pods With Pod Security Admission Lab
-
-You can now read a Pod Security Admission warning, write a `securityContext` that passes `restricted` and enforce the level on a namespace. The mission starts a `starfleet` namespace with three workloads that break `restricted` and a privileged Deployment, and asks you to make the namespace enforce `restricted` while the workloads keep running.
-
-Pause the playground first, so the lab has the memory it needs:
-
-```sh
-astrona stop ats-021-playground-010-02
-```
-
-Start the lab, then grade it when you are done:
-
-```sh
-astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-010/module-02/labs/lab-01
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-010/module-02/labs/lab-01
-```
-
-When you are done, remove the lab and start the playground again:
-
-```sh
-astrona destroy ats-021-lab-010-02
-astrona start ats-021-playground-010-02
-```

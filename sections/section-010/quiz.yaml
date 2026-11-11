@@ -64,7 +64,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Check any permission for another identity with kubectl auth can-i --as, including --list"
     source_readings:
-      - sections/section-010/module-01/course-03-proving-and-debugging-access.md
+      - sections/section-010/module-01/course-03-limit-subresources-and-named-objects.md
     prompt: |-
       You run `kubectl auth can-i patch deployments/scale -n starfleet --as=system:serviceaccount:starfleet:ci-deployer` and get `yes`. The pipeline still fails on `kubectl scale` with `cannot patch resource "deployments/scale"`. What explains this?
     options:
@@ -136,7 +136,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Extend a ClusterRole through aggregation labels instead of editing a built-in role"
     source_readings:
-      - sections/section-010/module-01/course-04-over-broad-grants-and-aggregation.md
+      - sections/section-010/module-01/course-04-extend-built-in-roles-with-aggregation.md
     prompt: |-
       The `developers` group is bound to `view` and must also list Leases (`coordination.k8s.io`). A colleague proposes editing `view`. What is the better way?
     options:
@@ -185,6 +185,7 @@ questions:
     learning_objective: "Test a level change against existing workloads with a server-side dry run before enforcing it"
     source_readings:
       - sections/section-010/module-02/course-02-changing-a-namespace-level.md
+      - sections/section-010/module-02/course-02-stage-namespace-enforcement.md
     prompt: |-
       You want to raise `starfleet` to `restricted`. The namespace runs pods that may break it. What is the safe order?
     options:
@@ -208,7 +209,7 @@ questions:
     difficulty: intermediate
     learning_objective: "Explain why a Deployment is accepted while its pods are rejected, and find the error in the ReplicaSet events"
     source_readings:
-      - sections/section-010/module-02/course-02-changing-a-namespace-level.md
+      - sections/section-010/module-02/course-02-stage-namespace-enforcement.md
     prompt: |-
       After `enforce=baseline` is set on `starfleet`, you run `kubectl -n starfleet rollout restart deployment privileged-debug`. The command prints `restarted`, but the `READY` column shows `1/1` with `UP-TO-DATE` `0`. Where is the Pod Security Admission error?
     options:

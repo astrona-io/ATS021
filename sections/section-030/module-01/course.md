@@ -4,11 +4,13 @@ RBAC decides who may create an object, and Pod Security Admission checks a fixed
 
 Keep one sentence in mind for this module: **a Kyverno rule selects objects with `match`, then validates, mutates or generates.** You will write a rule that blocks pods without limits, switch it between blocking and reporting and read the reports, add a default label with a mutate rule, and create a NetworkPolicy in every new namespace with a generate rule.
 
-The module has four parts. **Validate Rules And Admission** writes the first ClusterPolicy, reads Kyverno's rejection, and shows how one pod rule also checks Deployments. **Enforce, Audit And Policy Reports** switches the rule to Audit and reads the PolicyReports that Kyverno writes for existing and new objects. **Mutate And Generate Rules** changes objects as they are created and creates new ones, and explains the state of policy exceptions in Kyverno 1.19.1.
+The first two readings teach validation and policy reports. **Add Defaults With Mutation** preserves explicit team labels. **Generate And Maintain Namespace Policy** creates and restores a separate NetworkPolicy and explains policy exceptions.
 
 **Default Pod Labels With A NamespacedMutatingPolicy** writes a namespaced CEL mutation on CREATE and UPDATE, preserves a person's label change, and tests saved resources with the Kyverno command-line interface (CLI).
 
 Separate labs practise validation, label mutation and resource generation. Another lab uses a namespaced CEL mutation policy and checks CREATE and UPDATE behavior.
+
+Mutation and generation have separate readings and labs. First prove that defaults preserve explicit team values, then prove that the background controller creates and restores a namespace policy.
 
 ## Learning objectives
 

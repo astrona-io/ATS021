@@ -1,6 +1,6 @@
-# Audit Status And Template Errors
+# Read Gatekeeper Audit Results
 
-Admission only sees new create, update and delete requests. Gatekeeper also has an audit controller. The audit controller lists existing objects, evaluates constraints against them, and writes the result into each constraint's status.
+Gatekeeper admission evaluates incoming requests. Its audit controller also evaluates existing resources and records violations in constraint status. Read the object identities and the audit timestamp before using that status as an inventory.
 
 ## Audit results
 
@@ -23,7 +23,7 @@ Pod starfleet/probe-6f569ff97-qbm22: missing required label: team
 
 The pod name in your cluster will have a different suffix. The useful fields are `status.totalViolations` and `status.violations`. Each violation names the kind, namespace, object name and message.
 
-If you left the `dryrun` and `warn` pods from the previous page in place, the same command later reports them too:
+If you left the `dryrun` and `warn` pods from the enforcement-action exercise in place, the same command later reports them too:
 
 ```text
 3 total violations
@@ -34,35 +34,10 @@ Pod starfleet/no-team: missing required label: team
 
 That output shows the difference between admission and audit. Admission handles the request in front of it. Audit reports the current state of the cluster.
 
-## Template errors
-
-Gatekeeper also records template problems in status. The playground includes a broken ConstraintTemplate named `k8sbrokenlabels`. Its Rego rule is missing a closing brace.
-
-Check its status:
-
-```sh
-kubectl get constrainttemplate k8sbrokenlabels -o jsonpath='{.status.created}{"\n"}{.status.byPod[0].errors[0].message}{"\n"}'
-```
-
-You should see:
-
-```text
-false
-Could not ingest Rego: invalid ConstraintTemplate: 1 error occurred: template:6: rego_parse_error: unexpected eof token
-	  msg := "the team label is missing"
-	                                   ^
-```
-
-`status.created` is `false`, so Gatekeeper did not create a usable constraint kind from this template. The error message points at the Rego line where parsing reached the end of the file. In this case, the parser expected the missing closing brace for the `violation` rule.
-
-The exam task may give you a template that applies cleanly but never creates its constraint kind. Check the template status before you spend time debugging the constraint.
-
-You now know the full Gatekeeper loop: a template defines the kind and Rego code, a constraint selects objects and passes parameters, admission enforces new requests, and audit reports existing violations.
+A dryrun constraint lets requests proceed while the audit controller reports matching existing violations. Keep the original violating workload when the task is to inventory it.
 
 ## Common pitfalls
 
 > [!WARNING]
-> - **Expecting audit status immediately.** The audit controller runs on its own interval, so `totalViolations` can lag behind admission.
-> - **Forgetting that audit reports live objects.** If you delete a violating pod, the next audit run removes it from the status.
-> - **Stopping at `kubectl apply` for a template.** A broken template can be stored but still have `status.created: false`.
-> - **Reading only the first line of a Rego error.** The pointer line often shows the exact missing brace, unsafe variable or parse location.
+> - Wait for a fresh audit timestamp before interpreting the current violation list.
+> - Deleting a violating Pod removes evidence from a later audit result.

@@ -39,3 +39,21 @@ CI also checks quiz registration, answer references, unique question IDs, declar
 ## Readings without a module-lab link
 
 The generated reverse map in [LAB-COVERAGE.md](LAB-COVERAGE.md) lists supporting and capstone-only readings. A listed concept is not claimed as independently assessed without a lab link.
+
+## Reading and practice sequence
+
+Five module lesson pairs now have separate teaching before each lab:
+
+| Module | Reading and practice order |
+| --- | --- |
+| RBAC | Diagnose an access denial → grant namespace access → limit a named scale subresource → practise scaling rights |
+| RBAC | Find excessive grants → remove a broad grant → extend built-in roles → practise aggregation |
+| Pod Security | Inspect existing violations → record the baseline inventory → stage enforcement → configure namespace modes |
+| Kyverno | Add defaults with mutation → prove label behavior → generate namespace policy → prove creation and recreation |
+| Gatekeeper | Read audit results → inventory violations → diagnose template errors → repair compilation |
+
+Each of the seven capstones has its own integration reading immediately before the question. Existing lesson paths and lab identifiers remain valid. Quiz citations follow the extracted teaching, and the generated coverage map includes the new preparation pages.
+
+The sequence validator requires a mapped technical reading between successive labs, including capstones. Questions, summaries and unrelated pages do not count. This update changes teaching order and preparation; lab fixtures, solutions and graders are unchanged.
+
+The extracted named-object reading also corrects the restriction on list and watch: a matching name field selector is required. See the [Kubernetes 1.35 RBAC reference](https://v1-35.docs.kubernetes.io/docs/reference/access-authn-authz/rbac/) for the API behavior.

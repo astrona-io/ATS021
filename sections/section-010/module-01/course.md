@@ -6,6 +6,8 @@ Keep one sentence in mind for this module: **a role says what may be done, a bin
 
 The module has four parts. **The Request Path And Role Rules** follows one request through authentication, authorization and admission, and writes the first `Role` and `RoleBinding`. **Bindings, Subjects And Scope** compares users, groups and service accounts as subjects, and `Role` with `ClusterRole`. **Proving And Debugging Access** checks permissions for any identity and reads a `Forbidden` error field by field. **Finding Over-Broad Grants And Extending Roles** searches the cluster for `cluster-admin` bindings, removes one, and adds rights to a built-in role the safe way.
 
+The independent labs practise namespace grants, replacing excessive access, extending an aggregated role, and limiting access to a named scale subresource.
+
 ## Learning objectives
 
 After this module you can:

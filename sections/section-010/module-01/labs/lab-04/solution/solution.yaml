@@ -1,0 +1,37 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: scout-scaler
+  namespace: starfleet
+rules:
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  resourceNames:
+  - scout
+  verbs:
+  - get
+- apiGroups:
+  - apps
+  resources:
+  - deployments/scale
+  resourceNames:
+  - scout
+  verbs:
+  - get
+  - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: scout-scaler
+  namespace: starfleet
+subjects:
+- kind: ServiceAccount
+  name: scale-operator
+  namespace: starfleet
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: scout-scaler

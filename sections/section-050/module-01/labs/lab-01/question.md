@@ -2,16 +2,16 @@
 
 Solve this question on: `terminal`
 
-The release pipeline of the `starfleet` team runs in the namespace `pipelines` on Tekton Pipelines 1.17.0. The Pipeline `release-gate` is not finished: it deploys every release, even a release that breaks the platform rules, and nothing reports the outcome. The service account `pipeline-runner` also has more rights than the deploy step needs. A new run starts the Pipeline with the service account `pipeline-runner` and two workspaces. The workspace `release` holds the file `deployment.yaml` with one Deployment. The workspace `policies` holds the file `policies.yaml` with the platform rules.
+Tekton, `deploy-release`, the policy and release ConfigMaps are ready. `pipeline-runner` already has limited deployment access. The Pipeline has no check Task and does not gate deployment.
 
-The namespace `pipelines` already has the Tasks `deploy-release` and `report-outcome`. It also has the ConfigMap `platform-policies` and three releases you can try (`release-compliant`, `release-noncompliant` and `release-outpost`). Do not change these objects.
+## Tasks
 
-1. Create the Task `check-release` in the namespace `pipelines`. It has the workspaces `release` and `policies` and the result `outcome`. One step runs the image `ghcr.io/kyverno/kyverno-cli:v1.19.1` with the arguments `apply <policies path>/policies.yaml --resource <release path>/deployment.yaml`. A second step writes the word `pass` to the result `outcome` when the first step exited with code `0`, and the word `fail` otherwise. Write the word without a newline. The Task itself must succeed in both cases.
+1. Create `check-release` with workspaces `release` and `policies` and result `outcome`. Run the supplied policy through Kyverno CLI v1.19.1. Publish exactly `pass` or `fail` without a newline; the Task must succeed for either policy decision.
 
-2. Change the Pipeline `release-gate`. The Pipeline Task `deploy` must run only when the result `outcome` of the Pipeline Task `check` is `pass`. Tekton must skip it in every other case. Keep the names `check` and `deploy` and keep the two workspaces.
+2. Add a `when` expression to Pipeline Task `deploy` in `release-gate`, using the result of Pipeline Task `check`. Deploy only when its value is `pass`.
 
-3. Add a `finally` Task to `release-gate` that uses the Task `report-outcome`. Name the Pipeline Task `report`. It receives the status of all Tasks in the parameter `pipeline-status` and the status of `check` in the parameter `check-status`. It must run after a deployed release, a blocked release and a release whose deploy fails.
+3. Run the prepared compliant and noncompliant releases. Verify the check result, the deployed object for the compliant release, and a skipped deploy with no deploy TaskRun for the noncompliant release.
 
-4. Give the service account `pipeline-runner` only the rights the deploy step needs. It must be able to `get`, `list`, `create` and `patch` Deployments in the namespace `starfleet`, and nothing else in any namespace. In particular, it must not deploy into `outpost`, delete Deployments or read Secrets. Remove the grant that is too broad. Do not delete the service account.
+Keep the supplied Tasks, ConfigMaps, workload identities and namespaces. Do not hard-code release decisions. Each run takes additional time; inspect its conditions and TaskRuns before judging the outcome.
 
-`kubectl` already points at the cluster as the cluster administrator. You can test your work by starting the Pipeline with the three prepared releases. A run takes about 30 seconds. The grader uses its own policy file and releases, so do not tune the Pipeline to the prepared ones.
+Learner work: about 15 minutes. Cluster startup and controller reconciliation take additional time.

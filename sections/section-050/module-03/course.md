@@ -11,6 +11,8 @@ Keep one sentence in mind for this module: **the digest ties the inventory, the 
 - **Keep SBOM Evidence In A Tekton Pipeline** writes the inventory and scan report to a retained workspace, exports the verdict as a Task result, and reads the run reasons that tell a skipped deploy from a failed one. The vulnerability gate lab follows it.
 - **Verify Signatures Before Admission** verifies the fixture with cosign, then makes Kyverno's `ImageValidatingPolicy` require that key at admission and reads each stage's rejection text. The signature lab follows it and enforces the key only in namespaces labelled `environment: production`.
 
+Independent practice covers package inventories, scanning saved inventories, a pipeline scan gate, and image signature admission.
+
 ## Learning objectives
 
 After this module you can:

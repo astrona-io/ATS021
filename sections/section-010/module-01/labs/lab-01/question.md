@@ -2,12 +2,16 @@
 
 Solve this question on: `terminal`
 
-The `starfleet` namespace is running. A security review found three access problems. Fix all three with RBAC. Use only Roles and RoleBindings in `starfleet`, plus the one labelled ClusterRole in task 3. Do not change the workloads.
+The `ci-deployer` service account in `starfleet` has no resource permissions. Give this deployment pipeline access to one namespace.
 
-1. The service account `ci-deployer` in `starfleet` has no rights. It must be able to read (`get`, `list`, `watch`), create, `update` and `patch` Deployments in `starfleet`. It must not be able to delete Deployments, read Secrets, create pods, or do anything in another namespace.
+## Tasks
 
-2. The service account `legacy-agent` in `starfleet` is bound to the `cluster-admin` ClusterRole. Remove that grant, but keep the service account. The agent still has to read pods (`get`, `list`, `watch`) in `starfleet`, and nothing else.
+1. Inspect the existing service account and confirm it cannot patch Deployments in `starfleet`.
 
-3. The group `developers` already has the built-in `view` ClusterRole in `starfleet` through the RoleBinding `developers-view`. The group must also be able to list Leases (API group `coordination.k8s.io`) in `starfleet`. Do not edit the `view` ClusterRole and do not create a new binding. Extend `view` through its aggregation label instead.
+2. Create a Role and RoleBinding allowing `get`, `list`, `watch`, `create`, `update` and `patch` on Deployments in `starfleet`.
 
-`kubectl` already points at the cluster as the cluster administrator. You can check any identity with `--as` and `--as-group`.
+3. Prove that the account can annotate `scout`, but cannot delete Deployments, read Secrets, create Pods or access Deployments in `outpost`.
+
+Keep the prepared workloads, service accounts and namespace labels unchanged.
+
+Learner work: about 15 minutes. Cluster startup and controller reconciliation take additional time.

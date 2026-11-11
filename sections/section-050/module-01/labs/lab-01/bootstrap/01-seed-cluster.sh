@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
-# Starting state for the Tekton lab. Environment only: it installs Tekton
-# Pipelines, waits until the controller and webhook answer, and applies the
-# namespaces, the over-broad grant, the Tasks and the unfinished Pipeline.
-# It creates no check Task and does not fix the Pipeline.
+# Install Tekton and seed the supporting resources for this independent task.
 set -euo pipefail
 
 TEKTON_VERSION="v1.17.0"

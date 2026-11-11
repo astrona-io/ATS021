@@ -91,28 +91,97 @@ modules:
         title: "Proving And Debugging Access"
         path: sections/section-010/module-01/course-03-proving-and-debugging-access.md
       - type: reading
-        title: "Finding Over-Broad Grants And Extending Roles"
-        path: sections/section-010/module-01/course-04-over-broad-grants-and-aggregation.md
+        title: Question
+        path: sections/section-010/module-01/labs/lab-04/question.md
+      - type: lab
+        title: Grant Access To One Scale Subresource Lab
+        path: sections/section-010/module-01/labs/lab-04
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: access-control
+        task_kind: build
+        tags:
+        - rbac
+        - subresources
+        - resourceNames
+        learning_goals:
+        - Grant access to one named scale subresource.
+        - Prove scaling succeeds while template changes and unrelated access fail.
+        resources:
+        - name: Kubernetes RBAC reference
+          url: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+        - name: Kubernetes service accounts
+          url: https://kubernetes.io/docs/concepts/security/service-accounts/
       - type: reading
         title: Question
         path: sections/section-010/module-01/labs/lab-01/question.md
       - type: lab
-        title: "Grant Least-Privilege Access With RBAC Lab"
+        title: Grant Deployment Access In One Namespace Lab
         path: sections/section-010/module-01/labs/lab-01
         difficulty: intermediate
-        estimated_duration: 20m
+        estimated_duration: 15m
         topic: access-control
         task_kind: build
-        tags: [rbac, role, rolebinding, clusterrolebinding, serviceaccount, auth-can-i, least-privilege, aggregated-clusterrole]
+        tags:
+        - rbac
+        - role
+        - rolebinding
+        - least-privilege
         learning_goals:
-          - Write a Role and RoleBinding that give a service account only the Deployment verbs it needs in one namespace
-          - Remove a cluster-admin binding from a service account and replace it with a pod-reading Role
-          - Extend the built-in view ClusterRole through an aggregation label instead of editing it
+        - Grant Deployment access in one namespace.
+        - Prove allowed operations and least-privilege boundaries.
         resources:
-          - name: "Kubernetes RBAC reference"
-            url: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
-          - name: "Kubernetes service accounts"
-            url: https://kubernetes.io/docs/concepts/security/service-accounts/
+        - name: Kubernetes RBAC reference
+          url: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+        - name: Kubernetes service accounts
+          url: https://kubernetes.io/docs/concepts/security/service-accounts/
+      - type: reading
+        title: "Finding Over-Broad Grants And Extending Roles"
+        path: sections/section-010/module-01/course-04-over-broad-grants-and-aggregation.md
+      - type: reading
+        title: Question
+        path: sections/section-010/module-01/labs/lab-02/question.md
+      - type: lab
+        title: Replace An Excessive Service Account Grant Lab
+        path: sections/section-010/module-01/labs/lab-02
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: access-control
+        task_kind: troubleshooting
+        tags:
+        - rbac
+        - clusterrolebinding
+        - least-privilege
+        learning_goals:
+        - Find and replace an excessive service account grant.
+        - Preserve Pod reads while denying unrelated and cross-namespace access.
+        resources:
+        - name: Kubernetes RBAC reference
+          url: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+        - name: Kubernetes service accounts
+          url: https://kubernetes.io/docs/concepts/security/service-accounts/
+      - type: reading
+        title: Question
+        path: sections/section-010/module-01/labs/lab-03/question.md
+      - type: lab
+        title: Extend A Built-In Role Through Aggregation Lab
+        path: sections/section-010/module-01/labs/lab-03
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: access-control
+        task_kind: build
+        tags:
+        - rbac
+        - clusterrole
+        - aggregation
+        learning_goals:
+        - Extend view through ClusterRole aggregation.
+        - Verify the aggregated permissions and namespace boundary.
+        resources:
+        - name: Kubernetes RBAC reference
+          url: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+        - name: Kubernetes service accounts
+          url: https://kubernetes.io/docs/concepts/security/service-accounts/
       - type: reading
         title: Summary
         path: sections/section-010/module-01/course-05-summary.md
@@ -126,6 +195,58 @@ modules:
       - type: reading
         title: "Changing A Namespace Level Safely"
         path: sections/section-010/module-02/course-02-changing-a-namespace-level.md
+      - type: reading
+        title: Question
+        path: sections/section-010/module-02/labs/lab-03/question.md
+      - type: lab
+        title: Find A Baseline Violation Across Three Namespaces Lab
+        path: sections/section-010/module-02/labs/lab-03
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: workload-security
+        task_kind: troubleshooting
+        tags:
+        - pod-security-admission
+        - baseline
+        - warn
+        - namespace-labels
+        - dry-run
+        learning_goals:
+        - Enable baseline warnings across namespaces.
+        - Evaluate existing Pods without persisting enforcement.
+        - Label the namespace with a confirmed baseline violation.
+        resources:
+        - name: Pod Security Admission
+          url: https://kubernetes.io/docs/concepts/security/pod-security-admission/
+        - name: Pod Security Standards
+          url: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+        - name: Configure a security context
+          url: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+      - type: reading
+        title: Question
+        path: sections/section-010/module-02/labs/lab-02/question.md
+      - type: lab
+        title: Stage Restricted Pod Security With Warnings Lab
+        path: sections/section-010/module-02/labs/lab-02
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: workload-security
+        task_kind: migration
+        tags:
+        - pod-security-admission
+        - warn
+        - audit
+        - enforce
+        learning_goals:
+        - Stage restricted warnings while enforcing baseline.
+        - Pin policy versions and prove allowed and rejected Pod requests.
+        resources:
+        - name: Pod Security Admission
+          url: https://kubernetes.io/docs/concepts/security/pod-security-admission/
+        - name: Pod Security Standards
+          url: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+        - name: Configure a security context
+          url: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
       - type: reading
         title: "A securityContext That Passes Restricted"
         path: sections/section-010/module-02/course-03-securitycontext-for-restricted.md
@@ -207,30 +328,57 @@ modules:
         title: "Requiring STRICT Mutual TLS"
         path: sections/section-020/module-01/course-02-requiring-strict-mtls.md
       - type: reading
+        title: Question
+        path: sections/section-020/module-01/labs/lab-01/question.md
+      - type: lab
+        title: Require Istio Mutual TLS Lab
+        path: sections/section-020/module-01/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: service-mesh
+        task_kind: build
+        tags:
+        - istio
+        - mutual-tls
+        - peerauthentication
+        learning_goals:
+        - Require namespace-wide mutual TLS.
+        - Prove meshed clients work and plaintext clients fail.
+        resources:
+        - name: Istio PeerAuthentication reference
+          url: https://istio.io/latest/docs/reference/config/security/peer_authentication/
+        - name: Istio AuthorizationPolicy reference
+          url: https://istio.io/latest/docs/reference/config/security/authorization-policy/
+        - name: Istio mutual TLS migration
+          url: https://istio.io/latest/docs/tasks/security/authentication/mtls-migration/
+      - type: reading
         title: "Authorizing Callers"
         path: sections/section-020/module-01/course-03-authorizing-callers.md
       - type: reading
         title: Question
-        path: sections/section-020/module-01/labs/lab-01/question.md
+        path: sections/section-020/module-01/labs/lab-02/question.md
       - type: lab
-        title: "Require Mutual TLS And Authorize Callers With Istio Lab"
-        path: sections/section-020/module-01/labs/lab-01
+        title: Authorize Istio Callers And Methods Lab
+        path: sections/section-020/module-01/labs/lab-02
         difficulty: intermediate
-        estimated_duration: 25m
+        estimated_duration: 15m
         topic: service-mesh
         task_kind: build
-        tags: [istio, mtls-strict, peerauthentication, authorizationpolicy, spiffe-identity]
+        tags:
+        - istio
+        - authorizationpolicy
+        - allow
+        - deny
         learning_goals:
-          - Require STRICT mTLS in a namespace with a PeerAuthentication and prove a plain-text client is refused
-          - Write an ALLOW AuthorizationPolicy that admits only the shuttle identity and the GET method
-          - Close one path with a DENY policy and prove DENY is checked before ALLOW
+        - Restrict callers and methods by workload identity.
+        - Use a DENY rule to block a path for an otherwise allowed caller.
         resources:
-          - name: "Istio PeerAuthentication reference"
-            url: https://istio.io/latest/docs/reference/config/security/peer_authentication/
-          - name: "Istio AuthorizationPolicy reference"
-            url: https://istio.io/latest/docs/reference/config/security/authorization-policy/
-          - name: "Istio mutual TLS migration"
-            url: https://istio.io/latest/docs/tasks/security/authentication/mtls-migration/
+        - name: Istio PeerAuthentication reference
+          url: https://istio.io/latest/docs/reference/config/security/peer_authentication/
+        - name: Istio AuthorizationPolicy reference
+          url: https://istio.io/latest/docs/reference/config/security/authorization-policy/
+        - name: Istio mutual TLS migration
+          url: https://istio.io/latest/docs/tasks/security/authentication/mtls-migration/
       - type: reading
         title: Summary
         path: sections/section-020/module-01/course-04-summary.md
@@ -368,6 +516,30 @@ modules:
         title: "Validate Rules And Admission"
         path: sections/section-030/module-01/course-01-validate-rules-and-admission.md
       - type: reading
+        title: Question
+        path: sections/section-030/module-01/labs/lab-01/question.md
+      - type: lab
+        title: Require Container Limits With Kyverno Lab
+        path: sections/section-030/module-01/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: policy-engines
+        task_kind: build
+        tags:
+        - kyverno
+        - validate
+        - resource-limits
+        learning_goals:
+        - Require CPU and memory limits on each container.
+        - Test valid objects, missing limits and the namespace boundary.
+        resources:
+        - name: Kyverno validate rules
+          url: https://kyverno.io/docs/policy-types/cluster-policy/validate/
+        - name: Kyverno mutate rules
+          url: https://kyverno.io/docs/policy-types/cluster-policy/mutate/
+        - name: Kyverno generate rules
+          url: https://kyverno.io/docs/policy-types/cluster-policy/generate/
+      - type: reading
         title: "Enforce, Audit And Policy Reports"
         path: sections/section-030/module-01/course-02-enforce-audit-and-policy-reports.md
       - type: reading
@@ -375,26 +547,52 @@ modules:
         path: sections/section-030/module-01/course-03-mutate-and-generate-rules.md
       - type: reading
         title: Question
-        path: sections/section-030/module-01/labs/lab-01/question.md
+        path: sections/section-030/module-01/labs/lab-03/question.md
       - type: lab
-        title: "Validate, Mutate And Generate With Kyverno Lab"
-        path: sections/section-030/module-01/labs/lab-01
+        title: Default Pod Labels With A Mutate Rule Lab
+        path: sections/section-030/module-01/labs/lab-03
         difficulty: intermediate
-        estimated_duration: 30m
+        estimated_duration: 15m
         topic: policy-engines
         task_kind: build
-        tags: [kyverno, clusterpolicy, validate-rule, mutate-rule, generate-rule, enforce-mode]
+        tags:
+        - kyverno
+        - mutate
+        - labels
         learning_goals:
-          - Write a Kyverno ClusterPolicy in Enforce mode that refuses pods and Deployments without CPU and memory limits in one namespace
-          - Add a default team label with a mutate rule that keeps an existing value
-          - Generate a default-deny NetworkPolicy in every new namespace and skip the system namespaces
+        - Default a missing Pod label.
+        - Preserve explicit values and exclude unrelated namespaces.
         resources:
-          - name: "Kyverno validate rules"
-            url: https://kyverno.io/docs/policy-types/cluster-policy/validate/
-          - name: "Kyverno mutate rules"
-            url: https://kyverno.io/docs/policy-types/cluster-policy/mutate/
-          - name: "Kyverno generate rules"
-            url: https://kyverno.io/docs/policy-types/cluster-policy/generate/
+        - name: Kyverno validate rules
+          url: https://kyverno.io/docs/policy-types/cluster-policy/validate/
+        - name: Kyverno mutate rules
+          url: https://kyverno.io/docs/policy-types/cluster-policy/mutate/
+        - name: Kyverno generate rules
+          url: https://kyverno.io/docs/policy-types/cluster-policy/generate/
+      - type: reading
+        title: Question
+        path: sections/section-030/module-01/labs/lab-04/question.md
+      - type: lab
+        title: Generate A Namespace NetworkPolicy Lab
+        path: sections/section-030/module-01/labs/lab-04
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: policy-engines
+        task_kind: build
+        tags:
+        - kyverno
+        - generate
+        - networkpolicy
+        learning_goals:
+        - Generate a default-deny NetworkPolicy for a new namespace.
+        - Verify policy fields, excluded namespaces and recreation after deletion.
+        resources:
+        - name: Kyverno validate rules
+          url: https://kyverno.io/docs/policy-types/cluster-policy/validate/
+        - name: Kyverno mutate rules
+          url: https://kyverno.io/docs/policy-types/cluster-policy/mutate/
+        - name: Kyverno generate rules
+          url: https://kyverno.io/docs/policy-types/cluster-policy/generate/
       - type: reading
         title: "Default Pod Labels With A NamespacedMutatingPolicy"
         path: sections/section-030/module-01/course-04-namespaced-mutation-and-offline-tests.md
@@ -540,6 +738,28 @@ modules:
       - type: reading
         title: "Choosing The Right Tool"
         path: sections/section-030/module-03/course-03-choosing-the-right-tool.md
+      - type: reading
+        title: Question
+        path: sections/section-030/module-03/labs/lab-02/question.md
+      - type: lab
+        title: Repair CEL Type And Missing-Key Errors Lab
+        path: sections/section-030/module-03/labs/lab-02
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: admission-control
+        task_kind: troubleshooting
+        tags:
+        - validatingadmissionpolicy
+        - cel
+        - troubleshooting
+        learning_goals:
+        - Find a CEL type error and guard a missing map key.
+        - Repair CREATE and UPDATE validation while preserving enforcement.
+        resources:
+        - name: ValidatingAdmissionPolicy
+          url: https://kubernetes.io/docs/reference/access-authn-authz/validating-admission-policy/
+        - name: CEL in Kubernetes
+          url: https://kubernetes.io/docs/reference/using-api/cel/
       - type: reading
         title: Summary
         path: sections/section-030/module-03/course-04-summary.md
@@ -709,31 +929,79 @@ modules:
         title: "Gate The Deploy With A when Expression"
         path: sections/section-050/module-01/course-02-gate-the-deploy-with-a-when-expression.md
       - type: reading
+        title: Question
+        path: sections/section-050/module-01/labs/lab-01/question.md
+      - type: lab
+        title: Gate A Tekton Release On A Compliance Result Lab
+        path: sections/section-050/module-01/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: pipeline-security
+        task_kind: build
+        tags:
+        - tekton
+        - results
+        - when
+        - kyverno-cli
+        learning_goals:
+        - Publish a compliance decision as a Task result.
+        - Gate deployment on pass while completing a blocked PipelineRun.
+        resources:
+        - name: Tekton Tasks
+          url: https://tekton.dev/docs/pipelines/tasks/
+        - name: Tekton Pipelines
+          url: https://tekton.dev/docs/pipelines/pipelines/
+      - type: reading
         title: "Run finally On Every Path"
         path: sections/section-050/module-01/course-03-run-finally-on-every-path.md
+      - type: reading
+        title: Question
+        path: sections/section-050/module-01/labs/lab-02/question.md
+      - type: lab
+        title: Report Every Tekton Pipeline Outcome Lab
+        path: sections/section-050/module-01/labs/lab-02
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: pipeline-security
+        task_kind: build
+        tags:
+        - tekton
+        - finally
+        - results
+        learning_goals:
+        - Report permitted, blocked and failed pipeline outcomes.
+        - Handle an unavailable result without suppressing reporting.
+        resources:
+        - name: Tekton Tasks
+          url: https://tekton.dev/docs/pipelines/tasks/
+        - name: Tekton Pipelines
+          url: https://tekton.dev/docs/pipelines/pipelines/
       - type: reading
         title: "Read A Failed Task And Limit The Service Account"
         path: sections/section-050/module-01/course-04-read-a-failed-task-and-limit-the-service-account.md
       - type: reading
         title: Question
-        path: sections/section-050/module-01/labs/lab-01/question.md
+        path: sections/section-050/module-01/labs/lab-03/question.md
       - type: lab
-        title: "Gate A Tekton Pipeline On A Compliance Check Lab"
-        path: sections/section-050/module-01/labs/lab-01
+        title: Limit A Tekton Deployment Identity Lab
+        path: sections/section-050/module-01/labs/lab-03
         difficulty: intermediate
-        estimated_duration: 40m
+        estimated_duration: 15m
         topic: pipeline-security
         task_kind: build
-        tags: [tekton, tekton-task, tekton-pipeline, pipelinerun, task-result, when-expression, finally-task, least-privilege]
+        tags:
+        - tekton
+        - serviceaccount
+        - rbac
+        - least-privilege
         learning_goals:
-          - Write a Tekton Task that records pass or fail in a result
-          - Skip the deploy Task for a non-compliant release with a when expression and report every run in a finally Task
-          - Replace a broad grant with a Role that lets the pipeline service account change Deployments in one namespace only
+        - "Replace a pipeline identity\u2019s cluster-wide grant."
+        - Keep compliant deployment working with access limited to Deployments in one namespace.
         resources:
-          - name: "Tekton Tasks"
-            url: https://tekton.dev/docs/pipelines/tasks/
-          - name: "Tekton Pipelines"
-            url: https://tekton.dev/docs/pipelines/pipelines/
+        - name: Tekton Tasks
+          url: https://tekton.dev/docs/pipelines/tasks/
+        - name: Tekton Pipelines
+          url: https://tekton.dev/docs/pipelines/pipelines/
       - type: reading
         title: Summary
         path: sections/section-050/module-01/course-05-summary.md
@@ -747,26 +1015,48 @@ modules:
         title: "Allow Only One Registry With Kyverno"
         path: sections/section-050/module-02/course-02-allow-only-one-registry-with-kyverno.md
       - type: reading
+        title: Question
+        path: sections/section-050/module-02/labs/lab-01/question.md
+      - type: lab
+        title: Enforce A Registry Boundary With Kyverno Lab
+        path: sections/section-050/module-02/labs/lab-01
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: image-policy
+        task_kind: build
+        tags:
+        - kyverno
+        - image-registry
+        - namespace-selector
+        learning_goals:
+        - Restrict workload images to approved registry hosts.
+        - Prove denied images, allowed images and namespace scoping.
+        resources:
+        - name: Kyverno validate rules
+          url: https://kyverno.io/docs/policy-types/cluster-policy/validate/
+      - type: reading
         title: "Reject Latest, Untagged And Unpinned Images"
         path: sections/section-050/module-02/course-03-reject-latest-untagged-and-unpinned-images.md
       - type: reading
         title: Question
-        path: sections/section-050/module-02/labs/lab-01/question.md
+        path: sections/section-050/module-02/labs/lab-03/question.md
       - type: lab
-        title: "Admit Only Trusted Images Lab"
-        path: sections/section-050/module-02/labs/lab-01
+        title: Require Explicit Tags And Production Digests Lab
+        path: sections/section-050/module-02/labs/lab-03
         difficulty: intermediate
-        estimated_duration: 30m
+        estimated_duration: 15m
         topic: image-policy
         task_kind: build
-        tags: [kyverno, clusterpolicy, validate-rule, enforce-mode, image-policy, allowed-registries, disallow-latest, image-digest]
+        tags:
+        - kyverno
+        - image-tags
+        - image-digests
         learning_goals:
-          - Enforce an allowed-registries rule that also refuses look-alike registry names
-          - Refuse latest and untagged images with validate rules
-          - Require a digest in namespaces labelled environment=production only
+        - Reject latest and untagged images.
+        - Require digest references in production while allowing version tags in development.
         resources:
-          - name: "Kyverno validate rules"
-            url: https://kyverno.io/docs/policy-types/cluster-policy/validate/
+        - name: Kyverno validate rules
+          url: https://kyverno.io/docs/policy-types/cluster-policy/validate/
       - type: reading
         title: "Allow Only One Registry With Gatekeeper"
         path: sections/section-050/module-02/course-04-allow-only-one-registry-with-gatekeeper.md
@@ -817,6 +1107,31 @@ modules:
       - type: reading
         title: "Use Vulnerability Scan Exit Codes"
         path: sections/section-050/module-03/course-02-use-vulnerability-scan-exit-codes.md
+      - type: reading
+        title: Question
+        path: sections/section-050/module-03/labs/lab-04/question.md
+      - type: lab
+        title: Scan Saved Inventories And Record The Decision Lab
+        path: sections/section-050/module-03/labs/lab-04
+        difficulty: intermediate
+        estimated_duration: 15m
+        topic: supply-chain
+        task_kind: build
+        tags:
+        - trivy
+        - sbom
+        - vulnerability-scanning
+        - exit-code
+        - evidence
+        learning_goals:
+        - Scan saved inventories with an explicit severity filter.
+        - Record completed-scan exit statuses and finding counts.
+        - Keep the database and image identity with scan evidence.
+        resources:
+        - name: Trivy SBOM generation
+          url: https://github.com/aquasecurity/trivy/blob/v0.76.2/docs/guide/supply-chain/sbom.md
+        - name: Trivy SBOM scanning
+          url: https://github.com/aquasecurity/trivy/blob/v0.76.2/docs/guide/target/sbom.md
       - type: reading
         title: "Keep SBOM Evidence In A Tekton Pipeline"
         path: sections/section-050/module-03/course-03-keep-sbom-evidence-in-a-tekton-pipeline.md

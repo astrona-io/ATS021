@@ -1,0 +1,198 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pipelines
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: starfleet
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: outpost
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: pipeline-runner
+  namespace: pipelines
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-policies
+  namespace: pipelines
+data:
+  policies.yaml: "apiVersion: kyverno.io/v1\nkind: ClusterPolicy\nmetadata:\n  name: release-rules\nspec:\n\
+    \  rules:\n    - name: require-cpu-memory-limits\n      match:\n        any:\n          - resources:\n\
+    \              kinds: [\"Deployment\"]\n      validate:\n        failureAction: Enforce\n        message:\
+    \ \"Every container must set resources.limits.cpu and resources.limits.memory.\"\n        pattern:\n\
+    \          spec:\n            template:\n              spec:\n                containers:\n      \
+    \            - resources:\n                      limits:\n                        cpu: \"?*\"\n  \
+    \                      memory: \"?*\"\n    - name: disallow-latest-tag\n      match:\n        any:\n\
+    \          - resources:\n              kinds: [\"Deployment\"]\n      validate:\n        failureAction:\
+    \ Enforce\n        message: \"Images must use a fixed tag, not latest.\"\n        pattern:\n     \
+    \     spec:\n            template:\n              spec:\n                containers:\n           \
+    \       - image: \"!*:latest\"\n"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-compliant
+  namespace: pipelines
+data:
+  deployment.yaml: "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: scout\n  namespace: starfleet\n\
+    \  labels:\n    app: scout\nspec:\n  replicas: 1\n  selector:\n    matchLabels:\n      app: scout\n\
+    \  template:\n    metadata:\n      labels:\n        app: scout\n    spec:\n      containers:\n   \
+    \     - name: scout\n          image: ghcr.io/stefanprodan/podinfo:6.15.0\n          ports:\n    \
+    \        - containerPort: 9898\n          resources:\n            requests:\n              cpu: 10m\n\
+    \              memory: 32Mi\n            limits:\n              cpu: 100m\n              memory: 64Mi\n"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-noncompliant
+  namespace: pipelines
+data:
+  deployment.yaml: "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: scout\n  namespace: starfleet\n\
+    \  labels:\n    app: scout\nspec:\n  replicas: 1\n  selector:\n    matchLabels:\n      app: scout\n\
+    \  template:\n    metadata:\n      labels:\n        app: scout\n    spec:\n      containers:\n   \
+    \     - name: scout\n          image: ghcr.io/stefanprodan/podinfo:latest\n          ports:\n    \
+    \        - containerPort: 9898\n"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: release-outpost
+  namespace: pipelines
+data:
+  deployment.yaml: "apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: scout\n  namespace: outpost\n\
+    \  labels:\n    app: scout\nspec:\n  replicas: 1\n  selector:\n    matchLabels:\n      app: scout\n\
+    \  template:\n    metadata:\n      labels:\n        app: scout\n    spec:\n      containers:\n   \
+    \     - name: scout\n          image: ghcr.io/stefanprodan/podinfo:6.15.0\n          ports:\n    \
+    \        - containerPort: 9898\n          resources:\n            requests:\n              cpu: 10m\n\
+    \              memory: 32Mi\n            limits:\n              cpu: 100m\n              memory: 64Mi\n"
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: deploy-release
+  namespace: pipelines
+spec:
+  description: Applies the Deployment in the release workspace to the cluster.
+  workspaces:
+  - name: release
+    readOnly: true
+  steps:
+  - name: apply
+    image: registry.k8s.io/kubectl:v1.35.8
+    args:
+    - apply
+    - -f
+    - $(workspaces.release.path)/deployment.yaml
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: report-outcome
+  namespace: pipelines
+spec:
+  description: Prints the status of the pipeline and of the check Task.
+  params:
+  - name: pipeline-status
+  - name: check-status
+  steps:
+  - name: report
+    image: curlimages/curl:8.22.0
+    script: '#!/bin/sh
+
+      echo "pipeline status: $(params.pipeline-status)"
+
+      echo "check status:    $(params.check-status)"
+
+      '
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: check-release
+  namespace: pipelines
+spec:
+  description: Checks the release against the platform policies and writes pass or fail to a result.
+  workspaces:
+  - name: release
+    readOnly: true
+  - name: policies
+    readOnly: true
+  results:
+  - name: outcome
+    description: pass if the release follows every policy, fail if not
+  steps:
+  - name: validate
+    image: ghcr.io/kyverno/kyverno-cli:v1.19.1
+    onError: continue
+    args:
+    - apply
+    - $(workspaces.policies.path)/policies.yaml
+    - --resource
+    - $(workspaces.release.path)/deployment.yaml
+  - name: record-outcome
+    image: curlimages/curl:8.22.0
+    script: "#!/bin/sh\nif [ \"$(cat /tekton/steps/step-validate/exitCode)\" = \"0\" ]; then\n  printf\
+      \ pass | tee $(results.outcome.path)\nelse\n  printf fail | tee $(results.outcome.path)\nfi\n"
+---
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: release-gate
+  namespace: pipelines
+spec:
+  workspaces:
+  - name: release
+  - name: policies
+  tasks:
+  - name: check
+    taskRef:
+      name: check-release
+    workspaces:
+    - name: release
+      workspace: release
+    - name: policies
+      workspace: policies
+  - name: deploy
+    runAfter:
+    - check
+    when:
+    - input: $(tasks.check.results.outcome)
+      operator: in
+      values:
+      - pass
+    taskRef:
+      name: deploy-release
+    workspaces:
+    - name: release
+      workspace: release
+  finally:
+  - name: report
+    taskRef:
+      name: report-outcome
+    params:
+    - name: pipeline-status
+      value: $(tasks.status)
+    - name: check-status
+      value: $(tasks.check.status)
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: pipeline-runner-edit
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit
+subjects:
+- kind: ServiceAccount
+  name: pipeline-runner
+  namespace: pipelines

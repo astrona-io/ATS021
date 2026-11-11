@@ -6,6 +6,8 @@ Keep one sentence in mind for this module: **a namespace label picks a level and
 
 The module has three parts. **Levels, Modes And Rejections** explains the three levels and the three modes and reads a real rejection. **Changing A Namespace Level Safely** tests a level with a server-side dry run, uses `warn` and `audit` before `enforce`, and follows a rejection into a ReplicaSet's events. **A securityContext That Passes Restricted** writes the pod and container fields the `restricted` level needs and fixes the error the kubelet adds on top.
 
+The independent labs cover staged warning and enforcement labels, reviewing baseline violations across three namespaces, and repairing workloads for restricted admission.
+
 ## Learning objectives
 
 After this module you can:
@@ -14,6 +16,7 @@ After this module you can:
 - Read a Pod Security Admission rejection and name each field that breaks the level.
 - Write a `securityContext` (`runAsNonRoot`, `allowPrivilegeEscalation`, `capabilities` drop `ALL`, `seccompProfile` `RuntimeDefault`) that passes `restricted`.
 - Test a level change against existing workloads with a server-side dry run before enforcing it.
+- Find a baseline violation across several namespaces and label the namespace for review.
 - Explain why a Deployment is accepted while its pods are rejected, and find the error in the ReplicaSet events.
 
 ## Before you start

@@ -1,6 +1,4 @@
 # yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
-#
-# Validate, Mutate And Generate With Kyverno (LAB). Graded against the live cluster.
 apiVersion: astrona.io/v1
 metadata:
   name: ats-021-lab-030-01
@@ -8,64 +6,46 @@ metadata:
     prerequisites: prerequisites.md
     question: question.md
     solution: solution.md
-
 runtime:
   type: kind
   kind:
     image: kindest/node:v1.35.8
     preloadImages:
-      - ghcr.io/stefanprodan/podinfo:6.15.0
-      - mccutchen/go-httpbin:2.25.0
-      - curlimages/curl:8.22.0
-
-# Starting state: Kyverno 1.19.1 with its webhooks ready and the Starfleet
-# workloads. No ClusterPolicy exists. The learner writes all three.
+    - ghcr.io/stefanprodan/podinfo:6.15.0
+    - mccutchen/go-httpbin:2.25.0
+    - curlimages/curl:8.22.0
 bootstrap:
   init:
-    - name: seed-cluster
-      description: Install Kyverno 1.19.1, wait for its webhooks, then create the workloads
-      type: file
-      source: bootstrap/01-seed-cluster.sh
-
-# Applied only by `astrona test`: the reference solution.
+  - name: seed-cluster
+    description: Install Kyverno 1.19.1, wait for its webhooks, then create the workloads
+    type: file
+    source: bootstrap/01-seed-cluster.sh
 testing:
   init:
-    - name: verify-unfinished-state
-      description: Require a ready API and an explicit grader rejection before solving
-      type: file
-      source: testing/verify-start.sh
-      timeout: 10m
-    - name: apply-solution
-      description: Apply the reference solution
-      type: file
-      source: solution/apply.sh
-    - name: wait-for-policies
-      description: Wait until Kyverno enforces the policies
-      type: file
-      source: testing/wait-for-policies.sh
-
+  - name: verify-unfinished-state
+    description: Require a ready API and an explicit grader rejection before solving
+    type: file
+    source: testing/verify-start.sh
+    timeout: 10m
+  - name: apply-solution
+    description: Apply the reference solution for this task
+    type: file
+    source: solution/apply.sh
+  - name: wait-for-solution
+    type: file
+    source: testing/wait-for-solution.sh
 validation:
   scripts:
-    - name: limits-rule-rejects-pods
-      description: Pods and Deployments in starfleet without CPU and memory limits are rejected
-      type: file
-      source: validation/validate-limits-rule-rejects-pods.sh
-      hint: Use a ClusterPolicy with validate.failureAction Enforce. Both limits.cpu and limits.memory must be required. The Deployment case is covered by autogen.
-    - name: limits-rule-allows-good-pods
-      description: Pods with both limits are accepted, and outpost is not affected
-      type: file
-      source: validation/validate-limits-rule-allows-good-pods.sh
-      hint: Match only the namespace starfleet. Do not match every namespace.
-    - name: team-label-default
-      description: Pods in starfleet get team=unassigned only when they have no team label
-      type: file
-      source: validation/validate-team-label-default.sh
-      hint: Use a mutate rule with patchStrategicMerge and the add-if-missing anchor +(team).
-    - name: default-deny-generated
-      description: A new namespace gets a default-deny NetworkPolicy
-      type: file
-      source: validation/validate-default-deny-generated.sh
-      hint: Use a generate rule that matches kind Namespace and creates a NetworkPolicy named default-deny with an empty podSelector and both policy types.
-
+  - name: limits-rule-rejects-pods
+    description: Pods and Deployments in starfleet without CPU and memory limits are rejected
+    type: file
+    source: validation/validate-limits-rule-rejects-pods.sh
+    hint: Use a ClusterPolicy with validate.failureAction Enforce. Both limits.cpu and limits.memory must
+      be required. The Deployment case is covered by autogen.
+  - name: limits-rule-allows-good-pods
+    description: Pods with both limits are accepted, and outpost is not affected
+    type: file
+    source: validation/validate-limits-rule-allows-good-pods.sh
+    hint: Match only the namespace starfleet. Do not match every namespace.
 teardown:
   keepCluster: false

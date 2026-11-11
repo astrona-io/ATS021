@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-lab-050-03-04
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages: null
+bootstrap:
+  init:
+  - name: install-tools
+    description: Install Trivy 0.76.2 and jq 1.8.2 on the terminal
+    type: file
+    source: bootstrap/01-install-tools.sh
+  - name: prepare-inventories
+    type: file
+    source: bootstrap/02-prepare-inventories.sh
+testing:
+  init:
+  - name: verify-unfinished-state
+    description: Require a ready API and an explicit grader rejection before solving
+    type: file
+    source: testing/verify-start.sh
+    timeout: 10m
+  - name: apply-solution
+    type: file
+    source: solution/apply.sh
+    description: Apply the reference solution for this task
+validation:
+  scripts:
+  - name: scan-evidence
+    description: Reports and recorded decisions match independent scans of both prepared inventories
+    type: file
+    source: validation/validate-scans.sh
+    timeout: 5m
+teardown:
+  keepCluster: false

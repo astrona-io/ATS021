@@ -44,7 +44,7 @@ def verify(lab, graders):
     raise RuntimeError('all graders passed before the reference solution')
 
 
-GRADERS = ['validation/validate-strict-mtls-required.sh', 'validation/validate-scout-allows-shuttle-get.sh', 'validation/validate-scout-refuses-other-callers.sh', 'validation/validate-env-path-denied.sh']
+GRADERS = ['validation/validate-strict-mtls-required.sh']
 
 if __name__ == '__main__':
     try:

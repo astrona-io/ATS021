@@ -1,6 +1,4 @@
 # yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
-#
-# Admit Only Trusted Images (LAB). Graded against the live cluster.
 apiVersion: astrona.io/v1
 metadata:
   name: ats-021-lab-050-02
@@ -8,63 +6,47 @@ metadata:
     prerequisites: prerequisites.md
     question: question.md
     solution: solution.md
-
 runtime:
   type: kind
   kind:
     image: kindest/node:v1.35.8
     preloadImages:
-      - ghcr.io/stefanprodan/podinfo:6.15.0
-
-# Starting state: Kyverno 1.19.1 with its webhooks ready, the namespaces
-# starfleet (environment: development) and starfleet-prod (environment:
-# production), and the ClusterPolicy allowed-registries in Audit mode.
+    - ghcr.io/stefanprodan/podinfo:6.15.0
 bootstrap:
   init:
-    - name: seed-cluster
-      description: Install Kyverno 1.19.1, wait for its webhooks, then create the namespaces and the registry policy in Audit mode
-      type: file
-      source: bootstrap/01-seed-cluster.sh
-
-# Applied only by `astrona test`: the reference solution.
+  - name: seed-cluster
+    description: Install Kyverno 1.19.1, wait for its webhooks, then create the namespaces and the registry
+      policy in Audit mode
+    type: file
+    source: bootstrap/01-seed-cluster.sh
 testing:
   init:
-    - name: verify-unfinished-state
-      description: Require a ready API and an explicit grader rejection before solving
-      type: file
-      source: testing/verify-start.sh
-      timeout: 10m
-    - name: apply-solution
-      description: Apply the reference solution
-      type: file
-      source: solution/apply.sh
-    - name: wait-for-policies
-      description: Wait until Kyverno enforces the image policies
-      type: file
-      source: testing/wait-for-policies.sh
-
+  - name: verify-unfinished-state
+    description: Require a ready API and an explicit grader rejection before solving
+    type: file
+    source: testing/verify-start.sh
+    timeout: 10m
+  - name: apply-solution
+    description: Apply the reference solution for this task
+    type: file
+    source: solution/apply.sh
+  - name: wait-for-solution
+    type: file
+    source: testing/wait-for-solution.sh
 validation:
   scripts:
-    - name: registry-enforced
-      description: Images from a registry other than ghcr.io are rejected in namespaces with an environment label
-      type: file
-      source: validation/validate-registry-enforced.sh
-      hint: The policy allowed-registries has failureAction Audit, which only records. Change it to Enforce. The pattern ghcr.io/* must stay anchored at the start of the image.
-    - name: mutable-tags-rejected
-      description: The latest tag and a missing tag are rejected
-      type: file
-      source: validation/validate-mutable-tags-rejected.sh
-      hint: Use two rules. The pattern *:* requires a colon in the image, and the pattern !*:latest refuses the latest tag.
-    - name: digest-required-in-production
-      description: starfleet-prod requires a digest and starfleet does not
-      type: file
-      source: validation/validate-digest-required-in-production.sh
-      hint: Match the namespaceSelector matchLabels environment production and use the pattern *@sha256:*.
-    - name: scope-and-labels-unchanged
-      description: Namespace labels are unchanged and namespaces without an environment label are not affected
-      type: file
-      source: validation/validate-scope-and-labels-unchanged.sh
-      hint: Select namespaces by their environment label. Do not relabel namespaces and do not match every namespace.
-
+  - name: registry-enforced
+    description: Images from a registry other than ghcr.io are rejected in namespaces with an environment
+      label
+    type: file
+    source: validation/validate-registry-enforced.sh
+    hint: The policy allowed-registries has failureAction Audit, which only records. Change it to Enforce.
+      The pattern ghcr.io/* must stay anchored at the start of the image.
+  - name: scope-and-labels-unchanged
+    description: Namespace labels are unchanged and namespaces without an environment label are not affected
+    type: file
+    source: validation/validate-scope-and-labels-unchanged.sh
+    hint: Select namespaces by their environment label. Do not relabel namespaces and do not match every
+      namespace.
 teardown:
   keepCluster: false

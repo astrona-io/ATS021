@@ -1,30 +1,20 @@
 ---
-estimated_duration: 30m
+estimated_duration: 15m
 ---
 
-# Lab: Validate, Mutate And Generate With Kyverno
+# Require Container Limits With Kyverno
 
-Graded lab for the Kyverno module. The cluster starts with Kyverno 1.19.1, its webhooks ready, the Starfleet workloads and no policy. The task is in `question.md`; the walkthrough is in `solution.md`.
+Kyverno is ready and no policies exist. Require resource limits for new Pods and Deployment templates in `starfleet`.
 
-## Run it
+Allow about 15 minutes of learner work, plus startup and reconciliation.
 
 ```sh
-astrona run --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-01/labs/lab-01
-astrona submit --git ssh://git@github.com/astrona-io/ATS021.git -c sections/section-030/module-01/labs/lab-01
+astrona run -c sections/section-030/module-01/labs/lab-01
+astrona submit -c sections/section-030/module-01/labs/lab-01
 astrona destroy ats-021-lab-030-01
 ```
 
-Authors run the local copy with `astrona run -c <lab>` and prove the reference solution with `astrona test -c <lab>`.
+The task is in [question.md](question.md), with a [reference walkthrough](solution.md). Authors run `astrona validate -c sections/section-030/module-01/labs/lab-01` and `astrona test -c sections/section-030/module-01/labs/lab-01`. The lifecycle checks the unfinished state before applying the reference solution.
 
-## Checks
-
-The graders use `kubectl create --dry-run=server`, so every Kyverno webhook runs and nothing is stored.
-
-| Script | What it proves |
-| --- | --- |
-| `validate-limits-rule-rejects-pods.sh` | A pod with no limits, a memory-only limit or a CPU-only limit, and a Deployment with no limits, are rejected in `starfleet` |
-| `validate-limits-rule-allows-good-pods.sh` | A pod with both limits is accepted in `starfleet`; a pod with no limits is accepted in `outpost` |
-| `validate-team-label-default.sh` | A pod without `team` gets `unassigned`; `team: blue` stays; `outpost` is not changed |
-| `validate-default-deny-generated.sh` | A new namespace gets the NetworkPolicy `default-deny` with an empty pod selector and both policy types |
-
-A policy in `Audit` mode fails the first check, because the pod is then accepted. A policy that matches every namespace fails the second check.
+- Pods and Deployments in starfleet without CPU and memory limits are rejected.
+- Pods with both limits are accepted, and outpost is not affected.

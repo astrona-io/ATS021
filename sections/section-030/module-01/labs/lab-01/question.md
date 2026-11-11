@@ -2,12 +2,16 @@
 
 Solve this question on: `terminal`
 
-The platform team installed Kyverno 1.19.1 in the cluster, but no policy exists yet. The namespace `starfleet` runs `scout`, `probe` and `shuttle`. The namespace `outpost` runs `drifter`. Write three Kyverno `ClusterPolicy` resources. Do not change the running workloads, and do not remove or weaken Kyverno.
+Kyverno is ready and no policies exist. Require resource limits for new Pods and Deployment templates in `starfleet`.
 
-1. Every container in a pod in `starfleet` must set both `resources.limits.cpu` and `resources.limits.memory`. The API server must refuse a pod that does not, and a Deployment whose pod template does not. The rule must refuse the request, not only record it. It must not apply to `outpost`.
+## Tasks
 
-2. Every pod created in `starfleet` must carry a `team` label. When a pod has no `team` label, Kyverno must add `team: unassigned`. When a pod already has one (for example `team: blue`), Kyverno must keep it. Pods in `outpost` must not change.
+1. Inspect the running workloads and confirm that a Pod without limits is currently admitted with a server-side dry run.
 
-3. Every new namespace must get a NetworkPolicy named `default-deny` that selects all pods and lists both `Ingress` and `Egress` in `policyTypes`. Skip the system namespaces `kube-system`, `kube-public`, `kube-node-lease`, `kyverno` and `local-path-storage`.
+2. Write an enforcing ClusterPolicy requiring both CPU and memory limits on every regular container in `starfleet`.
 
-`kubectl` already points at the cluster. Kyverno takes a few seconds to start using a new policy, so run a check again if it still shows the old result. Applying a `kyverno.io/v1` ClusterPolicy prints a deprecation warning. You can ignore it.
+3. Prove that missing either limit is rejected for Pods and Deployments, that both limits are accepted, and that `outpost` remains outside the rule.
+
+Keep the prepared workloads, service accounts and namespace labels unchanged.
+
+Learner work: about 15 minutes. Cluster startup and controller reconciliation take additional time.

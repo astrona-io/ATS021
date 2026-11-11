@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-lab-030-01-04
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+    - ghcr.io/stefanprodan/podinfo:6.15.0
+    - mccutchen/go-httpbin:2.25.0
+    - curlimages/curl:8.22.0
+bootstrap:
+  init:
+  - name: seed-cluster
+    description: Install Kyverno 1.19.1, wait for its webhooks, then create the workloads
+    type: file
+    source: bootstrap/01-seed-cluster.sh
+testing:
+  init:
+  - name: verify-unfinished-state
+    description: Require a ready API and an explicit grader rejection before solving
+    type: file
+    source: testing/verify-start.sh
+    timeout: 10m
+  - name: apply-solution
+    description: Apply the reference solution for this task
+    type: file
+    source: solution/apply.sh
+  - name: wait-for-solution
+    type: file
+    source: testing/wait-for-solution.sh
+validation:
+  scripts:
+  - name: default-deny-generated
+    description: A new namespace gets a default-deny NetworkPolicy
+    type: file
+    source: validation/validate-default-deny-generated.sh
+    hint: Use a generate rule that matches kind Namespace and creates a NetworkPolicy named default-deny
+      with an empty podSelector and both policy types.
+teardown:
+  keepCluster: false

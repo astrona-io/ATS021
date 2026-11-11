@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=https://cli.astrona.io/schema/lab-config.schema.json
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-021-lab-050-01-03
+  docs:
+    prerequisites: prerequisites.md
+    question: question.md
+    solution: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.8
+    preloadImages:
+    - ghcr.io/stefanprodan/podinfo:6.15.0
+    - curlimages/curl:8.22.0
+    - ghcr.io/kyverno/kyverno-cli:v1.19.1
+    - registry.k8s.io/kubectl:v1.35.8
+bootstrap:
+  init:
+  - name: seed-cluster
+    description: Install Tekton Pipelines 1.17.0, then apply the namespaces, the service account, the
+      Tasks and the unfinished Pipeline
+    type: file
+    source: bootstrap/01-seed-cluster.sh
+testing:
+  init:
+  - name: verify-unfinished-state
+    description: Require a ready API and an explicit grader rejection before solving
+    type: file
+    source: testing/verify-start.sh
+    timeout: 10m
+  - name: apply-solution
+    description: Apply the reference solution for this task
+    type: file
+    source: solution/apply.sh
+validation:
+  scripts:
+  - name: compliant-release-deployed
+    description: A compliant release is checked, the check writes pass and the deploy Task creates the
+      Deployment in starfleet
+    type: file
+    source: validation/validate-compliant-release-deployed.sh
+    hint: Write the Task check-release with a result named outcome. The validate step needs onError continue,
+      so that the second step can write pass or fail.
+  - name: noncompliant-release-blocked
+    description: A release without limits and a release with the latest tag are not deployed, because
+      the deploy Task is skipped
+    type: file
+    source: validation/validate-noncompliant-release-blocked.sh
+    hint: Add a when expression to the Pipeline Task deploy. Its input is $(tasks.check.results.outcome),
+      the operator is in and the values are [pass].
+  - name: service-account-least-privilege
+    description: pipeline-runner may get, create and patch Deployments in starfleet and nothing else,
+      and a release for outpost is not deployed
+    type: file
+    source: validation/validate-service-account-least-privilege.sh
+    hint: Remove the ClusterRoleBinding pipeline-runner-edit. Create a Role in starfleet for Deployments
+      and bind it to pipeline-runner with a RoleBinding.
+teardown:
+  keepCluster: false
